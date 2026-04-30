@@ -1,0 +1,1011 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="manifest" href="/manifest.json">
+  <meta name="theme-color" content="#0F172A">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="Recanto">
+  <link rel="apple-touch-icon" href="/icons/icon-192.png">
+  <title>Mi Casa Su Casa — Início</title>
+  <link rel="stylesheet" href="css/estilo.css">
+  <script src="js/topo-ao-carregar.js"></script>
+  <script src="js/intro-nav-mobile.js" defer></script>
+</head>
+<body>
+  <div id="intro">
+    <div class="logo"><img class="logo-intro" src="assets/logo_animacao.svg" alt="Logo sitio recanto da paz"><img class="logo-fixed" src="data:image/svg+xml;utf8,%3Csvg%20width%3D%22600%22%20height%3D%22200%22%20viewBox%3D%220%200%20600%20200%22%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%3E%0A%0A%20%20%3C!--%20SITIO%20--%3E%0A%20%20%3Ctext%20x%3D%2250%25%22%20y%3D%2250%22%20text-anchor%3D%22middle%22%20fill%3D%22%23FFFFFF%22%20font-size%3D%2228%22%20letter-spacing%3D%226%22%20font-family%3D%22Arial%2C%20sans-serif%22%3E%0A%20%20%20%20S%C3%8DTIO%0A%20%20%3C%2Ftext%3E%0A%0A%20%20%3C!--%20Linha%20esquerda%20(mais%20afastada)%20--%3E%0A%20%20%3Cline%20x1%3D%2280%22%20y1%3D%2250%22%20x2%3D%22200%22%20y2%3D%2250%22%20stroke%3D%22%23FFFFFF%22%20stroke-width%3D%221.5%22%3E%3C%2Fline%3E%0A%0A%20%20%3C!--%20Linha%20direita%20(mais%20afastada)%20--%3E%0A%20%20%3Cline%20x1%3D%22400%22%20y1%3D%2250%22%20x2%3D%22520%22%20y2%3D%2250%22%20stroke%3D%22%23FFFFFF%22%20stroke-width%3D%221.5%22%3E%3C%2Fline%3E%0A%0A%20%20%3C!--%20Nome%20principal%20--%3E%0A%20%20%3Ctext%20x%3D%2250%25%22%20y%3D%22135%22%20dominant-baseline%3D%22middle%22%20text-anchor%3D%22middle%22%20fill%3D%22%23FFFFFF%22%20font-size%3D%2264%22%20font-family%3D%22Brush%20Script%20MT%2C%20cursive%22%3E%0A%20%20%20%20Recanto%20da%20Paz%0A%20%20%3C%2Ftext%3E%0A%0A%3C%2Fsvg%3E" alt="Logo sitio recanto da paz"></div>
+    <button type="button" class="intro-menu-toggle" id="intro-menu-toggle" aria-expanded="false" aria-controls="intro-nav-principal" aria-label="Abrir menu de navegação">
+      <span class="intro-menu-toggle-inner" aria-hidden="true"><span></span><span></span><span></span></span>
+    </button>
+    <div class="intro-menu-scrim" id="intro-menu-scrim" aria-hidden="true"></div>
+    <nav id="intro-nav-principal" class="menu" aria-label="Navegação principal">
+      <a href="index.html" class="ativo">Início</a>
+      <a href="quartos.html">Quartos</a>
+      <a href="galeria.html">Galeria</a>
+      <a href="sobre.html">Sobre</a>
+      <a href="reservar.html">Reservar</a>
+    </nav>
+  </div>
+
+  <main>
+    <div class="inicio-visivel-apenas-desktop">
+    <section class="inicio-hero-recanto" aria-label="Apresentação principal — carrossel e contato">
+      <section class="hero revelar-quando-visivel">
+        <div class="hero-carousel">
+          <div class="hero-slide ativo" style="background-image: url('imagem/35.jpeg')"></div>
+          <div class="hero-slide" style="background-image: url('imagem/36.jpg')"></div>
+          <div class="hero-slide" style="background-image: url('imagem/5.jpg')"></div>
+        </div>
+        <div class="hero-conteudo">
+          <p class="hero-subtitulo">Bem-vindo a pousada</p>
+          <h1 class="hero-titulo">Onde o conforto<br>encontra a paz</h1>
+          <p class="hero-descricao">
+            Descubra uma experiência única de hospedagem. Ambiente sofisticado e momentos inesquecíveis à sua espera.
+          </p>
+        </div>
+      </section>
+
+      <div class="hero-recanto-ponte">
+        <form class="hero-recanto-barra" action="#" method="get" aria-label="Endereço e reserva">
+          <div class="hero-recanto-campo">
+            <span class="hero-recanto-label">Endereço</span>
+            <p class="hero-recanto-info hero-recanto-endereco">
+              <span class="hero-recanto-endereco-curto">Rua Nações Unidas, 111, Benevides, Pará.</span>
+              <a href="sobre.html#contato-mapa" class="hero-recanto-ver-mais">ver mais<span class="hero-recanto-ver-mais-seta" aria-hidden="true">→</span></a>
+            </p>
+          </div>
+          <div class="hero-recanto-divisor" aria-hidden="true"></div>
+          <div class="hero-recanto-campo">
+            <span class="hero-recanto-label">Telefone</span>
+            <a class="hero-recanto-info hero-recanto-info-link" href="tel:+559180781514">(91) 8078-1514</a>
+          </div>
+          <a href="reservar.html" class="hero-recanto-btn">Fazer reserva</a>
+        </form>
+      </div>
+    </section>
+
+    <section class="secao secao-recanto secao-recanto--inicio-visivel-desktop" id="recanto" aria-label="Mi Casa Su Casa">
+      <div class="folhas-container" aria-hidden="true"></div>
+      <div class="recanto-wrapper">
+        <div class="recanto-texto">
+          <h2 class="recanto-titulo">Mi Casa Su Casa</h2>
+          <div class="recanto-texto-conteudo">
+            <p>Seu refúgio para desacelerar</p>
+            <p>Na Pousada &amp; Restaurante Mi Casa, Su Casa, o tempo desacelera e a natureza convida você a respirar fundo, se reconectar consigo mesmo e viver momentos simples que ficam na memória. Cada espaço foi pensado para oferecer acolhimento, tranquilidade e uma verdadeira pausa da rotina agitada.</p>
+            <p>Mais do que uma estadia, sentir-se em casa</p>
+            <p>Nossa proposta vai além da hospedagem: queremos que você sinta o lugar como uma extensão da sua casa. Cercada pela natureza, a pousada oferece ambientes integrados ao verde, uma piscina natural para relaxar espaços abertos de cozinhas que inspiram encontros, conversas e boas histórias para compartilhar.</p>
+            <p>Sabores, natureza e simplicidade</p>
+            <p>Para completar a experiência, nosso restaurante oferece sabores preparados com carinho, em harmonia com o clima natural do lugar. Na Mi Casa, Su Casa, cada detalhe existe para transformar sua passagem por aqui em uma experiência leve, autêntica e inesquecível.</p>
+          </div>
+        </div>
+        <div class="recanto-imagem recanto-imagem--video">
+          <div class="recanto-imagem-video-shell">
+            <video class="recanto-imagem-video" controls playsinline webkit-playsinline preload="auto" width="1280" height="720" poster="assets/video-poster-mi-casa-desktop.png" aria-label="Vídeo da área de lazer — Mi Casa Su Casa">
+                <source src="video/mi%20casa.mp4" type="video/mp4">
+                Seu navegador não reproduz vídeo.
+              </video>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="secao secao-quartos" id="quartos" aria-labelledby="quartos-titulo">
+      <div class="container">
+        <p class="secao-subtitulo quartos-subtitulo">Acomodações</p>
+        <h2 id="quartos-titulo" class="secao-titulo quartos-titulo">Quartos</h2>
+        <p class="quartos-intro">Escolha o ambiente ideal para descansar após um dia na natureza.</p>
+        <div class="quartos-showcase" data-quartos-showcase>
+          <div class="quartos-showcase-meio">
+            <div class="quartos-showcase-visual-wrap">
+              <button type="button" class="quartos-showcase-nav quartos-showcase-nav--prev" aria-label="Quarto anterior">
+                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 18l-6-6 6-6"/></svg>
+              </button>
+              <div class="quartos-showcase-visual">
+                <div class="quartos-3d-wrapper">
+                  <div class="quartos-3d-cena">
+                    <div class="quartos-3d-slide"><div class="quartos-3d-foto"><img src="imagem/16.jpg" alt="" width="960" height="640" decoding="async"></div></div>
+                    <div class="quartos-3d-slide"><div class="quartos-3d-foto"><img src="imagem/17.jpg" alt="" width="960" height="640" decoding="async"></div></div>
+                    <div class="quartos-3d-slide"><div class="quartos-3d-foto"><img src="imagem/18.jpg" alt="" width="960" height="640" decoding="async"></div></div>
+                  </div>
+                </div>
+              </div>
+              <button type="button" class="quartos-showcase-nav quartos-showcase-nav--next" aria-label="Próximo quarto">
+                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 18l6-6-6-6"/></svg>
+              </button>
+            </div>
+            <div class="quartos-showcase-copy" aria-live="polite">
+              <div class="quartos-showcase-copy-inner">
+                <h3 class="quartos-showcase-titulo">TEM-TEM</h3>
+                <p class="quartos-showcase-desc">Quarto Duplo com Banheiro Compartilhado. Quarto duplo aconchegante, ideal para casais que buscam conforto e tranquilidade. Cama de casal, vista para o jardim e banheiro compartilhado com chuveiro. Até 2 pessoas · 20 m².</p>
+                <div class="quartos-showcase-preco">
+                  <span class="quartos-showcase-preco-valor">R$ 150</span>
+                  <span class="quartos-showcase-preco-label">Noite</span>
+                </div>
+                <a class="btn btn-reserva quartos-showcase-btn" href="reservar.html?quarto=tem-tem">Ver quarto</a>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="secao secao-reserva" id="reserva">
+      <div class="container">
+        <div class="reserva-layout">
+          <div class="reserva-texto">
+            <p class="secao-subtitulo">Reserve com antecedência</p>
+            <h2 class="secao-titulo">Faça sua reserva</h2>
+            <p class="secao-reserva-desc">Escolha as datas da sua estadia e a quantidade de pessoas. veja se a disponibilidade na data escolhida.</p>
+          </div>
+          <form class="form-reserva" action="reservar.html" method="get" aria-label="Formulário de reserva">
+            <div class="form-reserva-grid">
+              <div class="form-group">
+                <label for="reserva-entrada">Data de entrada</label>
+                <input type="date" id="reserva-entrada" name="entrada" required>
+              </div>
+              <div class="form-group">
+                <label for="reserva-saida">Data de saída</label>
+                <input type="date" id="reserva-saida" name="saida" required>
+              </div>
+            </div>
+            <div class="form-reserva-acoes">
+              <button type="submit" class="btn btn-reserva">Consultar disponibilidade</button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </section>
+
+    <div class="inicio-servicos-carrossel revelar-quando-visivel" aria-label="Comodidades e fotos do sítio">
+    <section class="secao secao-servicos" aria-label="Comodidades">
+      <div class="container">
+        <div class="servicos-lista">
+          <div class="servico-item">
+            <div class="servico-icone servico-icone-imagem" aria-hidden="true">
+              <img src="assets/icone-estacionamento-carro.svg" width="64" height="64" alt="" decoding="async">
+            </div>
+            <span class="servico-nome">Estacionamento</span>
+          </div>
+          <div class="servico-item">
+            <div class="servico-icone" aria-hidden="true">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M5 12a10 10 0 0 1 14 0"/>
+                <path d="M8.5 15.5a5 5 0 0 1 7 0"/>
+                <path d="M12 19h.01"/>
+              </svg>
+            </div>
+            <span class="servico-nome">Wi-Fi</span>
+          </div>
+          <div class="servico-item">
+            <div class="servico-icone servico-icone-imagem" aria-hidden="true">
+              <img src="assets/icone-lago.svg" width="64" height="64" alt="" decoding="async">
+            </div>
+            <span class="servico-nome">Lago Privado</span>
+          </div>
+          <div class="servico-item">
+            <div class="servico-icone servico-icone-imagem" aria-hidden="true">
+              <img src="assets/icone-churrasqueira.svg" width="64" height="64" alt="" decoding="async">
+            </div>
+            <span class="servico-nome">Área de Churrasco</span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="secao secao-grid-fotos-inicio secao-grid-fotos-inicio--desktop" aria-label="Momentos do sítio">
+      <div class="container">
+        <div class="grid-fotos-inicio">
+          <figure class="grid-fotos-inicio-item"><img src="imagem/5.jpg" alt="Área externa e natureza — Mi Casa Su Casa" width="640" height="360" loading="lazy" decoding="async"></figure>
+          <figure class="grid-fotos-inicio-item"><img src="imagem/6.jpg" alt="Ambiente da pousada — Mi Casa Su Casa" width="640" height="360" loading="lazy" decoding="async"></figure>
+          <figure class="grid-fotos-inicio-item"><img src="imagem/7.jpg" alt="Espaço de convivência — Mi Casa Su Casa" width="640" height="360" loading="lazy" decoding="async"></figure>
+          <figure class="grid-fotos-inicio-item"><img src="imagem/8.jpg" alt="Detalhes do sítio — Mi Casa Su Casa" width="640" height="360" loading="lazy" decoding="async"></figure>
+          <figure class="grid-fotos-inicio-item"><img src="imagem/9.jpg" alt="Paisagem ao redor — Mi Casa Su Casa" width="640" height="360" loading="lazy" decoding="async"></figure>
+          <figure class="grid-fotos-inicio-item"><img src="imagem/10.jpg" alt="Área de lazer — Mi Casa Su Casa" width="640" height="360" loading="lazy" decoding="async"></figure>
+          <figure class="grid-fotos-inicio-item"><img src="imagem/11.jpg" alt="Jardim e verde — Mi Casa Su Casa" width="640" height="360" loading="lazy" decoding="async"></figure>
+          <figure class="grid-fotos-inicio-item"><img src="imagem/13.jpg" alt="Experiência Mi Casa Su Casa" width="640" height="360" loading="lazy" decoding="async"></figure>
+        </div>
+        <div class="grid-fotos-inicio-cta">
+          <p class="grid-fotos-inicio-msg">Descubra mais detalhes dos nossos espaços e veja como cada ambiente foi pensado para o seu conforto e para momentos inesquecíveis.</p>
+          <a class="btn btn-reserva grid-fotos-inicio-btn" href="galeria.html">Ver galeria</a>
+        </div>
+      </div>
+    </section>
+    </div>
+
+    <section class="secao-fita-imagens" aria-label="Galeria em faixa com quatro imagens">
+      <div class="secao-fita-imagens-grid">
+        <figure class="secao-fita-imagens-item"><img src="imagem/5.jpg" alt="Piscina e deck com vista para a natureza — Mi Casa Su Casa" width="640" height="360" loading="lazy" decoding="async"></figure>
+        <figure class="secao-fita-imagens-item"><img src="imagem/6.jpg" alt="Espreguiçadeiras em ambiente de descanso — Mi Casa Su Casa" width="640" height="360" loading="lazy" decoding="async"></figure>
+        <figure class="secao-fita-imagens-item"><img src="imagem/7.jpg" alt="Área de convivência com vista ampla — Mi Casa Su Casa" width="640" height="360" loading="lazy" decoding="async"></figure>
+        <figure class="secao-fita-imagens-item"><img src="imagem/8.jpg" alt="Espaço externo coberto para relaxar — Mi Casa Su Casa" width="640" height="360" loading="lazy" decoding="async"></figure>
+      </div>
+    </section>
+    </div>
+
+    <div class="inicio-visivel-apenas-mobile">
+    <section class="inicio-hero-recanto inicio-hero-recanto--duplicado" aria-label="Apresentação principal — carrossel e contato (mobile)">
+      <section class="hero revelar-quando-visivel">
+        <div class="hero-carousel">
+          <div class="hero-slide ativo" style="background-image: url('imagem/35.jpeg')"></div>
+          <div class="hero-slide" style="background-image: url('imagem/36.jpg')"></div>
+          <div class="hero-slide" style="background-image: url('imagem/5.jpg')"></div>
+        </div>
+        <div class="hero-conteudo">
+          <p class="hero-subtitulo">Bem-vindo a pousada</p>
+          <h1 class="hero-titulo">Onde o conforto<br>encontra a paz</h1>
+          <p class="hero-descricao">
+            Descubra uma experiência única de hospedagem. Ambiente sofisticado e momentos inesquecíveis à sua espera.
+          </p>
+        </div>
+      </section>
+
+      <div class="hero-recanto-ponte">
+        <form class="hero-recanto-barra" action="#" method="get" aria-label="Endereço e reserva">
+          <div class="hero-recanto-campo">
+            <span class="hero-recanto-label">Endereço</span>
+            <p class="hero-recanto-info hero-recanto-endereco">
+              <span class="hero-recanto-endereco-curto">Rua Nações Unidas, 111, Benevides, Pará.</span>
+              <a href="sobre.html#contato-mapa" class="hero-recanto-ver-mais">ver mais<span class="hero-recanto-ver-mais-seta" aria-hidden="true">→</span></a>
+            </p>
+          </div>
+          <div class="hero-recanto-divisor" aria-hidden="true"></div>
+          <div class="hero-recanto-campo">
+            <span class="hero-recanto-label">Telefone</span>
+            <a class="hero-recanto-info hero-recanto-info-link" href="tel:+559180781514">(91) 8078-1514</a>
+          </div>
+          <a href="reservar.html" class="hero-recanto-btn">Fazer reserva</a>
+        </form>
+      </div>
+    </section>
+
+    <section class="secao secao-recanto secao-recanto--inicio-visivel-mobile" id="recanto-dup" aria-label="Mi Casa Su Casa">
+      <div class="folhas-container" aria-hidden="true"></div>
+      <div class="recanto-wrapper">
+        <div class="recanto-texto">
+          <h2 class="recanto-titulo">Mi Casa Su Casa</h2>
+          <div class="recanto-texto-conteudo">
+            <p>Seu refúgio para desacelerar</p>
+            <p>Na Pousada &amp; Restaurante Mi Casa, Su Casa, o tempo desacelera e a natureza convida você a respirar fundo, se reconectar consigo mesmo e viver momentos simples que ficam na memória. Cada espaço foi pensado para oferecer acolhimento, tranquilidade e uma verdadeira pausa da rotina agitada.</p>
+            <p>Mais do que uma estadia, sentir-se em casa</p>
+            <p>Nossa proposta vai além da hospedagem: queremos que você sinta o lugar como uma extensão da sua casa. Cercada pela natureza, a pousada oferece ambientes integrados ao verde, uma piscina natural para relaxar espaços abertos de cozinhas que inspiram encontros, conversas e boas histórias para compartilhar.</p>
+            <p>Sabores, natureza e simplicidade</p>
+            <p>Para completar a experiência, nosso restaurante oferece sabores preparados com carinho, em harmonia com o clima natural do lugar. Na Mi Casa, Su Casa, cada detalhe existe para transformar sua passagem por aqui em uma experiência leve, autêntica e inesquecível.</p>
+          </div>
+        </div>
+        <div class="recanto-imagem recanto-imagem--video">
+          <div class="recanto-imagem-video-shell">
+            <video class="recanto-imagem-video" controls playsinline webkit-playsinline preload="auto" width="1280" height="720" poster="assets/video-poster-mi-casa-mobile.png" aria-label="Vídeo da área de lazer — Mi Casa Su Casa">
+                <source src="video/mi%20casa.mp4" type="video/mp4">
+                Seu navegador não reproduz vídeo.
+              </video>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="secao secao-quartos" id="quartos-dup" aria-labelledby="quartos-titulo-dup">
+      <div class="container">
+        <p class="secao-subtitulo quartos-subtitulo">Acomodações</p>
+        <h2 id="quartos-titulo-dup" class="secao-titulo quartos-titulo">Quartos</h2>
+        <p class="quartos-intro">Escolha o ambiente ideal para descansar após um dia na natureza.</p>
+        <div class="quartos-showcase" data-quartos-showcase>
+          <div class="quartos-showcase-meio">
+            <div class="quartos-showcase-visual-wrap">
+              <button type="button" class="quartos-showcase-nav quartos-showcase-nav--prev" aria-label="Quarto anterior">
+                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 18l-6-6 6-6"/></svg>
+              </button>
+              <div class="quartos-showcase-visual">
+                <div class="quartos-3d-wrapper">
+                  <div class="quartos-3d-cena">
+                    <div class="quartos-3d-slide"><div class="quartos-3d-foto"><img src="imagem/16.jpg" alt="" width="960" height="640" decoding="async"></div></div>
+                    <div class="quartos-3d-slide"><div class="quartos-3d-foto"><img src="imagem/17.jpg" alt="" width="960" height="640" decoding="async"></div></div>
+                    <div class="quartos-3d-slide"><div class="quartos-3d-foto"><img src="imagem/18.jpg" alt="" width="960" height="640" decoding="async"></div></div>
+                  </div>
+                </div>
+              </div>
+              <button type="button" class="quartos-showcase-nav quartos-showcase-nav--next" aria-label="Próximo quarto">
+                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 18l6-6-6-6"/></svg>
+              </button>
+            </div>
+            <div class="quartos-showcase-copy" aria-live="polite">
+              <div class="quartos-showcase-copy-inner">
+                <h3 class="quartos-showcase-titulo">TEM-TEM</h3>
+                <p class="quartos-showcase-desc">Quarto Duplo com Banheiro Compartilhado. Quarto duplo aconchegante, ideal para casais que buscam conforto e tranquilidade. Cama de casal, vista para o jardim e banheiro compartilhado com chuveiro. Até 2 pessoas · 20 m².</p>
+                <div class="quartos-showcase-preco">
+                  <span class="quartos-showcase-preco-valor">R$ 150</span>
+                  <span class="quartos-showcase-preco-label">Noite</span>
+                </div>
+                <a class="btn btn-reserva quartos-showcase-btn" href="reservar.html?quarto=tem-tem">Ver quarto</a>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="secao secao-reserva" id="reserva-dup">
+      <div class="container">
+        <div class="reserva-layout">
+          <div class="reserva-texto">
+            <p class="secao-subtitulo">Reserve com antecedência</p>
+            <h2 class="secao-titulo">Faça sua reserva</h2>
+            <p class="secao-reserva-desc">Escolha as datas da sua estadia e a quantidade de pessoas. veja se a disponibilidade na data escolhida.</p>
+          </div>
+          <form class="form-reserva" action="reservar.html" method="get" aria-label="Formulário de reserva">
+            <div class="form-reserva-grid">
+              <div class="form-group">
+                <label for="reserva-entrada-dup">Data de entrada</label>
+                <input type="date" id="reserva-entrada-dup" name="entrada" required>
+              </div>
+              <div class="form-group">
+                <label for="reserva-saida-dup">Data de saída</label>
+                <input type="date" id="reserva-saida-dup" name="saida" required>
+              </div>
+            </div>
+            <div class="form-reserva-acoes">
+              <button type="submit" class="btn btn-reserva">Consultar disponibilidade</button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </section>
+
+    <div class="inicio-servicos-carrossel revelar-quando-visivel" aria-label="Comodidades e fotos do sítio">
+    <section class="secao secao-servicos" aria-label="Comodidades">
+      <div class="container">
+        <div class="servicos-lista">
+          <div class="servico-item">
+            <div class="servico-icone servico-icone-imagem" aria-hidden="true">
+              <img src="assets/icone-estacionamento-carro.svg" width="64" height="64" alt="" decoding="async">
+            </div>
+            <span class="servico-nome">Estacionamento</span>
+          </div>
+          <div class="servico-item">
+            <div class="servico-icone" aria-hidden="true">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M5 12a10 10 0 0 1 14 0"/>
+                <path d="M8.5 15.5a5 5 0 0 1 7 0"/>
+                <path d="M12 19h.01"/>
+              </svg>
+            </div>
+            <span class="servico-nome">Wi-Fi</span>
+          </div>
+          <div class="servico-item">
+            <div class="servico-icone servico-icone-imagem" aria-hidden="true">
+              <img src="assets/icone-lago.svg" width="64" height="64" alt="" decoding="async">
+            </div>
+            <span class="servico-nome">Lago Privado</span>
+          </div>
+          <div class="servico-item">
+            <div class="servico-icone servico-icone-imagem" aria-hidden="true">
+              <img src="assets/icone-churrasqueira.svg" width="64" height="64" alt="" decoding="async">
+            </div>
+            <span class="servico-nome">Área de Churrasco</span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="secao secao-grid-fotos-inicio secao-grid-fotos-inicio--mobile" aria-label="Momentos do sítio em destaque">
+      <div class="container">
+        <div class="grid-fotos-movel" data-grid-fotos-movel>
+          <div class="grid-fotos-movel-viewport">
+            <div class="grid-fotos-movel-slides">
+              <div class="grid-fotos-movel-slide is-ativo" id="grid-fotos-movel-slide-0" data-slide="0">
+                <figure class="grid-fotos-movel-item"><img src="imagem/5.jpg" alt="Área externa e natureza — Mi Casa Su Casa" width="640" height="360" loading="lazy" decoding="async"></figure>
+              </div>
+              <div class="grid-fotos-movel-slide" id="grid-fotos-movel-slide-1" data-slide="1">
+                <figure class="grid-fotos-movel-item"><img src="imagem/6.jpg" alt="Ambiente da pousada — Mi Casa Su Casa" width="640" height="360" loading="lazy" decoding="async"></figure>
+              </div>
+              <div class="grid-fotos-movel-slide" id="grid-fotos-movel-slide-2" data-slide="2">
+                <figure class="grid-fotos-movel-item"><img src="imagem/7.jpg" alt="Espaço de convivência — Mi Casa Su Casa" width="640" height="360" loading="lazy" decoding="async"></figure>
+              </div>
+              <div class="grid-fotos-movel-slide" id="grid-fotos-movel-slide-3" data-slide="3">
+                <figure class="grid-fotos-movel-item"><img src="imagem/8.jpg" alt="Detalhes do sítio — Mi Casa Su Casa" width="640" height="360" loading="lazy" decoding="async"></figure>
+              </div>
+              <div class="grid-fotos-movel-slide" id="grid-fotos-movel-slide-4" data-slide="4">
+                <figure class="grid-fotos-movel-item"><img src="imagem/9.jpg" alt="Paisagem ao redor — Mi Casa Su Casa" width="640" height="360" loading="lazy" decoding="async"></figure>
+              </div>
+              <div class="grid-fotos-movel-slide" id="grid-fotos-movel-slide-5" data-slide="5">
+                <figure class="grid-fotos-movel-item"><img src="imagem/10.jpg" alt="Área de lazer — Mi Casa Su Casa" width="640" height="360" loading="lazy" decoding="async"></figure>
+              </div>
+              <div class="grid-fotos-movel-slide" id="grid-fotos-movel-slide-6" data-slide="6">
+                <figure class="grid-fotos-movel-item"><img src="imagem/11.jpg" alt="Jardim e verde — Mi Casa Su Casa" width="640" height="360" loading="lazy" decoding="async"></figure>
+              </div>
+              <div class="grid-fotos-movel-slide" id="grid-fotos-movel-slide-7" data-slide="7">
+                <figure class="grid-fotos-movel-item"><img src="imagem/13.jpg" alt="Experiência Mi Casa Su Casa" width="640" height="360" loading="lazy" decoding="async"></figure>
+              </div>
+            </div>
+          </div>
+          <div class="grid-fotos-movel-dots" role="tablist" aria-label="Navegação do carrossel de fotos">
+            <button type="button" class="grid-fotos-movel-dot is-ativo" role="tab" aria-selected="true" aria-controls="grid-fotos-movel-slide-0" id="grid-fotos-movel-tab-0" data-go="0"><span class="visually-hidden">Foto 1 de 8</span></button>
+            <button type="button" class="grid-fotos-movel-dot" role="tab" aria-selected="false" aria-controls="grid-fotos-movel-slide-1" id="grid-fotos-movel-tab-1" data-go="1"><span class="visually-hidden">Foto 2 de 8</span></button>
+            <button type="button" class="grid-fotos-movel-dot" role="tab" aria-selected="false" aria-controls="grid-fotos-movel-slide-2" id="grid-fotos-movel-tab-2" data-go="2"><span class="visually-hidden">Foto 3 de 8</span></button>
+            <button type="button" class="grid-fotos-movel-dot" role="tab" aria-selected="false" aria-controls="grid-fotos-movel-slide-3" id="grid-fotos-movel-tab-3" data-go="3"><span class="visually-hidden">Foto 4 de 8</span></button>
+            <button type="button" class="grid-fotos-movel-dot" role="tab" aria-selected="false" aria-controls="grid-fotos-movel-slide-4" id="grid-fotos-movel-tab-4" data-go="4"><span class="visually-hidden">Foto 5 de 8</span></button>
+            <button type="button" class="grid-fotos-movel-dot" role="tab" aria-selected="false" aria-controls="grid-fotos-movel-slide-5" id="grid-fotos-movel-tab-5" data-go="5"><span class="visually-hidden">Foto 6 de 8</span></button>
+            <button type="button" class="grid-fotos-movel-dot" role="tab" aria-selected="false" aria-controls="grid-fotos-movel-slide-6" id="grid-fotos-movel-tab-6" data-go="6"><span class="visually-hidden">Foto 7 de 8</span></button>
+            <button type="button" class="grid-fotos-movel-dot" role="tab" aria-selected="false" aria-controls="grid-fotos-movel-slide-7" id="grid-fotos-movel-tab-7" data-go="7"><span class="visually-hidden">Foto 8 de 8</span></button>
+          </div>
+        </div>
+        <div class="grid-fotos-inicio-cta">
+          <p class="grid-fotos-inicio-msg">Descubra mais detalhes dos nossos espaços e veja como cada ambiente foi pensado para o seu conforto e para momentos inesquecíveis.</p>
+          <a class="btn btn-reserva grid-fotos-inicio-btn" href="galeria.html">Ver galeria</a>
+        </div>
+      </div>
+    </section>
+    </div>
+
+    <section class="secao-fita-imagens secao-fita-imagens--mobile" aria-label="Galeria em faixa com quatro imagens">
+      <div class="secao-fita-imagens-grid">
+        <figure class="secao-fita-imagens-item"><img src="imagem/5.jpg" alt="Piscina e deck com vista para a natureza — Mi Casa Su Casa" width="640" height="360" loading="lazy" decoding="async"></figure>
+        <figure class="secao-fita-imagens-item"><img src="imagem/6.jpg" alt="Espreguiçadeiras em ambiente de descanso — Mi Casa Su Casa" width="640" height="360" loading="lazy" decoding="async"></figure>
+        <figure class="secao-fita-imagens-item"><img src="imagem/7.jpg" alt="Área de convivência com vista ampla — Mi Casa Su Casa" width="640" height="360" loading="lazy" decoding="async"></figure>
+        <figure class="secao-fita-imagens-item"><img src="imagem/8.jpg" alt="Espaço externo coberto para relaxar — Mi Casa Su Casa" width="640" height="360" loading="lazy" decoding="async"></figure>
+      </div>
+    </section>
+    </div>
+
+  </main>
+
+  <footer class="rodape">
+    <div class="rodape-inner">
+      <div>
+        <div class="logo"><img src="assets/logo_animacao.svg" alt="Logo sitio recanto da paz"></div>
+        <p>Um lugar de tranquilidade e conforto. Sua melhor escolha para momentos especiais.</p>
+      </div>
+      <div>
+        <h4>Navegação</h4>
+        <ul>
+          <li><a href="index.html">Início</a></li>
+          <li><a href="quartos.html">Quartos</a></li>
+          <li><a href="galeria.html">Galeria</a></li>
+          <li><a href="sobre.html">Sobre</a></li>
+          <li><a href="reservar.html">Reservar</a></li>
+        </ul>
+      </div>
+      <div>
+        <h4>Contato</h4>
+        <ul class="rodape-contato-links">
+          <li><a href="mailto:micasasucasaben@gmail.com">micasasucasaben@gmail.com</a></li>
+          <li><a href="https://wa.me/559180781514?text=ol%C3%A1%2C%20gostaria%20de%20tira%20uma%20duivida%20sobre%20o%20sitio." target="_blank" rel="noopener noreferrer">(91) 8078-1514</a></li>
+        </ul>
+        <p class="rodape-tambem-estamos">Também estamos em</p>
+        <ul class="rodape-parceiros sobre-contato-redes" aria-label="Redes sociais da Mi Casa Su Casa">
+          <li>
+            <a class="sobre-contato-rede sobre-contato-rede--facebook" href="https://www.facebook.com/pousadamicasasucasa" target="_blank" rel="noopener noreferrer" aria-label="Facebook da Mi Casa Su Casa">
+              <svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true" focusable="false"><path fill="currentColor" d="M24 12.073C24 5.405 18.627 0 12 0S0 5.405 0 12.073c0 5.996 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/></svg>
+            </a>
+          </li>
+          <li>
+            <a class="sobre-contato-rede sobre-contato-rede--whatsapp" href="https://wa.me/559180781514" target="_blank" rel="noopener noreferrer" aria-label="WhatsApp da Mi Casa Su Casa">
+              <svg class="sobre-contato-icone-grosso" viewBox="0 0 24 24" width="48" height="48" aria-hidden="true" focusable="false"><path fill="currentColor" d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.435 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
+            </a>
+          </li>
+          <li>
+            <a class="sobre-contato-rede sobre-contato-rede--instagram" href="https://www.instagram.com/pousada_micasasucasa" target="_blank" rel="noopener noreferrer" aria-label="Instagram da Mi Casa Su Casa">
+              <svg class="sobre-contato-icone-grosso" viewBox="0 0 24 24" width="48" height="48" aria-hidden="true" focusable="false">
+                <defs>
+                  <linearGradient id="rodape-ig-grad-index" x1="0%" y1="100%" x2="100%" y2="0%">
+                    <stop offset="0%" stop-color="#f9ce34"/>
+                    <stop offset="50%" stop-color="#ee2a7b"/>
+                    <stop offset="100%" stop-color="#6228d7"/>
+                  </linearGradient>
+                </defs>
+                <rect x="2.5" y="2.5" width="19" height="19" rx="5" fill="none" stroke="url(#rodape-ig-grad-index)" stroke-width="2.35" stroke-linejoin="round"/>
+                <circle cx="12" cy="12" r="4.25" fill="none" stroke="url(#rodape-ig-grad-index)" stroke-width="2.35"/>
+                <circle cx="17.35" cy="6.65" r="1.45" fill="url(#rodape-ig-grad-index)" stroke="none"/>
+              </svg>
+            </a>
+          </li>
+        </ul>
+      </div>
+    </div>
+    <p class="rodape-creditos">© Mi Casa Su Casa. Todos os direitos reservados.</p>
+  </footer>
+
+  <script>
+    (function controlarIntro() {
+      var intro = document.getElementById('intro');
+      if (!intro) return;
+      var navEntries = (typeof performance !== 'undefined' && performance.getEntriesByType) ? performance.getEntriesByType('navigation') : [];
+      var isReload = navEntries.length > 0 && navEntries[0].type === 'reload';
+      if (isReload) {
+        try { sessionStorage.removeItem('introPlayed'); } catch (e) {}
+      }
+      var alreadyVisited = null;
+      try { alreadyVisited = sessionStorage.getItem('introPlayed'); } catch (e) {}
+      if (!alreadyVisited) {
+        setTimeout(function() {
+          intro.classList.add('active');
+          try { sessionStorage.setItem('introPlayed', 'true'); } catch (e) {}
+        }, 2000);
+      } else {
+        intro.classList.add('active');
+      }
+    })();
+
+    window.addEventListener('scroll', function() {
+      const intro = document.getElementById('intro');
+      if (!intro.classList.contains('active')) return;
+      if (window.scrollY > 50) {
+        intro.classList.add('scrolled');
+      } else {
+        intro.classList.remove('scrolled');
+      }
+    });
+
+    (function animarTituloHeroVerticalCut() {
+      function splitChars(text) {
+        if (typeof Intl !== 'undefined' && Intl.Segmenter) {
+          var segmenter = new Intl.Segmenter('pt-BR', { granularity: 'grapheme' });
+          return Array.from(segmenter.segment(text), function(part) { return part.segment; });
+        }
+        return Array.from(text);
+      }
+
+      var titles = document.querySelectorAll('.inicio-hero-recanto .hero-titulo');
+      if (!titles.length) return;
+
+      titles.forEach(function(title) {
+        if (title.dataset.vcProcessed === 'true') return;
+        title.dataset.vcProcessed = 'true';
+
+        var html = title.innerHTML.trim();
+        var lineTexts = html.split(/<br\s*\/?>/i).map(function(fragment) {
+          var t = document.createElement('div');
+          t.innerHTML = fragment;
+          return (t.textContent || '').trim();
+        }).filter(function(s) {
+          return s.length;
+        });
+        if (lineTexts.length === 0) {
+          lineTexts = [(title.textContent || '').trim()];
+        }
+
+        var charIndex = 0;
+        var stagger = 0.042;
+        var atrasoInicioTituloS = 2;
+
+        title.classList.add('vc-ready');
+        title.textContent = '';
+
+        lineTexts.forEach(function(lineText, lineIdx) {
+          if (lineIdx > 0) {
+            charIndex += 6;
+          }
+          var words = lineText.split(/\s+/).filter(Boolean);
+          words.forEach(function(word, wordIdx) {
+            var wordEl = document.createElement('span');
+            wordEl.className = 'vc-word';
+
+            splitChars(word).forEach(function(ch) {
+              var wrap = document.createElement('span');
+              wrap.className = 'vc-char-wrap';
+              var inner = document.createElement('span');
+              inner.className = 'vc-char';
+              inner.style.setProperty(
+                '--char-delay',
+                (atrasoInicioTituloS + charIndex * stagger).toFixed(3) + 's'
+              );
+              inner.textContent = ch;
+              wrap.appendChild(inner);
+              wordEl.appendChild(wrap);
+              charIndex++;
+            });
+
+            title.appendChild(wordEl);
+            if (wordIdx < words.length - 1) {
+              title.appendChild(document.createTextNode(' '));
+            }
+          });
+          if (lineIdx < lineTexts.length - 1) {
+            title.appendChild(document.createElement('br'));
+          }
+        });
+
+        var ultimoDelayMs = Math.max(0, charIndex - 1) * stagger * 1000;
+        var baseMs = atrasoInicioTituloS * 1000;
+        title.dataset.vcFinaleMs = String(
+          Math.min(9000, Math.ceil(baseMs + ultimoDelayMs + 1180))
+        );
+
+        var hero = title.closest('section.hero');
+        function iniciarAnimacaoTituloHero() {
+          requestAnimationFrame(function() {
+            setTimeout(function() {
+              title.querySelectorAll('.vc-char').forEach(function(ch) {
+                ch.style.animation = 'none';
+                void ch.offsetWidth;
+                ch.style.removeProperty('animation');
+              });
+              var finaleMs = parseInt(title.dataset.vcFinaleMs, 10) || 2800;
+              setTimeout(function() {
+                title.classList.add('vc-shimmer');
+              }, finaleMs);
+            }, 80);
+          });
+        }
+        if (hero && hero.classList.contains('revelar-quando-visivel')) {
+          if (hero.classList.contains('esta-revelada')) {
+            iniciarAnimacaoTituloHero();
+          } else {
+            hero.addEventListener('secao-revelada', function onHeroRev() {
+              hero.removeEventListener('secao-revelada', onHeroRev);
+              iniciarAnimacaoTituloHero();
+            });
+          }
+        } else {
+          iniciarAnimacaoTituloHero();
+        }
+      });
+    })();
+
+    document.querySelectorAll('.inicio-hero-recanto .hero-carousel').forEach(function(carousel) {
+      var slides = carousel.querySelectorAll('.hero-slide');
+      if (slides.length === 0) return;
+      var indexAtual = 0;
+      var heroGate = carousel.closest('section.hero.revelar-quando-visivel');
+      function iniciarCarrosselHero() {
+        window.setInterval(function() {
+          slides[indexAtual].classList.remove('ativo');
+          indexAtual = (indexAtual + 1) % slides.length;
+          slides[indexAtual].classList.add('ativo');
+        }, 5000);
+      }
+      if (heroGate && !heroGate.classList.contains('esta-revelada')) {
+        heroGate.addEventListener('secao-revelada', iniciarCarrosselHero, { once: true });
+      } else {
+        iniciarCarrosselHero();
+      }
+    });
+
+    (function revelarAoEntrarNaViewport() {
+      if (!('IntersectionObserver' in window)) {
+        document.querySelectorAll('.revelar-quando-visivel').forEach(function(el) {
+          el.classList.add('esta-revelada');
+          el.dispatchEvent(new CustomEvent('secao-revelada'));
+        });
+        return;
+      }
+      var obs = new IntersectionObserver(function(entries) {
+        entries.forEach(function(entry) {
+          if (!entry.isIntersecting) return;
+          entry.target.classList.add('esta-revelada');
+          entry.target.dispatchEvent(new CustomEvent('secao-revelada', { bubbles: false }));
+          obs.unobserve(entry.target);
+        });
+      }, { threshold: 0.14, rootMargin: '0px 0px -6% 0px' });
+      document.querySelectorAll('.revelar-quando-visivel').forEach(function(el) {
+        obs.observe(el);
+      });
+    })();
+
+    ['recanto', 'recanto-dup'].forEach(function(recantoId) {
+      var secaoRecanto = document.getElementById(recantoId);
+      if (!secaoRecanto) return;
+      var recantoTexto = secaoRecanto.querySelector('.recanto-texto-conteudo');
+      var recantoImagem = secaoRecanto.querySelector('.recanto-imagem');
+      if (!recantoTexto) return;
+      var observer = new IntersectionObserver(function(entries) {
+        entries.forEach(function(entry) {
+          if (entry.isIntersecting) {
+            secaoRecanto.classList.add('esta-revelada');
+            recantoTexto.classList.add('visivel');
+            if (recantoImagem) recantoImagem.classList.add('recanto-imagem-visivel');
+            observer.unobserve(secaoRecanto);
+          }
+        });
+      }, { threshold: 0.2 });
+      observer.observe(secaoRecanto);
+    });
+
+    (function gridFotosMovelInit() {
+      var roots = document.querySelectorAll('[data-grid-fotos-movel]');
+      if (!roots.length) return;
+
+      var reduceMotion = false;
+      try {
+        reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+      } catch (e0) {}
+
+      var D_MS = 720;
+
+      roots.forEach(function(root) {
+        var slides = Array.prototype.slice.call(root.querySelectorAll('.grid-fotos-movel-slide'));
+        var dots = Array.prototype.slice.call(root.querySelectorAll('.grid-fotos-movel-dot'));
+        if (slides.length < 2 || dots.length !== slides.length) return;
+
+        var idx = 0;
+        for (var s = 0; s < slides.length; s++) {
+          if (slides[s].classList.contains('is-ativo')) {
+            idx = s;
+            break;
+          }
+        }
+
+        var busy = false;
+        var ticker = null;
+
+        function setDots(i) {
+          dots.forEach(function(d, j) {
+            var on = j === i;
+            d.classList.toggle('is-ativo', on);
+            d.setAttribute('aria-selected', on ? 'true' : 'false');
+          });
+        }
+
+        function goTo(nextIdx) {
+          if (busy || nextIdx === idx) return;
+          if (nextIdx < 0 || nextIdx >= slides.length) return;
+
+          var oldSlide = slides[idx];
+          var newSlide = slides[nextIdx];
+
+          if (reduceMotion) {
+            oldSlide.classList.remove('is-ativo', 'is-saindo-esq');
+            newSlide.classList.add('is-ativo');
+            idx = nextIdx;
+            setDots(idx);
+            return;
+          }
+
+          busy = true;
+          oldSlide.classList.remove('is-ativo');
+          oldSlide.classList.add('is-saindo-esq');
+
+          requestAnimationFrame(function() {
+            requestAnimationFrame(function() {
+              newSlide.classList.add('is-ativo');
+            });
+          });
+
+          window.setTimeout(function() {
+            oldSlide.classList.remove('is-saindo-esq');
+            idx = nextIdx;
+            setDots(idx);
+            busy = false;
+          }, D_MS);
+        }
+
+        function next() {
+          goTo((idx + 1) % slides.length);
+        }
+
+        dots.forEach(function(dot, i) {
+          dot.addEventListener('click', function() {
+            goTo(i);
+          });
+        });
+
+        setDots(idx);
+
+        var gateMovel = root.closest('.revelar-quando-visivel');
+        function iniciarTickerMovel() {
+          ticker = window.setInterval(next, 5500);
+          document.addEventListener('visibilitychange', function() {
+            if (document.hidden) {
+              if (ticker) {
+                window.clearInterval(ticker);
+                ticker = null;
+              }
+            } else if (!ticker) {
+              ticker = window.setInterval(next, 5500);
+            }
+          });
+        }
+        if (gateMovel && !gateMovel.classList.contains('esta-revelada')) {
+          gateMovel.addEventListener('secao-revelada', function onGridMovelRev() {
+            gateMovel.removeEventListener('secao-revelada', onGridMovelRev);
+            iniciarTickerMovel();
+          });
+        } else {
+          iniciarTickerMovel();
+        }
+      });
+    })();
+
+    (function carrosselQuartosShowcase() {
+      var QUARTOS = [
+        {
+          titulo: 'TEM-TEM',
+          desc:
+            'Quarto Duplo com Banheiro Compartilhado. Quarto duplo aconchegante, ideal para casais que buscam conforto e tranquilidade. Cama de casal, vista para o jardim e banheiro compartilhado com chuveiro. Até 2 pessoas · 20 m².',
+          preco: 'R$ 150',
+          precoLabel: 'Noite',
+          img: 'imagem/16.jpg',
+          alt: 'Quarto TEM-TEM — Mi Casa Su Casa',
+          href: 'reservar.html?quarto=tem-tem'
+        },
+        {
+          titulo: 'soco',
+          desc:
+            'Quarto Família (4 Camas de Solteiro). Espaçoso, com quatro camas de solteiro, ar-condicionado, cozinha compacta privativa, vista para o jardim e banheiro compartilhado. Até 4 pessoas · 40 m².',
+          preco: 'R$ 150',
+          precoLabel: 'Noite',
+          img: 'imagem/17.jpg',
+          alt: 'Quarto soco — Mi Casa Su Casa',
+          href: 'reservar.html?quarto=soco'
+        },
+        {
+          titulo: 'sabiá',
+          desc:
+            'Quarto Família (1 Cama de Casal + 3 de Solteiro). Amplo espaço, ar-condicionado, cozinha compacta privativa e vista para o jardim. Banheiro compartilhado. Até 5 pessoas · 40 m².',
+          preco: 'R$ 150',
+          precoLabel: 'Noite',
+          img: 'imagem/24.jpg',
+          alt: 'Quarto sabiá — Mi Casa Su Casa',
+          href: 'reservar.html?quarto=sabia'
+        },
+        {
+          titulo: 'Ararajuba',
+          desc:
+            'Quarto Duplo. Confortável para casais ou viajantes: cama de casal, vista para o jardim e banheiro compartilhado com chuveiro. Até 2 pessoas · 20 m².',
+          preco: 'R$ 150',
+          precoLabel: 'Noite',
+          img: 'imagem/24.jpg',
+          alt: 'Quarto Ararajuba — Mi Casa Su Casa',
+          href: 'reservar.html?quarto=ararajuba'
+        }
+      ];
+      var N = QUARTOS.length;
+      var DUR_SLIDE_MS = 900;
+      var richMotion = true;
+      try {
+        richMotion = !window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+      } catch (e1) {}
+
+      function aplicarSlides(slides, centerIdx) {
+        for (var i = 0; i < slides.length; i++) {
+          slides[i].classList.remove('pos-esquerda', 'pos-centro', 'pos-direita');
+          if (i === centerIdx) slides[i].classList.add('pos-centro');
+          else if (i === (centerIdx + 1) % 3) slides[i].classList.add('pos-direita');
+          else slides[i].classList.add('pos-esquerda');
+        }
+      }
+
+      function indiceQuartoNoSlide(centerIdx, slideIdx, roomIdx) {
+        var off = (slideIdx - centerIdx + 3) % 3;
+        return (roomIdx + off) % N;
+      }
+
+      function atualizarImagens(slides, centerIdx, roomIdx) {
+        for (var i = 0; i < slides.length; i++) {
+          var qi = indiceQuartoNoSlide(centerIdx, i, roomIdx);
+          var q = QUARTOS[qi];
+          var img = slides[i].querySelector('img');
+          if (img) {
+            img.src = q.img;
+            img.alt = q.alt;
+          }
+        }
+      }
+
+      function preencherCopy(copyInner, roomIdx) {
+        var q = QUARTOS[roomIdx];
+        copyInner.querySelector('.quartos-showcase-titulo').textContent = q.titulo;
+        copyInner.querySelector('.quartos-showcase-desc').textContent = q.desc;
+        copyInner.querySelector('.quartos-showcase-preco-valor').textContent = q.preco;
+        var lbl = copyInner.querySelector('.quartos-showcase-preco-label');
+        if (lbl) lbl.textContent = q.precoLabel || 'Noite';
+        var a = copyInner.querySelector('.quartos-showcase-btn');
+        if (a) a.href = q.href;
+      }
+
+      function animarTexto(copyInner, novoRoomIdx) {
+        if (!richMotion) {
+          preencherCopy(copyInner, novoRoomIdx);
+          return;
+        }
+        copyInner.classList.add('quartos-copy--saida');
+        setTimeout(function() {
+          preencherCopy(copyInner, novoRoomIdx);
+          copyInner.classList.remove('quartos-copy--saida');
+          copyInner.classList.add('quartos-copy--entrada-pre');
+          void copyInner.offsetWidth;
+          requestAnimationFrame(function() {
+            requestAnimationFrame(function() {
+              copyInner.classList.remove('quartos-copy--entrada-pre');
+              copyInner.classList.add('quartos-copy--entrada');
+              setTimeout(function() {
+                copyInner.classList.remove('quartos-copy--entrada');
+              }, 580);
+            });
+          });
+        }, 340);
+      }
+
+      function initRoot(root) {
+        var slides = root.querySelectorAll('.quartos-3d-slide');
+        if (slides.length !== 3) return;
+        var copyInner = root.querySelector('.quartos-showcase-copy-inner');
+        var prevBtn = root.querySelector('.quartos-showcase-nav--prev');
+        var nextBtn = root.querySelector('.quartos-showcase-nav--next');
+        if (!copyInner || !prevBtn || !nextBtn) return;
+
+        var roomIdx = 0;
+        var centerSlide = 0;
+        var animando = false;
+
+        function setBusy(b) {
+          if (b) {
+            root.setAttribute('aria-busy', 'true');
+            prevBtn.disabled = true;
+            nextBtn.disabled = true;
+          } else {
+            root.removeAttribute('aria-busy');
+            prevBtn.disabled = false;
+            nextBtn.disabled = false;
+          }
+        }
+
+        function ir(dir) {
+          if (animando || N < 2) return;
+          animando = true;
+          setBusy(true);
+
+          var novoR = dir === 1 ? (roomIdx + 1) % N : (roomIdx + N - 1) % N;
+          var novoC = dir === 1 ? (centerSlide + 1) % 3 : (centerSlide + 2) % 3;
+
+          if (dir === 1) {
+            var slidePatch = (centerSlide + 2) % 3;
+            var qAlvo = QUARTOS[(roomIdx + 2) % N];
+            var imgP = slides[slidePatch].querySelector('img');
+            if (imgP) {
+              imgP.src = qAlvo.img;
+              imgP.alt = qAlvo.alt;
+            }
+          }
+
+          roomIdx = novoR;
+          centerSlide = novoC;
+          aplicarSlides(slides, centerSlide);
+          animarTexto(copyInner, novoR);
+
+          setTimeout(function() {
+            atualizarImagens(slides, centerSlide, roomIdx);
+            animando = false;
+            setBusy(false);
+          }, DUR_SLIDE_MS);
+        }
+
+        atualizarImagens(slides, centerSlide, roomIdx);
+        aplicarSlides(slides, centerSlide);
+        preencherCopy(copyInner, roomIdx);
+
+        prevBtn.addEventListener('click', function() { ir(-1); });
+        nextBtn.addEventListener('click', function() { ir(1); });
+      }
+
+      document.querySelectorAll('[data-quartos-showcase]').forEach(function(root) {
+        initRoot(root);
+      });
+    })();
+  </script>
+  <script>
+    document.addEventListener('DOMContentLoaded', function () {
+      var containers = document.querySelectorAll('.secao-recanto .folhas-container');
+      var totalFolhas = 15;
+      containers.forEach(function (container) {
+        if (!container || container.dataset.folhasInit === 'true') return;
+        container.dataset.folhasInit = 'true';
+        for (var i = 0; i < totalFolhas; i++) {
+          var folha = document.createElement('div');
+          folha.classList.add('folha');
+          folha.style.left = Math.random() * 100 + 'vw';
+          folha.style.animationDuration = 6 + Math.random() * 10 + 's';
+          folha.style.animationDelay = Math.random() * 5 + 's';
+          var size = 10 + Math.random() * 20;
+          folha.style.width = size + 'px';
+          folha.style.height = size + 'px';
+          folha.style.opacity = String(0.05 + Math.random() * 0.2);
+          container.appendChild(folha);
+        }
+      });
+    });
+  </script>
+</body>
+</html>

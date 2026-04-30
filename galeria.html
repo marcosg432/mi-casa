@@ -1,0 +1,485 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Mi Casa Su Casa — Galeria</title>
+  <link rel="stylesheet" href="css/estilo.css">
+  <script src="js/topo-ao-carregar.js"></script>
+  <script src="js/intro-nav-mobile.js" defer></script>
+</head>
+<body>
+  <div id="intro" class="active">
+    <div class="logo"><img class="logo-intro" src="assets/logo_animacao.svg" alt="Logo sitio recanto da paz"><img class="logo-fixed" src="data:image/svg+xml;utf8,%3Csvg%20width%3D%22600%22%20height%3D%22200%22%20viewBox%3D%220%200%20600%20200%22%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%3E%0A%0A%20%20%3C!--%20SITIO%20--%3E%0A%20%20%3Ctext%20x%3D%2250%25%22%20y%3D%2250%22%20text-anchor%3D%22middle%22%20fill%3D%22%23FFFFFF%22%20font-size%3D%2228%22%20letter-spacing%3D%226%22%20font-family%3D%22Arial%2C%20sans-serif%22%3E%0A%20%20%20%20S%C3%8DTIO%0A%20%20%3C%2Ftext%3E%0A%0A%20%20%3C!--%20Linha%20esquerda%20(mais%20afastada)%20--%3E%0A%20%20%3Cline%20x1%3D%2280%22%20y1%3D%2250%22%20x2%3D%22200%22%20y2%3D%2250%22%20stroke%3D%22%23FFFFFF%22%20stroke-width%3D%221.5%22%3E%3C%2Fline%3E%0A%0A%20%20%3C!--%20Linha%20direita%20(mais%20afastada)%20--%3E%0A%20%20%3Cline%20x1%3D%22400%22%20y1%3D%2250%22%20x2%3D%22520%22%20y2%3D%2250%22%20stroke%3D%22%23FFFFFF%22%20stroke-width%3D%221.5%22%3E%3C%2Fline%3E%0A%0A%20%20%3C!--%20Nome%20principal%20--%3E%0A%20%20%3Ctext%20x%3D%2250%25%22%20y%3D%22135%22%20dominant-baseline%3D%22middle%22%20text-anchor%3D%22middle%22%20fill%3D%22%23FFFFFF%22%20font-size%3D%2264%22%20font-family%3D%22Brush%20Script%20MT%2C%20cursive%22%3E%0A%20%20%20%20Recanto%20da%20Paz%0A%20%20%3C%2Ftext%3E%0A%0A%3C%2Fsvg%3E" alt="Logo sitio recanto da paz"></div>
+    <button type="button" class="intro-menu-toggle" id="intro-menu-toggle" aria-expanded="false" aria-controls="intro-nav-principal" aria-label="Abrir menu de navegação">
+      <span class="intro-menu-toggle-inner" aria-hidden="true"><span></span><span></span><span></span></span>
+    </button>
+    <div class="intro-menu-scrim" id="intro-menu-scrim" aria-hidden="true"></div>
+    <nav id="intro-nav-principal" class="menu" aria-label="Navegação principal">
+      <a href="index.html">Início</a>
+      <a href="quartos.html">Quartos</a>
+      <a href="galeria.html" class="ativo">Galeria</a>
+      <a href="sobre.html">Sobre</a>
+      <a href="reservar.html">Reservar</a>
+    </nav>
+  </div>
+
+  <main>
+    <section class="pagina-hero pagina-hero--galeria">
+      <div>
+        <h1>Galeria</h1>
+        <p>Conheça nossos ambientes</p>
+      </div>
+    </section>
+
+    <section class="secao secao-galeria-intro scroll-morph-section" id="scroll-morph-hero">
+      <div class="scroll-morph-container" id="scroll-morph-container">
+        <div class="scroll-morph-intro-text" id="scroll-morph-intro-text">
+          <h2 class="scroll-morph-intro-title">Role para explorar</h2>
+          <p class="scroll-morph-intro-sub">SCROLL TO EXPLORE</p>
+        </div>
+        <div class="scroll-morph-content-text" id="scroll-morph-content-text">
+          <h2 class="scroll-morph-content-title">Explore Nossa Galeria</h2>
+          <p class="scroll-morph-content-desc">Descubra os ambientes da Mi Casa Su Casa. Role para ver os cartões em arco.</p>
+        </div>
+        <div class="scroll-morph-cards-wrap" id="scroll-morph-cards-wrap">
+          <!-- 16 cards gerados por JS -->
+        </div>
+      </div>
+    </section>
+
+    <section class="secao">
+      <div class="container">
+        <p class="secao-subtitulo">Imagens</p>
+        <h2 class="secao-titulo">Nossos espaços em fotos</h2>
+        <section class="galeria-mosaico galeria-mosaico-desktop">
+          <div class="masonry-container masonry-container-desktop" id="galeria-espacos-desktop"></div>
+        </section>
+
+        <section class="galeria-mosaico galeria-mosaico-mobile">
+          <div class="masonry-container masonry-container-mobile" id="galeria-espacos-mobile"></div>
+        </section>
+      </div>
+    </section>
+
+    <div class="lightbox" id="lightbox-espacos" aria-hidden="true">
+      <div class="lightbox-backdrop" id="lightbox-espacos-backdrop"></div>
+      <button type="button" class="lightbox-arrow lightbox-prev" id="lightbox-espacos-prev" aria-label="Foto anterior">‹</button>
+      <button type="button" class="lightbox-arrow lightbox-next" id="lightbox-espacos-next" aria-label="Próxima foto">›</button>
+      <div class="lightbox-img-wrap image-modal-image-container">
+        <img class="image-modal-image lightbox-img" id="lightbox-espacos-img" src="" alt="">
+      </div>
+    </div>
+  </main>
+
+  <footer class="rodape">
+    <div class="rodape-inner">
+      <div>
+        <div class="logo"><img src="assets/logo_animacao.svg" alt="Logo sitio recanto da paz"></div>
+        <p>Um lugar de tranquilidade e conforto.</p>
+      </div>
+      <div>
+        <h4>Navegação</h4>
+        <ul>
+          <li><a href="index.html">Início</a></li>
+          <li><a href="quartos.html">Quartos</a></li>
+          <li><a href="galeria.html">Galeria</a></li>
+          <li><a href="sobre.html">Sobre</a></li>
+          <li><a href="reservar.html">Reservar</a></li>
+        </ul>
+      </div>
+      <div>
+        <h4>Contato</h4>
+        <ul class="rodape-contato-links">
+          <li><a href="mailto:micasasucasaben@gmail.com">micasasucasaben@gmail.com</a></li>
+          <li><a href="https://wa.me/559180781514?text=ol%C3%A1%2C%20gostaria%20de%20tira%20uma%20duivida%20sobre%20o%20sitio." target="_blank" rel="noopener noreferrer">(91) 8078-1514</a></li>
+        </ul>
+        <p class="rodape-tambem-estamos">Também estamos em</p>
+        <ul class="rodape-parceiros sobre-contato-redes" aria-label="Redes sociais da Mi Casa Su Casa">
+          <li>
+            <a class="sobre-contato-rede sobre-contato-rede--facebook" href="https://www.facebook.com/pousadamicasasucasa" target="_blank" rel="noopener noreferrer" aria-label="Facebook da Mi Casa Su Casa">
+              <svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true" focusable="false"><path fill="currentColor" d="M24 12.073C24 5.405 18.627 0 12 0S0 5.405 0 12.073c0 5.996 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/></svg>
+            </a>
+          </li>
+          <li>
+            <a class="sobre-contato-rede sobre-contato-rede--whatsapp" href="https://wa.me/559180781514" target="_blank" rel="noopener noreferrer" aria-label="WhatsApp da Mi Casa Su Casa">
+              <svg class="sobre-contato-icone-grosso" viewBox="0 0 24 24" width="48" height="48" aria-hidden="true" focusable="false"><path fill="currentColor" d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.435 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
+            </a>
+          </li>
+          <li>
+            <a class="sobre-contato-rede sobre-contato-rede--instagram" href="https://www.instagram.com/pousada_micasasucasa" target="_blank" rel="noopener noreferrer" aria-label="Instagram da Mi Casa Su Casa">
+              <svg class="sobre-contato-icone-grosso" viewBox="0 0 24 24" width="48" height="48" aria-hidden="true" focusable="false">
+                <defs>
+                  <linearGradient id="rodape-ig-grad-galeria" x1="0%" y1="100%" x2="100%" y2="0%">
+                    <stop offset="0%" stop-color="#f9ce34"/>
+                    <stop offset="50%" stop-color="#ee2a7b"/>
+                    <stop offset="100%" stop-color="#6228d7"/>
+                  </linearGradient>
+                </defs>
+                <rect x="2.5" y="2.5" width="19" height="19" rx="5" fill="none" stroke="url(#rodape-ig-grad-galeria)" stroke-width="2.35" stroke-linejoin="round"/>
+                <circle cx="12" cy="12" r="4.25" fill="none" stroke="url(#rodape-ig-grad-galeria)" stroke-width="2.35"/>
+                <circle cx="17.35" cy="6.65" r="1.45" fill="url(#rodape-ig-grad-galeria)" stroke="none"/>
+              </svg>
+            </a>
+          </li>
+        </ul>
+      </div>
+    </div>
+    <p class="rodape-creditos">© Mi Casa Su Casa. Todos os direitos reservados.</p>
+  </footer>
+
+  <script>
+    window.addEventListener('scroll', function() {
+      const intro = document.getElementById('intro');
+      if (!intro.classList.contains('active')) return;
+      if (window.scrollY > 50) {
+        intro.classList.add('scrolled');
+      } else {
+        intro.classList.remove('scrolled');
+      }
+    });
+
+    var GALERIA_IMAGENS = [
+      { src: 'imagem/1.jpg', number: 1 },
+      { src: 'imagem/2.jpg', number: 2 },
+      { src: 'imagem/3.jpg', number: 3 },
+      { src: 'imagem/5.jpg', number: 5 },
+      { src: 'imagem/6.jpg', number: 6 },
+      { src: 'imagem/7.jpg', number: 7 },
+      { src: 'imagem/8.jpg', number: 8 },
+      { src: 'imagem/9.jpg', number: 9 },
+      { src: 'imagem/10.jpg', number: 10 },
+      { src: 'imagem/11.jpg', number: 11 },
+      { src: 'imagem/13.jpg', number: 13 },
+      { src: 'imagem/14.jpg', number: 14 },
+      { src: 'imagem/15.jpg', number: 15 },
+      { src: 'imagem/16.jpg', number: 16 },
+      { src: 'imagem/17.jpg', number: 17 },
+      { src: 'imagem/18.jpg', number: 18 },
+      { src: 'imagem/19.jpg', number: 19 },
+      { src: 'imagem/20.jpg', number: 20 },
+      { src: 'imagem/21.jpg', number: 21 },
+      { src: 'imagem/22.jpg', number: 22 },
+      { src: 'imagem/23.jpg', number: 23 },
+      { src: 'imagem/24.jpg', number: 24 },
+      { src: 'imagem/25.jpg', number: 25 },
+      { src: 'imagem/26.jpg', number: 26 },
+      { src: 'imagem/27.jpg', number: 27 },
+      { src: 'imagem/28.jpg', number: 28 },
+      { src: 'imagem/29.jpg', number: 29 },
+      { src: 'imagem/30.jpg', number: 30 },
+      { src: 'imagem/31.jpg', number: 31 },
+      { src: 'imagem/32.jpg', number: 32 },
+      { src: 'imagem/33.jpg', number: 33 },
+      { src: 'imagem/34.jpg', number: 34 },
+      { src: 'imagem/35.jpeg', number: 35 },
+      { src: 'imagem/36.jpg', number: 36 },
+      { src: 'imagem/37.jpg', number: 37 }
+    ];
+
+    (function montarGaleriaMosaico() {
+      var desktop = document.getElementById('galeria-espacos-desktop');
+      var mobile = document.getElementById('galeria-espacos-mobile');
+      if (!desktop || !mobile) return;
+
+      var totalImages = GALERIA_IMAGENS.length;
+      var imagesPerCol = Math.ceil(totalImages / 3);
+      var middleColEnd = imagesPerCol * 2;
+
+      GALERIA_IMAGENS.forEach(function(image, index) {
+        var desktopItem = document.createElement('div');
+        var isLastMiddleImage = index === (middleColEnd - 1);
+        desktopItem.className = 'masonry-item' + (isLastMiddleImage ? ' masonry-item-middle-align' : '');
+        desktopItem.setAttribute('data-index', String(index));
+        desktopItem.setAttribute('tabindex', '0');
+        desktopItem.setAttribute('role', 'button');
+        desktopItem.innerHTML = '<img src="' + image.src + '" alt="Imagem ' + (image.number || index) + '" loading="lazy" decoding="async">';
+        desktop.appendChild(desktopItem);
+
+        var mobileItem = document.createElement('div');
+        mobileItem.className = 'masonry-item masonry-item-mobile';
+        mobileItem.setAttribute('data-index', String(index));
+        mobileItem.setAttribute('tabindex', '0');
+        mobileItem.setAttribute('role', 'button');
+        mobileItem.innerHTML = '<img src="' + image.src + '" alt="Imagem ' + (image.number || index) + '" loading="lazy" decoding="async">';
+        mobile.appendChild(mobileItem);
+      });
+    })();
+
+    (function entradaGaleria() {
+      var itens = document.querySelectorAll('.masonry-container .masonry-item');
+      if (!itens.length) return;
+      var observer = new IntersectionObserver(function(entries) {
+        entries.forEach(function(entry) {
+          if (entry.isIntersecting) entry.target.classList.add('entrada-galeria');
+        });
+      }, { rootMargin: '0px 0px -60px 0px', threshold: 0.05 });
+      itens.forEach(function(el) { observer.observe(el); });
+    })();
+
+    (function lightboxEspacos() {
+      var lightbox = document.getElementById('lightbox-espacos');
+      var imgEl = document.getElementById('lightbox-espacos-img');
+      var backdrop = document.getElementById('lightbox-espacos-backdrop');
+      var prevBtn = document.getElementById('lightbox-espacos-prev');
+      var nextBtn = document.getElementById('lightbox-espacos-next');
+      if (!lightbox || !imgEl) return;
+
+      var itens = document.querySelectorAll('.masonry-container .masonry-item');
+      var total = GALERIA_IMAGENS.length;
+      var indexAtual = 0;
+      var autoTimer = null;
+      var AUTO_INTERVAL = 4500;
+
+      function goTo(i) {
+        if (total === 0) return;
+        indexAtual = (i % total + total) % total;
+        var item = GALERIA_IMAGENS[indexAtual];
+        var src = item ? item.src : '';
+        var alt = 'Imagem ' + (item && item.number ? item.number : indexAtual);
+        if (imgEl.src !== src) {
+          imgEl.classList.remove('entrando-esq', 'entrando-dir', 'sainte-esq', 'sainte-dir');
+          imgEl.offsetHeight;
+          imgEl.src = src;
+          imgEl.alt = alt;
+        }
+      }
+
+      function openLightbox(clickIndex) {
+        indexAtual = clickIndex;
+        goTo(indexAtual);
+        lightbox.classList.add('open');
+        lightbox.setAttribute('aria-hidden', 'false');
+        document.body.classList.add('lightbox-aberto');
+        clearInterval(autoTimer);
+        autoTimer = setInterval(function() {
+          goTo(indexAtual + 1);
+        }, AUTO_INTERVAL);
+      }
+
+      function closeLightbox() {
+        lightbox.classList.remove('open');
+        lightbox.setAttribute('aria-hidden', 'true');
+        document.body.classList.remove('lightbox-aberto');
+        clearInterval(autoTimer);
+        autoTimer = null;
+      }
+
+      itens.forEach(function(item) {
+        var itemIndex = parseInt(item.getAttribute('data-index'), 10);
+        if (Number.isNaN(itemIndex)) return;
+        item.addEventListener('click', function() { openLightbox(itemIndex); });
+        item.addEventListener('keydown', function(e) {
+          if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); openLightbox(itemIndex); }
+        });
+      });
+
+      if (backdrop) backdrop.addEventListener('click', closeLightbox);
+      if (prevBtn) prevBtn.addEventListener('click', function() {
+        goTo(indexAtual - 1);
+        if (autoTimer) { clearInterval(autoTimer); autoTimer = setInterval(function() { goTo(indexAtual + 1); }, AUTO_INTERVAL); }
+      });
+      if (nextBtn) nextBtn.addEventListener('click', function() {
+        goTo(indexAtual + 1);
+        if (autoTimer) { clearInterval(autoTimer); autoTimer = setInterval(function() { goTo(indexAtual + 1); }, AUTO_INTERVAL); }
+      });
+
+      document.addEventListener('keydown', function(e) {
+        if (!lightbox.classList.contains('open')) return;
+        if (e.key === 'Escape') closeLightbox();
+        if (e.key === 'ArrowLeft') { goTo(indexAtual - 1); e.preventDefault(); }
+        if (e.key === 'ArrowRight') { goTo(indexAtual + 1); e.preventDefault(); }
+      });
+    })();
+
+    (function() {
+      var TOTAL_IMAGES = 16;
+      var MAX_SCROLL = 3000;
+      var IMAGES = [
+        "imagem/1.jpg",
+        "imagem/14.jpg",
+        "imagem/2.jpg",
+        "imagem/10.jpg",
+        "imagem/9.jpg",
+        "imagem/17.jpg",
+        "imagem/6.jpg",
+        "imagem/11.jpg",
+        "imagem/20.jpg",
+        "imagem/7.jpg",
+        "imagem/3.jpg",
+        "imagem/16.jpg",
+        "imagem/24.jpg",
+        "imagem/8.jpg",
+        "imagem/5.jpg",
+        "imagem/25.jpg"
+      ];
+
+      function lerp(s, e, t) { return s * (1 - t) + e * t; }
+
+      var container = document.getElementById('scroll-morph-container');
+      var wrap = document.getElementById('scroll-morph-cards-wrap');
+      var introText = document.getElementById('scroll-morph-intro-text');
+      var contentText = document.getElementById('scroll-morph-content-text');
+
+      if (!container || !wrap) return;
+
+      var containerSize = { width: container.offsetWidth, height: container.offsetHeight };
+      var virtualScroll = 0;
+      /* Já inicia em círculo (“bolinha”), sem fase reta/linha ao carregar */
+      var introPhase = 'circle';
+      var morphValue = 0;
+      var rotateValue = 0;
+
+      for (var i = 0; i < TOTAL_IMAGES; i++) {
+        var card = document.createElement('div');
+        card.className = 'scroll-morph-card';
+        card.setAttribute('data-index', i);
+        card.innerHTML = '<div class="scroll-morph-card-motion">' +
+          '<div class="scroll-morph-card-surface">' +
+            '<img src="' + IMAGES[i] + '" alt="" width="320" height="452" decoding="async">' +
+          '</div>' +
+        '</div>';
+        wrap.appendChild(card);
+      }
+
+      var cards = wrap.querySelectorAll('.scroll-morph-card');
+
+      if (typeof ResizeObserver !== 'undefined') {
+        new ResizeObserver(function(entries) {
+          var r = entries[0].contentRect;
+          containerSize.width = r.width;
+          containerSize.height = r.height;
+        }).observe(container);
+      }
+
+      var section = document.getElementById('scroll-morph-hero');
+      if (!section) section = container.closest('section');
+
+      var rafScrollPin = null;
+      function pinSectionScroll() {
+        if (!section) return;
+        if (rafScrollPin) return;
+        rafScrollPin = requestAnimationFrame(function() {
+          window.scrollTo(0, section.offsetTop);
+          rafScrollPin = null;
+        });
+      }
+
+      function isSectionInTrapZone() {
+        if (!section) return false;
+        var rect = section.getBoundingClientRect();
+        var top = rect.top;
+        var bottom = rect.bottom;
+        return top <= 200 && bottom > 300;
+      }
+
+      var animSpeed = 2.2;
+
+      window.addEventListener('wheel', function(e) {
+        if (!section) return;
+        if (window.innerWidth < 768) return;
+        var inZone = isSectionInTrapZone();
+        var delta = e.deltaY;
+
+        if (!inZone) return;
+
+        if (delta > 0) {
+          if (virtualScroll < MAX_SCROLL) {
+            e.preventDefault();
+            virtualScroll = Math.min(virtualScroll + delta * animSpeed, MAX_SCROLL);
+            pinSectionScroll();
+          }
+        } else if (delta < 0) {
+          if (virtualScroll > 0) {
+            e.preventDefault();
+            virtualScroll = Math.max(virtualScroll + delta * animSpeed, 0);
+            pinSectionScroll();
+          }
+        }
+      }, { passive: false });
+
+      function update() {
+        var isMobile = containerSize.width < 768;
+        if (isMobile && section) {
+          var rect = section.getBoundingClientRect();
+          var sectionTop = window.scrollY + rect.top;
+          var startY = sectionTop - window.innerHeight * 0.2;
+          var endY = sectionTop + rect.height * 0.95;
+          var denom = endY - startY;
+          if (denom > 0) {
+            var progress = (window.scrollY - startY) / denom;
+            progress = Math.max(0, Math.min(1, progress));
+            virtualScroll = progress * MAX_SCROLL;
+          }
+        }
+
+        morphValue = Math.min(Math.max(virtualScroll / 600, 0), 1);
+        rotateValue = virtualScroll <= 600 ? 0 : Math.min((virtualScroll - 600) / (MAX_SCROLL - 600), 1) * 360;
+
+        if (morphValue > 0.8) {
+          contentText.classList.add('visible');
+          introText.style.opacity = '0';
+        } else {
+          contentText.classList.remove('visible');
+          introText.style.opacity = morphValue < 0.5 ? String(1 - morphValue * 2) : '0';
+        }
+
+        var minDim = Math.min(containerSize.width, containerSize.height);
+        var circleRadius = Math.min(minDim * 0.4, 300);
+        var baseRadius = Math.min(containerSize.width, containerSize.height * 1.5);
+        var arcRadius = baseRadius * (isMobile ? 1.34 : 1.1);
+        var arcApexY = containerSize.height * (isMobile ? 0.22 : 0.25);
+        var arcCenterY = arcApexY + arcRadius;
+        var spreadAngle = isMobile ? 132 : 130;
+        var startAngle = -90 - spreadAngle / 2;
+        var step = spreadAngle / (TOTAL_IMAGES - 1);
+        var maxRotation = spreadAngle * 0.8;
+        var boundedRotation = -(rotateValue / 360) * maxRotation;
+
+        for (var i = 0; i < cards.length; i++) {
+          var card = cards[i];
+          var motion = card.querySelector('.scroll-morph-card-motion');
+          var x = 0, y = 0, rot = 0, scale = 1;
+
+          if (introPhase === 'circle') {
+            card.style.opacity = '1';
+            var circleAngle = (i / TOTAL_IMAGES) * 360;
+            var circleRad = circleAngle * Math.PI / 180;
+            var circleX = Math.cos(circleRad) * circleRadius;
+            var circleY = Math.sin(circleRad) * circleRadius;
+            var circleRot = circleAngle + 90;
+
+            var currentArcAngle = startAngle + (i * step) + boundedRotation;
+            var arcRad = currentArcAngle * Math.PI / 180;
+            var arcX = Math.cos(arcRad) * arcRadius;
+            var arcY = Math.sin(arcRad) * arcRadius + arcCenterY;
+            var arcRot = currentArcAngle + 90;
+            /* Cartões maiores no CSS + escala menor = mesma área visual, foto menos borrada */
+            var arcScale = isMobile ? 1.12 : 1.62;
+
+            x = lerp(circleX, arcX, morphValue);
+            y = lerp(circleY, arcY, morphValue);
+            rot = lerp(circleRot, arcRot, morphValue);
+            scale = lerp(1, arcScale, morphValue);
+          }
+
+          if (motion) {
+            motion.style.transform = 'translate(' + x + 'px, ' + y + 'px) rotate(' + rot + 'deg) scale(' + scale + ')';
+          }
+        }
+
+        if (!isMobile && section && virtualScroll > 0 && virtualScroll < MAX_SCROLL && isSectionInTrapZone()) {
+          window.scrollTo(0, section.offsetTop);
+        }
+      }
+
+      function tick() {
+        update();
+        requestAnimationFrame(tick);
+      }
+      tick();
+    })();
+
+  </script>
+</body>
+</html>

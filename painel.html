@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="robots" content="noindex, nofollow">
+  <link rel="manifest" href="/manifest.json">
+  <meta name="theme-color" content="#0F172A">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="Recanto">
+  <link rel="apple-touch-icon" href="/icons/icon-192.png">
+  <title>Painel — Mi Casa Su Casa</title>
+  <link rel="stylesheet" href="css/painel.css">
+  <script src="js/topo-ao-carregar.js"></script>
+</head>
+<body class="painel">
+  <button class="sys-mobile-toggle" id="sys-mobile-toggle" aria-label="Abrir menu" aria-expanded="false">☰ Menu</button>
+  <div class="sys-shell">
+    <aside class="sys-sidebar">
+      <div class="sys-logo-wrap">
+        <img src="assets/logo-footer-sitio.png" alt="Logo Recanto da Paz" class="sys-logo-img" />
+      </div>
+      <button class="sys-nav-btn active" data-tab="faturamento">faturamento</button>
+      <button class="sys-nav-btn" data-tab="ficha">ficha de reserva</button>
+      <button class="sys-nav-btn" data-tab="calendario">configuração</button>
+      <button type="button" class="sys-nav-btn" id="btn-instalar-app" data-sidebar-action="install">instalar app</button>
+      <button type="button" class="sys-nav-btn" id="btn-logout" data-sidebar-action="logout">sair</button>
+      <a href="index.html" class="sys-voltar">← Voltar ao site</a>
+    </aside>
+
+    <main class="sys-main">
+      <section class="sys-tab active" id="tab-faturamento"></section>
+      <section class="sys-tab" id="tab-ficha"></section>
+      <section class="sys-tab" id="tab-calendario"></section>
+    </main>
+  </div>
+  <div class="sys-modal" id="reserva-modal" hidden>
+    <div class="sys-modal-backdrop" data-close-modal="true"></div>
+    <div class="sys-modal-card" id="reserva-modal-card"></div>
+  </div>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="js/supabase-client.js"></script>
+  <script src="js/auth.js"></script>
+  <script src="js/guards.js"></script>
+  <script src="js/system-store.js"></script>
+  <script src="js/painel.js"></script>
+</body>
+</html>

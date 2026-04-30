@@ -1,0 +1,345 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Mi Casa Su Casa — Sobre</title>
+  <link rel="stylesheet" href="css/estilo.css">
+  <script src="js/topo-ao-carregar.js"></script>
+  <script src="js/intro-nav-mobile.js" defer></script>
+</head>
+<body>
+  <div id="intro" class="active">
+    <div class="logo"><img class="logo-intro" src="assets/logo_animacao.svg" alt="Logo sitio recanto da paz"><img class="logo-fixed" src="data:image/svg+xml;utf8,%3Csvg%20width%3D%22600%22%20height%3D%22200%22%20viewBox%3D%220%200%20600%20200%22%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%3E%0A%0A%20%20%3C!--%20SITIO%20--%3E%0A%20%20%3Ctext%20x%3D%2250%25%22%20y%3D%2250%22%20text-anchor%3D%22middle%22%20fill%3D%22%23FFFFFF%22%20font-size%3D%2228%22%20letter-spacing%3D%226%22%20font-family%3D%22Arial%2C%20sans-serif%22%3E%0A%20%20%20%20S%C3%8DTIO%0A%20%20%3C%2Ftext%3E%0A%0A%20%20%3C!--%20Linha%20esquerda%20(mais%20afastada)%20--%3E%0A%20%20%3Cline%20x1%3D%2280%22%20y1%3D%2250%22%20x2%3D%22200%22%20y2%3D%2250%22%20stroke%3D%22%23FFFFFF%22%20stroke-width%3D%221.5%22%3E%3C%2Fline%3E%0A%0A%20%20%3C!--%20Linha%20direita%20(mais%20afastada)%20--%3E%0A%20%20%3Cline%20x1%3D%22400%22%20y1%3D%2250%22%20x2%3D%22520%22%20y2%3D%2250%22%20stroke%3D%22%23FFFFFF%22%20stroke-width%3D%221.5%22%3E%3C%2Fline%3E%0A%0A%20%20%3C!--%20Nome%20principal%20--%3E%0A%20%20%3Ctext%20x%3D%2250%25%22%20y%3D%22135%22%20dominant-baseline%3D%22middle%22%20text-anchor%3D%22middle%22%20fill%3D%22%23FFFFFF%22%20font-size%3D%2264%22%20font-family%3D%22Brush%20Script%20MT%2C%20cursive%22%3E%0A%20%20%20%20Recanto%20da%20Paz%0A%20%20%3C%2Ftext%3E%0A%0A%3C%2Fsvg%3E" alt="Logo sitio recanto da paz"></div>
+    <button type="button" class="intro-menu-toggle" id="intro-menu-toggle" aria-expanded="false" aria-controls="intro-nav-principal" aria-label="Abrir menu de navegação">
+      <span class="intro-menu-toggle-inner" aria-hidden="true"><span></span><span></span><span></span></span>
+    </button>
+    <div class="intro-menu-scrim" id="intro-menu-scrim" aria-hidden="true"></div>
+    <nav id="intro-nav-principal" class="menu" aria-label="Navegação principal">
+      <a href="index.html">Início</a>
+      <a href="quartos.html">Quartos</a>
+      <a href="galeria.html">Galeria</a>
+      <a href="sobre.html" class="ativo">Sobre</a>
+      <a href="reservar.html">Reservar</a>
+    </nav>
+  </div>
+
+  <main>
+    <section class="pagina-hero pagina-hero--sobre">
+      <div>
+        <h1>Sobre nós</h1>
+        <p>Nossa história e valores</p>
+      </div>
+    </section>
+
+    <section class="sobre-secao-fundo" aria-label="Nossa história">
+      <div class="sobre-secao-fundo-bg" aria-hidden="true"></div>
+      <div class="sobre-secao-fundo-fosco" aria-hidden="true"></div>
+      <div class="container sobre-secao-fundo-conteudo">
+        <p class="sobre-secao-fundo-rotulo">Desde o primeiro dia</p>
+        <h2 class="sobre-secao-fundo-titulo">Um lugar feito para momentos únicos</h2>
+        <div class="sobre-secao-fundo-texto">
+          <p>
+            A Pousada Mi Casa Su Casa nasceu com o propósito de oferecer mais do que uma hospedagem:
+            criar uma experiência de acolhimento, conexão com a natureza e desaceleração do ritmo do dia a dia.
+            Nossa missão é proporcionar um ambiente simples, verdadeiro e humano, onde cada hóspede se sinta em casa
+            desde o primeiro momento.
+          </p>
+          <p>
+            Inspirados pela tranquilidade do ambiente natural que nos cerca, cada espaço foi pensado para convidar
+            ao descanso, à convivência e ao bem-estar. A piscina natural, os ambientes integrados ao verde, a cozinha
+            compartilhada e o restaurante refletem nosso cuidado em criar experiências leves, autênticas e memoráveis.
+          </p>
+          <p>
+            Seguimos construindo nossa história com carinho, respeito e atenção aos detalhes, acreditando que receber
+            bem é criar laços, momentos e lembranças que ficam. Aqui, cada estadia é única, porque cada pessoa também é.
+          </p>
+        </div>
+      </div>
+    </section>
+
+    <section class="sobre-vantagens secao" aria-labelledby="sobre-vantagens-titulo">
+      <div class="container">
+        <h2 id="sobre-vantagens-titulo" class="secao-titulo">Por que ficar conosco</h2>
+        <p class="secao-subtitulo">Algumas razões que fazem a diferença na sua estadia</p>
+        <div class="sobre-vantagens-carrossel" id="sobre-vantagens-carrossel" aria-label="Carrossel de destaques">
+          <div class="sobre-vantagens-carrossel-viewport">
+            <div class="sobre-vantagens-carrossel-pista">
+              <div class="sobre-vantagens-grupo is-ativo" data-grupo="0" role="group" aria-label="Destaques 1 e 2">
+                <div class="sobre-vantagens-grid sobre-vantagens-grid--carrossel">
+                  <figure class="sobre-vantagem-card">
+                    <div class="sobre-vantagem-media sobre-vantagem-media--duo">
+                      <img
+                        src="imagem/35.jpeg"
+                        alt="Mi Casa Su Casa — ambiente acolhedor para descanso"
+                        width="800"
+                        height="533"
+                        loading="lazy"
+                        decoding="async">
+                    </div>
+                    <figcaption class="sobre-vantagem-legenda">
+                      Quartos pensados para noites de descanso com todo o conforto.
+                    </figcaption>
+                  </figure>
+                  <figure class="sobre-vantagem-card">
+                    <div class="sobre-vantagem-media sobre-vantagem-media--duo">
+                      <img
+                        src="imagem/5.jpg"
+                        alt="Mi Casa Su Casa — refeições e momentos especiais"
+                        width="800"
+                        height="533"
+                        loading="lazy"
+                        decoding="async">
+                    </div>
+                    <figcaption class="sobre-vantagem-legenda">
+                      Piscina aquecida, perfeita para momentos de lazer, relaxamento e diversão em família.
+                    </figcaption>
+                  </figure>
+                </div>
+              </div>
+              <div class="sobre-vantagens-grupo is-espera" data-grupo="1" role="group" aria-label="Destaques 3 e 4" aria-hidden="true">
+                <div class="sobre-vantagens-grid sobre-vantagens-grid--carrossel">
+                  <figure class="sobre-vantagem-card">
+                    <div class="sobre-vantagem-media sobre-vantagem-media--duo">
+                      <img
+                        src="imagem/24.jpg"
+                        alt="Mi Casa Su Casa — natureza e churrasco"
+                        width="800"
+                        height="533"
+                        loading="lazy"
+                        decoding="async">
+                    </div>
+                    <figcaption class="sobre-vantagem-legenda">
+                      Espaços abertos e muito verde para momentos de paz ao ar livre.
+                    </figcaption>
+                  </figure>
+                  <figure class="sobre-vantagem-card">
+                    <div class="sobre-vantagem-media sobre-vantagem-media--duo">
+                      <img
+                        src="imagem/34.jpg"
+                        alt="Mi Casa Su Casa — foto 1"
+                        width="800"
+                        height="533"
+                        loading="lazy"
+                        decoding="async">
+                    </div>
+                    <figcaption class="sobre-vantagem-legenda">
+                      Área de churrasco completa para confraternizar em meio à natureza.
+                    </figcaption>
+                  </figure>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="sobre-contato secao" id="contato-mapa" aria-labelledby="sobre-contato-titulo">
+      <div class="container sobre-contato-grid">
+        <div class="sobre-contato-info">
+          <h2 id="sobre-contato-titulo" class="sobre-contato-titulo">contato</h2>
+          <dl class="sobre-contato-lista">
+            <div class="sobre-contato-item">
+              <dt>endereço</dt>
+              <dd>Rua Nações Unidas, 111, Benevides, Pará.</dd>
+            </div>
+            <div class="sobre-contato-item">
+              <dt>número</dt>
+              <dd><a href="tel:+559180781514">(91) 8078-1514</a></dd>
+            </div>
+            <div class="sobre-contato-item">
+              <dt>email</dt>
+              <dd><a href="mailto:micasasucasaben@gmail.com">micasasucasaben@gmail.com</a></dd>
+            </div>
+          </dl>
+          <ul class="sobre-contato-redes" aria-label="Redes sociais">
+            <li>
+              <a href="https://www.facebook.com/pousadamicasasucasa" class="sobre-contato-rede sobre-contato-rede--facebook" target="_blank" rel="noopener noreferrer" aria-label="Facebook da Pousada Mi Casa Su Casa">
+                <svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true" focusable="false"><path fill="currentColor" d="M24 12.073C24 5.405 18.627 0 12 0S0 5.405 0 12.073c0 5.996 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/></svg>
+              </a>
+            </li>
+            <li>
+              <a href="https://wa.me/559180781514" class="sobre-contato-rede sobre-contato-rede--whatsapp" target="_blank" rel="noopener noreferrer" aria-label="WhatsApp da Pousada Mi Casa Su Casa">
+                <svg class="sobre-contato-icone-grosso" viewBox="0 0 24 24" width="48" height="48" aria-hidden="true" focusable="false"><path fill="currentColor" d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.435 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
+              </a>
+            </li>
+            <li>
+              <a href="https://www.instagram.com/pousada_micasasucasa" class="sobre-contato-rede sobre-contato-rede--instagram" target="_blank" rel="noopener noreferrer" aria-label="Instagram da Pousada Mi Casa Su Casa">
+                <svg class="sobre-contato-icone-grosso" viewBox="0 0 24 24" width="48" height="48" aria-hidden="true" focusable="false">
+                  <defs>
+                    <linearGradient id="sobre-ig-grad" x1="0%" y1="100%" x2="100%" y2="0%">
+                      <stop offset="0%" stop-color="#f9ce34"/>
+                      <stop offset="50%" stop-color="#ee2a7b"/>
+                      <stop offset="100%" stop-color="#6228d7"/>
+                    </linearGradient>
+                  </defs>
+                  <rect x="2.5" y="2.5" width="19" height="19" rx="5" fill="none" stroke="url(#sobre-ig-grad)" stroke-width="2.35" stroke-linejoin="round"/>
+                  <circle cx="12" cy="12" r="4.25" fill="none" stroke="url(#sobre-ig-grad)" stroke-width="2.35"/>
+                  <circle cx="17.35" cy="6.65" r="1.45" fill="url(#sobre-ig-grad)" stroke="none"/>
+                </svg>
+              </a>
+            </li>
+          </ul>
+        </div>
+        <div class="sobre-contato-mapa-wrap">
+          <iframe
+            class="sobre-contato-mapa"
+            title="Localização da Mi Casa Su Casa no mapa"
+            src="https://maps.google.com/maps?q=Rua+Na%C3%A7%C3%B5es+Unidas%2C+111%2C+Benevides%2C+Par%C3%A1&hl=pt&z=15&output=embed"
+            loading="lazy"
+            referrerpolicy="no-referrer-when-downgrade"
+            allowfullscreen></iframe>
+        </div>
+      </div>
+    </section>
+
+    <section class="secao-cta-fundo sobre-cta-reserva" aria-labelledby="sobre-cta-reserva-titulo">
+      <div class="secao-cta-fundo-bg sobre-cta-reserva-bg" aria-hidden="true"></div>
+      <div class="secao-cta-fundo-overlay" aria-hidden="true"></div>
+      <div class="secao-cta-fundo-conteudo">
+        <h2 id="sobre-cta-reserva-titulo" class="secao-cta-fundo-titulo">
+          Sua próxima aventura começa com um só clique
+        </h2>
+        <p class="secao-cta-fundo-texto">
+          Reserve direto com a gente e garanta o melhor da pousada — datas flexíveis,
+          atendimento que cuida de cada detalhe e a tranquilidade de saber que sua estadia está nas mãos certas.
+        </p>
+        <a href="reservar.html" class="btn-cta-fundo btn-cta-fundo--natural">fazer reserva</a>
+      </div>
+    </section>
+  </main>
+
+  <footer class="rodape">
+    <div class="rodape-inner">
+      <div>
+        <div class="logo"><img src="assets/logo_animacao.svg" alt="Logo sitio recanto da paz"></div>
+        <p>Um lugar de tranquilidade e conforto.</p>
+      </div>
+      <div>
+        <h4>Navegação</h4>
+        <ul>
+          <li><a href="index.html">Início</a></li>
+          <li><a href="quartos.html">Quartos</a></li>
+          <li><a href="galeria.html">Galeria</a></li>
+          <li><a href="sobre.html">Sobre</a></li>
+          <li><a href="reservar.html">Reservar</a></li>
+        </ul>
+      </div>
+      <div>
+        <h4>Contato</h4>
+        <ul class="rodape-contato-links">
+          <li><a href="mailto:micasasucasaben@gmail.com">micasasucasaben@gmail.com</a></li>
+          <li><a href="https://wa.me/559180781514?text=ol%C3%A1%2C%20gostaria%20de%20tira%20uma%20duivida%20sobre%20o%20sitio." target="_blank" rel="noopener noreferrer">(91) 8078-1514</a></li>
+        </ul>
+        <p class="rodape-tambem-estamos">Também estamos em</p>
+        <ul class="rodape-parceiros sobre-contato-redes" aria-label="Redes sociais da Mi Casa Su Casa">
+          <li>
+            <a class="sobre-contato-rede sobre-contato-rede--facebook" href="https://www.facebook.com/pousadamicasasucasa" target="_blank" rel="noopener noreferrer" aria-label="Facebook da Mi Casa Su Casa">
+              <svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true" focusable="false"><path fill="currentColor" d="M24 12.073C24 5.405 18.627 0 12 0S0 5.405 0 12.073c0 5.996 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/></svg>
+            </a>
+          </li>
+          <li>
+            <a class="sobre-contato-rede sobre-contato-rede--whatsapp" href="https://wa.me/559180781514" target="_blank" rel="noopener noreferrer" aria-label="WhatsApp da Mi Casa Su Casa">
+              <svg class="sobre-contato-icone-grosso" viewBox="0 0 24 24" width="48" height="48" aria-hidden="true" focusable="false"><path fill="currentColor" d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.435 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
+            </a>
+          </li>
+          <li>
+            <a class="sobre-contato-rede sobre-contato-rede--instagram" href="https://www.instagram.com/pousada_micasasucasa" target="_blank" rel="noopener noreferrer" aria-label="Instagram da Mi Casa Su Casa">
+              <svg class="sobre-contato-icone-grosso" viewBox="0 0 24 24" width="48" height="48" aria-hidden="true" focusable="false">
+                <defs>
+                  <linearGradient id="rodape-ig-grad-sobre" x1="0%" y1="100%" x2="100%" y2="0%">
+                    <stop offset="0%" stop-color="#f9ce34"/>
+                    <stop offset="50%" stop-color="#ee2a7b"/>
+                    <stop offset="100%" stop-color="#6228d7"/>
+                  </linearGradient>
+                </defs>
+                <rect x="2.5" y="2.5" width="19" height="19" rx="5" fill="none" stroke="url(#rodape-ig-grad-sobre)" stroke-width="2.35" stroke-linejoin="round"/>
+                <circle cx="12" cy="12" r="4.25" fill="none" stroke="url(#rodape-ig-grad-sobre)" stroke-width="2.35"/>
+                <circle cx="17.35" cy="6.65" r="1.45" fill="url(#rodape-ig-grad-sobre)" stroke="none"/>
+              </svg>
+            </a>
+          </li>
+        </ul>
+      </div>
+    </div>
+    <p class="rodape-creditos">© Mi Casa Su Casa. Todos os direitos reservados.</p>
+  </footer>
+
+  <script>
+    window.addEventListener('scroll', function() {
+      const intro = document.getElementById('intro');
+      if (!intro.classList.contains('active')) return;
+      if (window.scrollY > 50) {
+        intro.classList.add('scrolled');
+      } else {
+        intro.classList.remove('scrolled');
+      }
+    });
+
+    (function initSobreVantagensCarrossel() {
+      var root = document.getElementById('sobre-vantagens-carrossel');
+      if (!root) return;
+      var grupos = root.querySelectorAll('.sobre-vantagens-grupo');
+      if (grupos.length < 2) return;
+
+      var idxAtivo = 0;
+      var bloqueado = false;
+      var DUR = 10000;
+      var TRANS = 950;
+
+      function aplicarAria() {
+        grupos.forEach(function (g, i) {
+          var ativo = i === idxAtivo;
+          g.setAttribute('aria-hidden', ativo ? 'false' : 'true');
+        });
+      }
+
+      function aposTransicao() {
+        grupos.forEach(function (g) {
+          g.classList.remove('is-saida');
+          if (!g.classList.contains('is-ativo')) {
+            g.classList.remove('is-espera');
+            g.classList.add('is-espera');
+          }
+        });
+        bloqueado = false;
+        aplicarAria();
+      }
+
+      function avancar() {
+        if (bloqueado) return;
+        bloqueado = true;
+        var atual = grupos[idxAtivo];
+        var prox = grupos[idxAtivo === 0 ? 1 : 0];
+
+        prox.classList.remove('is-espera');
+        atual.classList.remove('is-ativo');
+        atual.classList.add('is-saida');
+        prox.classList.add('is-ativo');
+
+        idxAtivo = idxAtivo === 0 ? 1 : 0;
+        aplicarAria();
+
+        setTimeout(aposTransicao, TRANS);
+      }
+
+      aplicarAria();
+      var timerId = null;
+      function iniciarTimer() {
+        if (timerId) clearInterval(timerId);
+        timerId = setInterval(avancar, DUR);
+      }
+      iniciarTimer();
+      document.addEventListener('visibilitychange', function () {
+        if (document.hidden) {
+          if (timerId) clearInterval(timerId);
+          timerId = null;
+        } else {
+          iniciarTimer();
+        }
+      });
+    })();
+  </script>
+</body>
+</html>

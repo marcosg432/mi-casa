@@ -1,0 +1,19 @@
+{
+  "name": "mi-casa",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Site institucional, reservas (Supabase), painel administrativo e PWA.",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "pm2:start": "pm2 start ecosystem.config.cjs",
+    "pm2:reload": "pm2 reload mi-casa",
+    "pm2:stop": "pm2 stop mi-casa"
+  },
+  "engines": {
+    "node": ">=18"
+  },
+  "dependencies": {
+    "express": "^4.21.2"
+  }
+}

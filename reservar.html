@@ -1,0 +1,316 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Reservar — Mi Casa Su Casa</title>
+  <link rel="stylesheet" href="css/estilo.css">
+  <script src="js/topo-ao-carregar.js"></script>
+  <script src="js/intro-nav-mobile.js" defer></script>
+</head>
+<body>
+  <div id="intro" class="active">
+    <div class="logo"><img class="logo-intro" src="assets/logo_animacao.svg" alt="Logo sitio recanto da paz"><img class="logo-fixed" src="data:image/svg+xml;utf8,%3Csvg%20width%3D%22600%22%20height%3D%22200%22%20viewBox%3D%220%200%20600%20200%22%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%3E%0A%20%20%3Ctext%20x%3D%2250%25%22%20y%3D%2250%22%20text-anchor%3D%22middle%22%20fill%3D%22%23FFFFFF%22%20font-size%3D%2228%22%20letter-spacing%3D%226%22%20font-family%3D%22Arial%2C%20sans-serif%22%3ES%C3%8DTIO%3C%2Ftext%3E%0A%20%20%3Cline%20x1%3D%2280%22%20y1%3D%2250%22%20x2%3D%22200%22%20y2%3D%2250%22%20stroke%3D%22%23FFFFFF%22%20stroke-width%3D%221.5%22%2F%3E%0A%20%20%3Cline%20x1%3D%22400%22%20y1%3D%2250%22%20x2%3D%22520%22%20y2%3D%2250%22%20stroke%3D%22%23FFFFFF%22%20stroke-width%3D%221.5%22%2F%3E%0A%20%20%3Ctext%20x%3D%2250%25%22%20y%3D%22135%22%20dominant-baseline%3D%22middle%22%20text-anchor%3D%22middle%22%20fill%3D%22%23FFFFFF%22%20font-size%3D%2264%22%20font-family%3D%22Brush%20Script%20MT%2C%20cursive%22%3ERecanto%20da%20Paz%3C%2Ftext%3E%0A%3C%2Fsvg%3E" alt="Logo sitio recanto da paz"></div>
+    <button type="button" class="intro-menu-toggle" id="intro-menu-toggle" aria-expanded="false" aria-controls="intro-nav-principal" aria-label="Abrir menu de navegação">
+      <span class="intro-menu-toggle-inner" aria-hidden="true"><span></span><span></span><span></span></span>
+    </button>
+    <div class="intro-menu-scrim" id="intro-menu-scrim" aria-hidden="true"></div>
+    <nav id="intro-nav-principal" class="menu" aria-label="Navegação principal">
+      <a href="index.html">Início</a>
+      <a href="quartos.html">Quartos</a>
+      <a href="galeria.html">Galeria</a>
+      <a href="sobre.html">Sobre</a>
+      <a href="reservar.html" class="ativo">Reservar</a>
+    </nav>
+  </div>
+
+  <main class="reservar-main">
+    <div class="reservar-pagina">
+      <p id="reservar-passo-indicador" class="reservar-passo-indicador">Passo 1 de 4</p>
+
+      <header class="reservar-cabecalho">
+        <h1>Reservar estadia</h1>
+        <p>Escolha a data de entrada e de saída. O pagamento abaixo é apenas uma simulação.</p>
+      </header>
+
+      <div id="reservar-aviso-pagamento-topo" class="reservar-aviso-pagamento-topo" hidden role="alert">
+        <strong>Atenção:</strong> este método de pagamento <em>não é real</em>. Serve somente para você entender como funcionará o site quando estiver no ar.
+      </div>
+
+      <div class="reservar-showcase-externo">
+        <section class="quartos-showcase reservar-quarto-showcase" data-reservar-quarto-showcase aria-label="Escolha o quarto">
+          <div class="quartos-showcase-meio">
+            <div class="quartos-showcase-visual-wrap">
+              <button type="button" class="quartos-showcase-nav quartos-showcase-nav--prev" aria-label="Quarto anterior">
+                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 18l-6-6 6-6"/></svg>
+              </button>
+              <div class="quartos-showcase-visual">
+                <div class="quartos-3d-wrapper">
+                  <div class="quartos-3d-cena">
+                    <div class="quartos-3d-slide"><div class="quartos-3d-foto"><img src="imagem/16.jpg" alt="" width="960" height="640" decoding="async"></div></div>
+                    <div class="quartos-3d-slide"><div class="quartos-3d-foto"><img src="imagem/17.jpg" alt="" width="960" height="640" decoding="async"></div></div>
+                    <div class="quartos-3d-slide"><div class="quartos-3d-foto"><img src="imagem/18.jpg" alt="" width="960" height="640" decoding="async"></div></div>
+                  </div>
+                </div>
+              </div>
+              <button type="button" class="quartos-showcase-nav quartos-showcase-nav--next" aria-label="Próximo quarto">
+                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 18l6-6-6-6"/></svg>
+              </button>
+            </div>
+            <div class="quartos-showcase-copy" aria-live="polite">
+              <div class="quartos-showcase-copy-inner">
+                <h3 class="quartos-showcase-titulo">Quarto</h3>
+                <p class="quartos-showcase-desc">Carregando…</p>
+                <div class="quartos-showcase-preco">
+                  <span class="quartos-showcase-preco-valor">—</span>
+                  <span class="quartos-showcase-preco-label">Noite</span>
+                </div>
+                <a class="btn btn-reserva quartos-showcase-btn" href="quartos.html">Ver quarto</a>
+              </div>
+            </div>
+          </div>
+        </section>
+      </div>
+
+      <div class="reservar-layout">
+        <div class="reservar-conteudo-area">
+          <section id="painel-etapa-datas" class="reservar-etapa" aria-labelledby="titulo-etapa-datas">
+            <h2 id="titulo-etapa-datas" class="visually-hidden">Datas</h2>
+            <div class="reservar-calendarios-dupla">
+              <div class="reservar-cal-wrap">
+                <p class="reservar-cal-legenda">Entrada</p>
+                <p id="reservar-chip-entrada" class="reservar-cal-chip-fecha" aria-live="polite">Carregando calendário…</p>
+                <div id="cal-entrada" class="reservar-cal-mount"></div>
+              </div>
+              <div class="reservar-cal-wrap">
+                <p class="reservar-cal-legenda">Saída</p>
+                <p id="reservar-chip-saida" class="reservar-cal-chip-fecha" aria-live="polite">Carregando calendário…</p>
+                <div id="cal-saida" class="reservar-cal-mount"></div>
+              </div>
+            </div>
+          </section>
+
+          <section id="painel-etapa-pessoas" class="reservar-etapa" hidden aria-labelledby="titulo-etapa-pessoas">
+            <h2 id="titulo-etapa-pessoas">Hóspedes e valor</h2>
+            <p class="reservar-etapa-desc">Confira as noites e o valor estimado. Até 6 pessoas a diária base é R$ 600; acima disso há adicional por pessoa (tabela no resumo). Para mais de 6, use <strong>Quero levar mais de 6 pessoas</strong>.</p>
+            <div class="reservar-resumo-linha">
+              <span>Noites</span>
+              <strong id="reservar-preview-noites">—</strong>
+            </div>
+            <div class="reservar-resumo-linha">
+              <span>Total estimado</span>
+              <strong id="reservar-preview-valor">—</strong>
+            </div>
+            <div id="reservar-pessoas-simples" class="reservar-pessoas-simples">
+              <div class="reservar-pessoas-row">
+                <div class="reservar-pessoas-row-stepper">
+                  <span class="reservar-stepper-label">Quantidade de pessoas (até 6)</span>
+                  <div class="reservar-stepper">
+                    <button type="button" id="reservar-pessoas-menos" class="reservar-stepper-btn" aria-label="Menos uma pessoa">−</button>
+                    <input type="number" id="reservar-input-pessoas" class="reservar-stepper-input" min="1" max="6" value="2" inputmode="numeric" aria-label="Número de pessoas, até 6">
+                    <button type="button" id="reservar-pessoas-mais" class="reservar-stepper-btn" aria-label="Mais uma pessoa">+</button>
+                  </div>
+                </div>
+                <div class="reservar-pessoas-row-side">
+                  <p class="reservar-pessoas-pergunta">Quer adicionar mais pessoas?</p>
+                  <button type="button" id="btn-quero-mais-pessoas" class="btn-reservar-texto">Quero levar mais de 6 pessoas</button>
+                </div>
+              </div>
+            </div>
+
+            <div id="reservar-pessoas-grupo" class="reservar-pessoas-grupo" hidden>
+              <label class="reservar-label" for="reservar-input-pessoas-total">Quantas pessoas no total irá?</label>
+              <div class="reservar-pessoas-grupo-linha">
+                <input type="text" id="reservar-input-pessoas-total" class="reservar-input reservar-input-pessoas-total" value="7" inputmode="numeric" autocomplete="off" aria-label="Total de pessoas no grupo. Deixe em branco até definir.">
+                <button type="button" id="btn-voltar-ate-seis" class="btn-reservar-secundario btn-reservar-secundario--inline">Até 6 pessoas</button>
+              </div>
+            </div>
+
+            <p id="reservar-msg-adicional" class="reservar-msg-adicional" hidden role="status"></p>
+            <p id="reservar-valor-adicional-wrap" class="reservar-valor-adicional-wrap" hidden>
+              <span class="reservar-valor-adicional-label">Valor estimado só do adicional:</span>
+              <strong id="reservar-valor-adicional" class="reservar-valor-adicional-valor">—</strong>
+            </p>
+            <div class="reservar-acoes-etapa">
+              <button type="button" id="btn-voltar-pessoas" class="btn-reservar-secundario">Voltar</button>
+              <button type="button" id="btn-step-pessoas" class="btn-reservar-primario">Continuar</button>
+            </div>
+          </section>
+
+          <section id="painel-etapa-contato" class="reservar-etapa" hidden aria-labelledby="titulo-etapa-contato">
+            <h2 id="titulo-etapa-contato">Seus dados</h2>
+            <p class="reservar-etapa-desc">Nome completo, e-mail e telefone para contato.</p>
+            <div class="reservar-campos">
+              <label class="reservar-label">Nome completo
+                <input type="text" id="reservar-nome" class="reservar-input" autocomplete="name" required>
+              </label>
+              <label class="reservar-label">E-mail
+                <input type="email" id="reservar-email" class="reservar-input" autocomplete="email" required>
+              </label>
+              <label class="reservar-label">Telefone / WhatsApp
+                <input type="tel" id="reservar-telefone" class="reservar-input" autocomplete="tel" inputmode="numeric" maxlength="15" placeholder="(00) 00000-0000" required>
+              </label>
+            </div>
+            <div class="reservar-acoes-etapa">
+              <button type="button" id="btn-voltar-contato" class="btn-reservar-secundario">Voltar</button>
+              <button type="button" id="btn-step-contato" class="btn-reservar-primario">Continuar para pagamento</button>
+            </div>
+          </section>
+
+          <section id="painel-etapa-pagamento" class="reservar-etapa" hidden aria-labelledby="titulo-etapa-pagamento">
+            <h2 id="titulo-etapa-pagamento">Pagamento (simulação)</h2>
+            <p class="reservar-etapa-desc">Escolha o método de pagamento e confirme para finalizar o fluxo de demonstração.</p>
+            <div class="reservar-pix-caixa">
+              <label class="reservar-pix-opcao">
+                <input type="radio" name="reservar-metodo" value="pix" checked>
+                <span>PIX — apenas demonstração</span>
+              </label>
+              <label class="reservar-pix-opcao">
+                <input type="radio" name="reservar-metodo" value="cartao_credito">
+                <span>Cartão de crédito — apenas demonstração</span>
+              </label>
+              <label class="reservar-pix-opcao">
+                <input type="radio" name="reservar-metodo" value="cartao_debito">
+                <span>Cartão de débito — apenas demonstração</span>
+              </label>
+              <label class="reservar-pix-opcao">
+                <input type="radio" name="reservar-metodo" value="boleto">
+                <span>Boleto — apenas demonstração</span>
+              </label>
+              <label class="reservar-pix-opcao">
+                <input type="radio" name="reservar-metodo" value="transferencia">
+                <span>Transferência — apenas demonstração</span>
+              </label>
+              <p class="reservar-pix-detalhe">Nenhuma cobrança será gerada. Ao clicar em <strong>Pagar</strong>, apenas a mensagem de sucesso será exibida.</p>
+            </div>
+            <div class="reservar-acoes-etapa">
+              <button type="button" id="btn-voltar-pagamento" class="btn-reservar-secundario">Voltar</button>
+              <button type="button" id="btn-pagar" class="btn-reservar-pagar">Pagar</button>
+            </div>
+          </section>
+
+          <div class="reservar-regras-balao" aria-labelledby="reservar-regras-titulo">
+            <h3 id="reservar-regras-titulo" class="reservar-regras-balao-titulo">Regras do sítio / informações</h3>
+            <ul class="reservar-regras-balao-lista">
+              <li><strong>Piscina aquecida</strong> para lazer e descanso dos hóspedes;</li>
+              <li>Possui <strong>Wi-Fi</strong> em toda a área interna da casa e área externa de lazer. Temos TV a cabo;</li>
+              <li>Não é permitido fumar dentro da casa;</li>
+              <li>O caseiro está disponível a 200&nbsp;m da propriedade. O contato será disponibilizado assim como o contato com o proprietário;</li>
+              <li>Temos gerador. O mesmo somente será ligado pelo caseiro;</li>
+              <li>Há canoa para uso na represa, sendo necessário uso de coletes salva-vidas. É permitida pesca.</li>
+            </ul>
+          </div>
+        </div>
+
+        <aside class="reservar-painel" aria-label="Resumo da reserva">
+          <div class="reservar-painel-inner">
+            <h2 class="reservar-painel-titulo">Sua reserva</h2>
+
+            <div class="reservar-painel-bloco">
+              <h3 class="reservar-painel-sub">Horários</h3>
+              <p class="reservar-painel-texto"><strong>Check-in:</strong> 12 horas.</p>
+              <p class="reservar-painel-texto"><strong>Check-out:</strong> até 17 horas.</p>
+            </div>
+
+            <div class="reservar-painel-bloco">
+              <h3 class="reservar-painel-sub">Quarto</h3>
+              <p id="reservar-sum-quarto-nome" class="reservar-painel-texto">—</p>
+            </div>
+
+            <div class="reservar-painel-bloco reservar-painel-dinamico">
+              <h3 class="reservar-painel-sub">Datas escolhidas</h3>
+              <p class="reservar-painel-linha"><span>Entrada</span> <span id="reservar-sum-checkin">—</span></p>
+              <p class="reservar-painel-linha"><span>Saída</span> <span id="reservar-sum-checkout">—</span></p>
+              <p class="reservar-painel-linha"><span>Noites</span> <span id="reservar-sum-noites">—</span></p>
+              <p class="reservar-painel-linha"><span>Pessoas</span> <span id="reservar-sum-pessoas">2</span></p>
+              <p class="reservar-painel-linha reservar-painel-total"><span>Total estimado</span> <span id="reservar-sum-total">—</span></p>
+            </div>
+
+            <p id="reservar-sum-resumo-contato" class="reservar-painel-contato" hidden></p>
+
+            <div class="reservar-painel-acoes">
+              <button type="button" id="btn-step-datas" class="btn-reservar-primario btn-step-datas-full" disabled>Continuar</button>
+            </div>
+          </div>
+        </aside>
+      </div>
+    </div>
+  </main>
+
+  <footer class="rodape">
+    <div class="rodape-inner">
+      <div>
+        <div class="logo"><img src="assets/logo_animacao.svg" alt="Logo sitio recanto da paz"></div>
+        <p>Um lugar de tranquilidade e conforto.</p>
+      </div>
+      <div>
+        <h4>Navegação</h4>
+        <ul>
+          <li><a href="index.html">Início</a></li>
+          <li><a href="quartos.html">Quartos</a></li>
+          <li><a href="galeria.html">Galeria</a></li>
+          <li><a href="sobre.html">Sobre</a></li>
+          <li><a href="reservar.html">Reservar</a></li>
+        </ul>
+      </div>
+      <div>
+        <h4>Contato</h4>
+        <ul class="rodape-contato-links">
+          <li><a href="mailto:micasasucasaben@gmail.com">micasasucasaben@gmail.com</a></li>
+          <li><a href="https://wa.me/559180781514?text=ol%C3%A1%2C%20gostaria%20de%20tira%20uma%20duivida%20sobre%20o%20sitio." target="_blank" rel="noopener noreferrer">(91) 8078-1514</a></li>
+        </ul>
+        <p class="rodape-tambem-estamos">Também estamos em</p>
+        <ul class="rodape-parceiros sobre-contato-redes" aria-label="Redes sociais da Mi Casa Su Casa">
+          <li>
+            <a class="sobre-contato-rede sobre-contato-rede--facebook" href="https://www.facebook.com/pousadamicasasucasa" target="_blank" rel="noopener noreferrer" aria-label="Facebook da Mi Casa Su Casa">
+              <svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true" focusable="false"><path fill="currentColor" d="M24 12.073C24 5.405 18.627 0 12 0S0 5.405 0 12.073c0 5.996 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/></svg>
+            </a>
+          </li>
+          <li>
+            <a class="sobre-contato-rede sobre-contato-rede--whatsapp" href="https://wa.me/559180781514" target="_blank" rel="noopener noreferrer" aria-label="WhatsApp da Mi Casa Su Casa">
+              <svg class="sobre-contato-icone-grosso" viewBox="0 0 24 24" width="48" height="48" aria-hidden="true" focusable="false"><path fill="currentColor" d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.435 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
+            </a>
+          </li>
+          <li>
+            <a class="sobre-contato-rede sobre-contato-rede--instagram" href="https://www.instagram.com/pousada_micasasucasa" target="_blank" rel="noopener noreferrer" aria-label="Instagram da Mi Casa Su Casa">
+              <svg class="sobre-contato-icone-grosso" viewBox="0 0 24 24" width="48" height="48" aria-hidden="true" focusable="false">
+                <defs>
+                  <linearGradient id="rodape-ig-grad-reservar" x1="0%" y1="100%" x2="100%" y2="0%">
+                    <stop offset="0%" stop-color="#f9ce34"/>
+                    <stop offset="50%" stop-color="#ee2a7b"/>
+                    <stop offset="100%" stop-color="#6228d7"/>
+                  </linearGradient>
+                </defs>
+                <rect x="2.5" y="2.5" width="19" height="19" rx="5" fill="none" stroke="url(#rodape-ig-grad-reservar)" stroke-width="2.35" stroke-linejoin="round"/>
+                <circle cx="12" cy="12" r="4.25" fill="none" stroke="url(#rodape-ig-grad-reservar)" stroke-width="2.35"/>
+                <circle cx="17.35" cy="6.65" r="1.45" fill="url(#rodape-ig-grad-reservar)" stroke="none"/>
+              </svg>
+            </a>
+          </li>
+        </ul>
+      </div>
+    </div>
+    <p class="rodape-creditos">© Mi Casa Su Casa. Todos os direitos reservados.</p>
+  </footer>
+
+  <div id="reservar-sucesso" class="reservar-overlay" hidden aria-live="assertive" role="dialog" aria-modal="true" aria-labelledby="reservar-sucesso-titulo">
+    <div class="reservar-sucesso-card">
+      <p id="reservar-sucesso-titulo" class="reservar-sucesso-msg">Sua reserva foi concluída!</p>
+      <p class="reservar-sucesso-sub">Em alguns segundos você voltará ao início do site.</p>
+    </div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="js/supabase-client.js"></script>
+  <script src="js/system-store.js"></script>
+  <script src="js/reservar.js"></script>
+  <script>
+    window.addEventListener('scroll', function () {
+      var intro = document.getElementById('intro');
+      if (!intro.classList.contains('active')) return;
+      if (window.scrollY > 50) intro.classList.add('scrolled');
+      else intro.classList.remove('scrolled');
+    });
+  </script>
+</body>
+</html>
