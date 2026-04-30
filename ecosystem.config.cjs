@@ -1,4 +1,4 @@
-/** PM2 — Hostinger VPS; app ouvindo em 0.0.0.0:3013 (nginx faz proxy para cá) */
+/** PM2 — Hostinger VPS; app ouvindo em 0.0.0.0:3014 (nginx faz proxy para cá) */
 module.exports = {
   apps: [
     {
@@ -11,7 +11,7 @@ module.exports = {
       max_memory_restart: '200M',
       env: {
         NODE_ENV: 'production',
-        PORT: 3013
+        PORT: 3014
       }
     }
   ]

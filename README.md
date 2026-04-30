@@ -9,7 +9,7 @@ npm install
 npm start
 ```
 
-Abre `http://localhost:3013` (ou a `PORT` definida no ambiente).
+Abre `http://localhost:3014` (ou a `PORT` definida no ambiente).
 
 ## Produção (PM2)
 
