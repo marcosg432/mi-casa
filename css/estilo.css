@@ -233,6 +233,16 @@ a:hover {
   -webkit-backdrop-filter: blur(10px);
 }
 
+/* Mobile: sem backdrop-filter no header após rolar — senão o painel .menu (fixed)
+   fica preso ao #intro (~80px) em vez da viewport (bug ao abrir o menu mais abaixo na página). */
+@media (max-width: 768px) {
+  #intro.active.scrolled {
+    backdrop-filter: none;
+    -webkit-backdrop-filter: none;
+    background: rgba(30, 69, 48, 0.94);
+  }
+}
+
 #intro.active.scrolled .logo,
 #intro.active.scrolled .menu a {
   color: rgba(255, 255, 255, 0.96);

@@ -3,6 +3,8 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link rel="manifest" href="/manifest.json">
   <meta name="theme-color" content="#0F172A">
   <meta name="apple-mobile-web-app-capable" content="yes">
@@ -11,7 +13,7 @@
   <link rel="apple-touch-icon" href="/icons/icon-192.png">
   <title>Mi Casa Su Casa — Início</title>
   <link rel="stylesheet" href="css/estilo.css">
-  <script src="js/topo-ao-carregar.js"></script>
+  <script src="js/topo-ao-carregar.js" defer></script>
   <script src="js/intro-nav-mobile.js" defer></script>
 </head>
 <body>
@@ -83,7 +85,7 @@
         </div>
         <div class="recanto-imagem recanto-imagem--video">
           <div class="recanto-imagem-video-shell">
-            <video class="recanto-imagem-video" controls playsinline webkit-playsinline preload="auto" width="1280" height="720" poster="assets/video-poster-mi-casa-desktop.png" aria-label="Vídeo da área de lazer — Mi Casa Su Casa">
+            <video class="recanto-imagem-video" controls playsinline webkit-playsinline preload="none" width="1280" height="720" poster="assets/video-poster-mi-casa-desktop.png" aria-label="Vídeo da área de lazer — Mi Casa Su Casa">
                 <source src="video/mi%20casa.mp4" type="video/mp4">
                 Seu navegador não reproduz vídeo.
               </video>
@@ -277,7 +279,7 @@
         </div>
         <div class="recanto-imagem recanto-imagem--video">
           <div class="recanto-imagem-video-shell">
-            <video class="recanto-imagem-video" controls playsinline webkit-playsinline preload="auto" width="1280" height="720" poster="assets/video-poster-mi-casa-mobile.png" aria-label="Vídeo da área de lazer — Mi Casa Su Casa">
+            <video class="recanto-imagem-video" controls playsinline webkit-playsinline preload="none" width="1280" height="720" poster="assets/video-poster-mi-casa-mobile.png" aria-label="Vídeo da área de lazer — Mi Casa Su Casa">
                 <source src="video/mi%20casa.mp4" type="video/mp4">
                 Seu navegador não reproduz vídeo.
               </video>
