@@ -35,6 +35,9 @@
 
 html {
   scroll-behavior: smooth;
+  overflow-x: hidden;
+  max-width: 100%;
+  overscroll-behavior-x: none;
 }
 
 body {
@@ -44,6 +47,10 @@ body {
   background: var(--cor-fundo-pagina);
   line-height: 1.6;
   overflow-x: hidden;
+  max-width: 100%;
+  overscroll-behavior-x: none;
+  /* Mobile: só scroll vertical na página (evita “deslizar” o site para os lados) */
+  touch-action: pan-y pinch-zoom;
 }
 
 img {
