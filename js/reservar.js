@@ -4,7 +4,20 @@
     valorAdicionalPorPessoa: 50,
     pessoasIncluidas: 6
   };
-  var MAX_PESSOAS_STEPPER = config.pessoasIncluidas || 6;
+  /** Máximo de pessoas a mais além da capacidade do quarto. */
+  var MAX_PESSOAS_EXTRAS = 3;
+
+  /** Evita que o clique em «Pagar» fique preso se o Supabase não responder. */
+  function withTimeoutMs(promise, ms) {
+    return Promise.race([
+      promise,
+      new Promise(function (_, reject) {
+        window.setTimeout(function () {
+          reject(new Error('timeout'));
+        }, ms);
+      })
+    ]);
+  }
 
   var MESES = [
     'JANEIRO', 'FEVEREIRO', 'MARÇO', 'ABRIL', 'MAIO', 'JUNHO',
@@ -14,45 +27,49 @@
   var QUARTOS_RESERVA = [
     {
       id: 'tem-tem',
+      capacidade: 2,
       titulo: 'TEM-TEM',
       desc:
         'Quarto Duplo com Banheiro Compartilhado. Quarto duplo aconchegante, ideal para casais que buscam conforto e tranquilidade. Cama de casal, vista para o jardim e banheiro compartilhado com chuveiro. Até 2 pessoas · 20 m².',
       preco: 'R$ 150',
       precoLabel: 'Noite',
-      img: 'imagem/16.jpg',
+      img: 'imagem/6.webp',
       alt: 'Quarto TEM-TEM — Mi Casa Su Casa',
       verQuartoHref: 'quartos.html#quarto-tem-tem'
     },
     {
       id: 'soco',
+      capacidade: 4,
       titulo: 'soco',
       desc:
         'Quarto Família (4 Camas de Solteiro). Espaçoso, com quatro camas de solteiro, ar-condicionado, cozinha compacta privativa, vista para o jardim e banheiro compartilhado. Até 4 pessoas · 40 m².',
       preco: 'R$ 150',
       precoLabel: 'Noite',
-      img: 'imagem/17.jpg',
+      img: 'imagem/6.webp',
       alt: 'Quarto soco — Mi Casa Su Casa',
       verQuartoHref: 'quartos.html#quarto-soco'
     },
     {
       id: 'sabia',
+      capacidade: 5,
       titulo: 'sabiá',
       desc:
         'Quarto Família (1 Cama de Casal + 3 de Solteiro). Amplo espaço, ar-condicionado, cozinha compacta privativa e vista para o jardim. Banheiro compartilhado. Até 5 pessoas · 40 m².',
       preco: 'R$ 150',
       precoLabel: 'Noite',
-      img: 'imagem/24.jpg',
+      img: 'imagem/6.webp',
       alt: 'Quarto sabiá — Mi Casa Su Casa',
       verQuartoHref: 'quartos.html#quarto-sabia'
     },
     {
       id: 'ararajuba',
+      capacidade: 2,
       titulo: 'Ararajuba',
       desc:
         'Quarto Duplo. Confortável para casais ou viajantes: cama de casal, vista para o jardim e banheiro compartilhado com chuveiro. Até 2 pessoas · 20 m².',
       preco: 'R$ 150',
       precoLabel: 'Noite',
-      img: 'imagem/24.jpg',
+      img: 'imagem/6.webp',
       alt: 'Quarto Ararajuba — Mi Casa Su Casa',
       verQuartoHref: 'quartos.html#quarto-ararajuba'
     }
@@ -96,6 +113,16 @@
       if (QUARTOS_RESERVA[i].id === id) return QUARTOS_RESERVA[i].titulo;
     }
     return '—';
+  }
+
+  function capacidadeQuartoId(id) {
+    for (var i = 0; i < QUARTOS_RESERVA.length; i++) {
+      if (QUARTOS_RESERVA[i].id === id) {
+        var c = QUARTOS_RESERVA[i].capacidade;
+        if (typeof c === 'number' && c >= 1) return Math.floor(c);
+      }
+    }
+    return 2;
   }
 
   function pad(n) {
@@ -177,21 +204,21 @@
     return config.valorDiaria + extras * config.valorAdicionalPorPessoa;
   }
 
-  /** Campo total (modo grupo): vazio, 0 ou inválido = inválido. */
-  function parsePessoasGrupo(raw) {
+  /** Modo “pessoas a mais”: 1 a MAX_PESSOAS_EXTRAS (além da capacidade do quarto). */
+  function parsePessoasExtras(raw) {
     var s = String(raw == null ? '' : raw).trim();
     if (s === '') return { valid: false, value: null };
     var v = parseInt(s, 10);
-    if (isNaN(v)) return { valid: false, value: null };
-    if (v < 1) return { valid: false, value: null };
+    if (isNaN(v) || v < 1 || v > MAX_PESSOAS_EXTRAS) return { valid: false, value: null };
     return { valid: true, value: v };
   }
 
   function getPessoasParaCalculo() {
     if (state.modoGrupo) {
       var inp = document.getElementById('reservar-input-pessoas-total');
-      var parsed = parsePessoasGrupo(inp && inp.value);
-      return parsed.valid ? parsed.value : null;
+      var parsed = parsePessoasExtras(inp && inp.value);
+      if (!parsed.valid) return null;
+      return capacidadeQuartoId(state.quartoId) + parsed.value;
     }
     return state.pessoas;
   }
@@ -262,13 +289,13 @@
     var strong = document.getElementById('reservar-valor-adicional');
     if (!el) return;
     var p = getPessoasParaCalculo();
-    if (p == null || p <= 6) {
+    if (p == null || p <= config.pessoasIncluidas) {
       el.textContent = '';
       el.hidden = true;
       if (wrap) wrap.hidden = true;
       return;
     }
-    var x = p - 6;
+    var x = p - config.pessoasIncluidas;
     el.hidden = false;
     el.textContent =
       'Será cobrado adicional de ' +
@@ -296,7 +323,7 @@
     }
     if (state.modoGrupo) {
       var inp = document.getElementById('reservar-input-pessoas-total');
-      btn.disabled = !parsePessoasGrupo(inp && inp.value).valid;
+      btn.disabled = !parsePessoasExtras(inp && inp.value).valid;
     } else {
       btn.disabled = false;
     }
@@ -311,14 +338,11 @@
 
     if (on) {
       var inpT = document.getElementById('reservar-input-pessoas-total');
-      var cur = state.pessoas;
-      if (inpT) {
-        var start = cur > 6 ? cur : 7;
-        inpT.value = String(start);
-      }
+      if (inpT) inpT.value = '1';
     } else {
+      var cap = capacidadeQuartoId(state.quartoId);
       var inpP = document.getElementById('reservar-input-pessoas');
-      if (inpP) inpP.value = String(Math.min(MAX_PESSOAS_STEPPER, Math.max(1, state.pessoas)));
+      if (inpP) inpP.value = String(Math.min(cap, Math.max(1, state.pessoas)));
     }
     syncPessoas();
   }
@@ -538,6 +562,9 @@
       var q = QUARTOS_RESERVA[roomIdx];
       if (!q) return;
       state.quartoId = q.id;
+      var capQ = capacidadeQuartoId(state.quartoId);
+      if (state.pessoas > capQ) state.pessoas = capQ;
+      if (state.pessoas < 1) state.pessoas = 1;
       state.checkIn = null;
       state.checkOut = null;
       var hoje = startOfToday();
@@ -552,6 +579,8 @@
       } catch (eUrl) {}
       pintarCalendariosEsumario();
       showStep(1);
+      var ipFix = document.getElementById('reservar-input-pessoas');
+      if (ipFix) ipFix.value = String(state.pessoas);
     }
 
     pintarCalendariosEsumario();
@@ -563,20 +592,13 @@
       state.checkOut = pSaida;
       state.entradaMes = new Date(pEntrada.getFullYear(), pEntrada.getMonth(), 1);
       state.saidaMes = new Date(pSaida.getFullYear(), pSaida.getMonth(), 1);
+      var capUrl = capacidadeQuartoId(state.quartoId);
+      if (state.pessoas > capUrl) state.pessoas = capUrl;
       pintarCalendariosEsumario();
       showStep(2);
     }
 
     initShowcaseQuartosReservar(aplicarQuartoPorIndice);
-
-    if (window.SystemStore && window.SystemStore.init) {
-      try {
-        await window.SystemStore.init();
-      } catch (errInit) {
-        console.error('Falha ao carregar reservas no Supabase:', errInit);
-      }
-      pintarCalendariosEsumario();
-    }
 
     var inpP = document.getElementById('reservar-input-pessoas');
     var inpTotal = document.getElementById('reservar-input-pessoas-total');
@@ -607,18 +629,34 @@
       });
     }
 
+    function atualizarUIPessoasCapacidade() {
+      var cap = capacidadeQuartoId(state.quartoId);
+      var label = document.getElementById('reservar-stepper-label-cap');
+      if (label) {
+        label.textContent = 'Quantidade de pessoas (até ' + cap + ' no quarto)';
+      }
+      if (inpP) {
+        inpP.setAttribute('max', String(cap));
+        inpP.setAttribute(
+          'aria-label',
+          'Número de hóspedes no quarto, até ' + cap + ' pessoas conforme capacidade'
+        );
+      }
+    }
+
     function syncPessoas() {
       var v;
+      var cap = capacidadeQuartoId(state.quartoId);
       if (state.modoGrupo) {
         var raw = inpTotal && inpTotal.value;
-        var parsed = parsePessoasGrupo(raw);
+        var parsed = parsePessoasExtras(raw);
         if (parsed.valid) {
-          state.pessoas = parsed.value;
+          state.pessoas = cap + parsed.value;
         }
       } else {
         v = parseInt(inpP && inpP.value, 10);
         if (isNaN(v) || v < 1) v = 1;
-        if (v > MAX_PESSOAS_STEPPER) v = MAX_PESSOAS_STEPPER;
+        if (v > cap) v = cap;
         if (inpP) inpP.value = String(v);
         state.pessoas = v;
       }
@@ -636,6 +674,7 @@
       updateMsgAdicional();
       updateSidebar();
       updateBtnContinuarPessoas();
+      atualizarUIPessoasCapacidade();
     }
 
     if (menos) {
@@ -648,7 +687,8 @@
     if (mais) {
       mais.addEventListener('click', function () {
         if (!inpP) return;
-        inpP.value = String(Math.min(MAX_PESSOAS_STEPPER, state.pessoas + 1));
+        var c = capacidadeQuartoId(state.quartoId);
+        inpP.value = String(Math.min(c, state.pessoas + 1));
         syncPessoas();
       });
     }
@@ -688,7 +728,7 @@
         if (btnPessoas.disabled) return;
         syncPessoas();
         if (nights() <= 0) return;
-        if (state.modoGrupo && !parsePessoasGrupo(inpTotal && inpTotal.value).valid) return;
+        if (state.modoGrupo && !parsePessoasExtras(inpTotal && inpTotal.value).valid) return;
         showStep(3);
       });
     }
@@ -735,10 +775,9 @@
         var metodo = metodoEl ? metodoEl.value : 'pix';
         if (window.SystemStore && window.SystemStore.listarReservas) {
           try {
-            await window.SystemStore.listarReservas();
+            await withTimeoutMs(window.SystemStore.listarReservas(), 8000);
           } catch (errList) {
-            alert('Nao foi possivel validar disponibilidade no banco. Tente novamente.');
-            return;
+            console.warn('Reservas: atualização remota ignorada (rede ou timeout).', errList);
           }
         }
         if (
@@ -751,22 +790,25 @@
           return;
         }
         var reservaCriada = null;
-        if (window.SystemStore) {
+        if (window.SystemStore && window.SystemStore.criarReserva) {
           try {
-            reservaCriada = await window.SystemStore.criarReserva({
-              nome: state.nome,
-              email: state.email,
-              telefone: state.telefone,
-              pessoas: pReserva,
-              dataEntrada: entradaIso,
-              dataSaida: saidaIso,
-              plataforma: 'site',
-              metodoPagamento: metodo,
-              quartoId: state.quartoId
-            });
+            reservaCriada = await withTimeoutMs(
+              window.SystemStore.criarReserva({
+                nome: state.nome,
+                email: state.email,
+                telefone: state.telefone,
+                pessoas: pReserva,
+                dataEntrada: entradaIso,
+                dataSaida: saidaIso,
+                plataforma: 'site',
+                metodoPagamento: metodo,
+                quartoId: state.quartoId
+              }),
+              15000
+            );
           } catch (errSave) {
-            alert('Nao foi possivel salvar a reserva no Supabase. Verifique a tabela e as permissoes.');
-            return;
+            console.warn('Reservas: não gravou no servidor; segue só simulação.', errSave);
+            reservaCriada = null;
           }
         }
         var ov = document.getElementById('reservar-sucesso');
@@ -775,8 +817,8 @@
           document.body.style.overflow = 'hidden';
           var titulo = document.getElementById('reservar-sucesso-titulo');
           var sub = document.querySelector('.reservar-sucesso-sub');
-          var metodoEl = document.querySelector('input[name="reservar-metodo"]:checked');
-          var metodo = metodoEl ? metodoEl.value : 'pix';
+          var metodoEl2 = document.querySelector('input[name="reservar-metodo"]:checked');
+          var metodo2 = metodoEl2 ? metodoEl2.value : 'pix';
           var metodoLabelMap = {
             pix: 'PIX',
             cartao_credito: 'Cartão de crédito',
@@ -784,11 +826,20 @@
             boleto: 'Boleto',
             transferencia: 'Transferência'
           };
-          if (titulo && reservaCriada && reservaCriada.codigo) {
-            titulo.textContent = 'Reserva concluída! Código: ' + reservaCriada.codigo;
+          if (titulo) {
+            if (reservaCriada && reservaCriada.codigo) {
+              titulo.textContent = 'Reserva concluída! Código: ' + reservaCriada.codigo;
+            } else {
+              titulo.textContent = 'Reserva simulada (demonstração)';
+            }
           }
           if (sub) {
-            sub.textContent = 'Método escolhido: ' + (metodoLabelMap[metodo] || 'PIX') + ' (simulação). Em alguns segundos você voltará ao início do site.';
+            sub.textContent =
+              'Método escolhido: ' +
+              (metodoLabelMap[metodo2] || 'PIX') +
+              (reservaCriada && reservaCriada.codigo
+                ? ' (simulação). Em alguns segundos você voltará ao início do site.'
+                : '. Não foi possível confirmar no servidor; este passo é só demonstração. Em alguns segundos você voltará ao início do site.');
           }
         }
         window.setTimeout(function () {
@@ -802,6 +853,16 @@
     if (simples) simples.hidden = state.modoGrupo;
     if (grupo) grupo.hidden = !state.modoGrupo;
     syncPessoas();
+
+    /* Carregar reservas depois de ligar os botões: um await aqui bloqueava todos os cliques. */
+    if (window.SystemStore && window.SystemStore.init) {
+      try {
+        await window.SystemStore.init();
+      } catch (errInit) {
+        console.error('Falha ao carregar reservas no Supabase:', errInit);
+      }
+      pintarCalendariosEsumario();
+    }
   }
 
   function initShowcaseQuartosReservar(onSelecionarQuarto) {

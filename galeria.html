@@ -10,7 +10,7 @@
 </head>
 <body>
   <div id="intro" class="active">
-    <div class="logo"><img class="logo-intro" src="assets/logo_animacao.svg" alt="Logo sitio recanto da paz"><img class="logo-fixed" src="data:image/svg+xml;utf8,%3Csvg%20width%3D%22600%22%20height%3D%22200%22%20viewBox%3D%220%200%20600%20200%22%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%3E%0A%0A%20%20%3C!--%20SITIO%20--%3E%0A%20%20%3Ctext%20x%3D%2250%25%22%20y%3D%2250%22%20text-anchor%3D%22middle%22%20fill%3D%22%23FFFFFF%22%20font-size%3D%2228%22%20letter-spacing%3D%226%22%20font-family%3D%22Arial%2C%20sans-serif%22%3E%0A%20%20%20%20S%C3%8DTIO%0A%20%20%3C%2Ftext%3E%0A%0A%20%20%3C!--%20Linha%20esquerda%20(mais%20afastada)%20--%3E%0A%20%20%3Cline%20x1%3D%2280%22%20y1%3D%2250%22%20x2%3D%22200%22%20y2%3D%2250%22%20stroke%3D%22%23FFFFFF%22%20stroke-width%3D%221.5%22%3E%3C%2Fline%3E%0A%0A%20%20%3C!--%20Linha%20direita%20(mais%20afastada)%20--%3E%0A%20%20%3Cline%20x1%3D%22400%22%20y1%3D%2250%22%20x2%3D%22520%22%20y2%3D%2250%22%20stroke%3D%22%23FFFFFF%22%20stroke-width%3D%221.5%22%3E%3C%2Fline%3E%0A%0A%20%20%3C!--%20Nome%20principal%20--%3E%0A%20%20%3Ctext%20x%3D%2250%25%22%20y%3D%22135%22%20dominant-baseline%3D%22middle%22%20text-anchor%3D%22middle%22%20fill%3D%22%23FFFFFF%22%20font-size%3D%2264%22%20font-family%3D%22Brush%20Script%20MT%2C%20cursive%22%3E%0A%20%20%20%20Recanto%20da%20Paz%0A%20%20%3C%2Ftext%3E%0A%0A%3C%2Fsvg%3E" alt="Logo sitio recanto da paz"></div>
+    <div class="logo"><img src="icons/logo%20boa.png" alt="Logo Mi Casa Su Casa"></div>
     <button type="button" class="intro-menu-toggle" id="intro-menu-toggle" aria-expanded="false" aria-controls="intro-nav-principal" aria-label="Abrir menu de navegação">
       <span class="intro-menu-toggle-inner" aria-hidden="true"><span></span><span></span><span></span></span>
     </button>
@@ -43,7 +43,7 @@
           <p class="scroll-morph-content-desc">Descubra os ambientes da Mi Casa Su Casa. Role para ver os cartões em arco.</p>
         </div>
         <div class="scroll-morph-cards-wrap" id="scroll-morph-cards-wrap">
-          <!-- 16 cards gerados por JS -->
+          <!-- Anel 3D: só as primeiras 20 imagens da lista (mosaico abaixo mantém todas) -->
         </div>
       </div>
     </section>
@@ -75,7 +75,7 @@
   <footer class="rodape">
     <div class="rodape-inner">
       <div>
-        <div class="logo"><img src="assets/logo_animacao.svg" alt="Logo sitio recanto da paz"></div>
+        <div class="logo"><img src="imagem/branco.jpg" alt="Logo Mi Casa Su Casa"></div>
         <p>Um lugar de tranquilidade e conforto.</p>
       </div>
       <div>
@@ -92,7 +92,7 @@
         <h4>Contato</h4>
         <ul class="rodape-contato-links">
           <li><a href="mailto:micasasucasaben@gmail.com">micasasucasaben@gmail.com</a></li>
-          <li><a href="https://wa.me/559180781514?text=ol%C3%A1%2C%20gostaria%20de%20tira%20uma%20duivida%20sobre%20o%20sitio." target="_blank" rel="noopener noreferrer">(91) 8078-1514</a></li>
+          <li><a href="https://wa.me/559180781514?text=ol%C3%A1%2C%20gostaria%20de%20tirar%20uma%20d%C3%BAvida%20sobre%20a%20pousada." target="_blank" rel="noopener noreferrer">(91) 8078-1514</a></li>
         </ul>
         <p class="rodape-tambem-estamos">Também estamos em</p>
         <ul class="rodape-parceiros sobre-contato-redes" aria-label="Redes sociais da Mi Casa Su Casa">
@@ -139,43 +139,21 @@
       }
     });
 
-    var GALERIA_IMAGENS = [
-      { src: 'imagem/1.jpg', number: 1 },
-      { src: 'imagem/2.jpg', number: 2 },
-      { src: 'imagem/3.jpg', number: 3 },
-      { src: 'imagem/5.jpg', number: 5 },
-      { src: 'imagem/6.jpg', number: 6 },
-      { src: 'imagem/7.jpg', number: 7 },
-      { src: 'imagem/8.jpg', number: 8 },
-      { src: 'imagem/9.jpg', number: 9 },
-      { src: 'imagem/10.jpg', number: 10 },
-      { src: 'imagem/11.jpg', number: 11 },
-      { src: 'imagem/13.jpg', number: 13 },
-      { src: 'imagem/14.jpg', number: 14 },
-      { src: 'imagem/15.jpg', number: 15 },
-      { src: 'imagem/16.jpg', number: 16 },
-      { src: 'imagem/17.jpg', number: 17 },
-      { src: 'imagem/18.jpg', number: 18 },
-      { src: 'imagem/19.jpg', number: 19 },
-      { src: 'imagem/20.jpg', number: 20 },
-      { src: 'imagem/21.jpg', number: 21 },
-      { src: 'imagem/22.jpg', number: 22 },
-      { src: 'imagem/23.jpg', number: 23 },
-      { src: 'imagem/24.jpg', number: 24 },
-      { src: 'imagem/25.jpg', number: 25 },
-      { src: 'imagem/26.jpg', number: 26 },
-      { src: 'imagem/27.jpg', number: 27 },
-      { src: 'imagem/28.jpg', number: 28 },
-      { src: 'imagem/29.jpg', number: 29 },
-      { src: 'imagem/30.jpg', number: 30 },
-      { src: 'imagem/31.jpg', number: 31 },
-      { src: 'imagem/32.jpg', number: 32 },
-      { src: 'imagem/33.jpg', number: 33 },
-      { src: 'imagem/34.jpg', number: 34 },
-      { src: 'imagem/35.jpeg', number: 35 },
-      { src: 'imagem/36.jpg', number: 36 },
-      { src: 'imagem/37.jpg', number: 37 }
+    /* Galeria só por número: 1 … 37 (imagem/N.ext). Um ficheiro por número; 4, 12 e 13 sem ficheiro na pasta ficam de fora. */
+    var _GALERIA_NUMS = [
+      [1, 'webp'], [2, 'webp'], [3, 'webp'], [5, 'webp'], [6, 'webp'], [7, 'webp'], [8, 'webp'], [9, 'webp'], [10, 'webp'], [11, 'webp'],
+      [14, 'webp'], [15, 'webp'], [16, 'webp'], [17, 'webp'], [18, 'webp'], [19, 'webp'], [20, 'webp'], [21, 'webp'], [22, 'webp'], [23, 'jpg'],
+      [24, 'webp'], [25, 'webp'], [26, 'webp'], [27, 'webp'], [28, 'webp'], [29, 'jpg'], [30, 'webp'], [31, 'jpg'], [32, 'webp'], [33, 'jpg'],
+      [34, 'webp'], [35, 'jpeg'], [36, 'webp'], [37, 'webp']
     ];
+
+    var IMAGENS_PASTA = _GALERIA_NUMS.map(function (x) {
+      return 'imagem/' + x[0] + '.' + x[1];
+    });
+
+    var GALERIA_IMAGENS = _GALERIA_NUMS.map(function (x) {
+      return { src: 'imagem/' + x[0] + '.' + x[1], number: x[0] };
+    });
 
     (function montarGaleriaMosaico() {
       var desktop = document.getElementById('galeria-espacos-desktop');
@@ -293,26 +271,11 @@
     })();
 
     (function() {
-      var TOTAL_IMAGES = 16;
-      var MAX_SCROLL = 3000;
-      var IMAGES = [
-        "imagem/1.jpg",
-        "imagem/14.jpg",
-        "imagem/2.jpg",
-        "imagem/10.jpg",
-        "imagem/9.jpg",
-        "imagem/17.jpg",
-        "imagem/6.jpg",
-        "imagem/11.jpg",
-        "imagem/20.jpg",
-        "imagem/7.jpg",
-        "imagem/3.jpg",
-        "imagem/16.jpg",
-        "imagem/24.jpg",
-        "imagem/8.jpg",
-        "imagem/5.jpg",
-        "imagem/25.jpg"
-      ];
+      var MAX_IMAGENS_ANIMACAO = 20;
+      var IMAGES = IMAGENS_PASTA.slice(0, MAX_IMAGENS_ANIMACAO);
+      var TOTAL_IMAGES = IMAGES.length;
+      if (TOTAL_IMAGES < 1) return;
+      var MAX_SCROLL = Math.max(3000, Math.min(9000, TOTAL_IMAGES * 100));
 
       function lerp(s, e, t) { return s * (1 - t) + e * t; }
 
@@ -432,7 +395,7 @@
         var arcCenterY = arcApexY + arcRadius;
         var spreadAngle = isMobile ? 132 : 130;
         var startAngle = -90 - spreadAngle / 2;
-        var step = spreadAngle / (TOTAL_IMAGES - 1);
+        var step = TOTAL_IMAGES > 1 ? spreadAngle / (TOTAL_IMAGES - 1) : spreadAngle;
         var maxRotation = spreadAngle * 0.8;
         var boundedRotation = -(rotateValue / 360) * maxRotation;
 

@@ -96,6 +96,11 @@ a:hover {
   -webkit-backdrop-filter: blur(3px);
 }
 
+#intro:not(.active) {
+  padding-top: clamp(1rem, 4vh, 3rem);
+  box-sizing: border-box;
+}
+
 #intro .logo {
   font-family: var(--font-display);
   font-size: clamp(2.3rem, 6vw, 4.2rem);
@@ -104,8 +109,7 @@ a:hover {
   color: #fff;
   transform: translateY(0) scale(1);
   transform-origin: center center;
-  opacity: 0;
-  animation: introLogoIn 0.9s ease 0.25s forwards;
+  opacity: 1;
   transition: transform 1.2s cubic-bezier(0.22, 1, 0.36, 1);
 }
 
@@ -120,8 +124,8 @@ a:hover {
   align-items: center;
 }
 
-#intro:not(.active) .logo .logo-intro {
-  width: clamp(300px, 46vw, 620px);
+#intro:not(.active) .logo img {
+  width: clamp(170px, 28vw, 360px);
   max-width: 100%;
   flex-shrink: 0;
 }
@@ -130,17 +134,8 @@ a:hover {
   display: block;
   width: 100%;
   height: auto;
-  filter: brightness(0) invert(1);
   /* Sobrepõe .logo img { max-width: 300px }, que deixava a logo da intro deslocada */
   max-width: none;
-}
-
-#intro .logo .logo-intro {
-  display: block;
-}
-
-#intro .logo .logo-fixed {
-  display: none;
 }
 
 #intro .menu {
@@ -175,7 +170,10 @@ a:hover {
   height: 80px;
   min-height: 0;
   padding: 0 40px;
+  padding-top: max(2px, env(safe-area-inset-top, 0px));
+  box-sizing: border-box;
   flex-direction: row;
+  align-items: center;
   justify-content: space-between;
   background: transparent;
   backdrop-filter: none;
@@ -191,24 +189,15 @@ a:hover {
 }
 
 #intro.active .logo {
-  animation: none;
   opacity: 1;
-  transform: translate(0, 0) scale(0.62);
+  transform: translate(0, -3px) scale(0.42);
   transform-origin: left center;
   font-size: 1.75rem;
   color: #fff;
 }
 
-#intro.active .logo .logo-intro {
-  display: none;
-}
-
-#intro.active .logo .logo-fixed {
-  display: block;
-}
-
 #intro.active .logo img {
-  max-width: min(300px, 55vw);
+  max-width: min(168px, 40vw);
 }
 
 #intro.active .menu {
@@ -428,26 +417,16 @@ body.intro-menu-aberto-no-body {
     min-height: 0;
     height: 80px;
     padding: 0 16px;
+    padding-top: max(2px, env(safe-area-inset-top, 0px));
   }
 
   #intro.active .logo {
     font-size: 1.35rem;
-    transform: translate(0, 0) scale(0.78);
+    transform: translate(0, -2px) scale(0.5);
   }
 
   #intro.active .logo img {
-    max-width: min(260px, 50vw);
-  }
-}
-
-@keyframes introLogoIn {
-  from {
-    opacity: 0;
-    transform: translateY(18px) scale(0.98);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0) scale(1);
+    max-width: min(158px, 38vw);
   }
 }
 
@@ -3606,7 +3585,7 @@ body.lightbox-aberto .cabecalho {
   position: absolute;
   inset: 0;
   z-index: 0;
-  background-image: url('../imagem/32.jpg');
+  background-image: url('../imagem/32.webp');
   background-size: cover;
   background-position: center;
   background-repeat: no-repeat;
@@ -4077,12 +4056,11 @@ body.lightbox-aberto .cabecalho {
 }
 
 .rodape .logo img {
-  max-width: 380px;
-  max-height: 140px;
+  max-width: 220px;
+  max-height: 78px;
   width: auto;
   height: auto;
   object-fit: contain;
-  filter: brightness(0) invert(1);
 }
 
 .rodape p {
@@ -4251,9 +4229,19 @@ body.lightbox-aberto .cabecalho {
 }
 
 .pagina-hero--sobre > div,
-.pagina-hero--galeria > div,
-.pagina-hero--quartos > div {
+.pagina-hero--galeria > div {
   width: 100%;
+}
+
+/* Quartos: moldura só com borda e cantos arredondados à volta do título */
+.pagina-hero--quartos > div {
+  width: fit-content;
+  max-width: min(100%, 36rem);
+  margin-inline: auto;
+  padding: 1.25rem 1.75rem 1.35rem;
+  border: 2px solid rgba(255, 255, 255, 0.88);
+  border-radius: 14px;
+  box-sizing: border-box;
 }
 
 .pagina-hero--sobre h1,

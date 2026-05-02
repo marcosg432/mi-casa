@@ -10,7 +10,7 @@
 </head>
 <body>
   <div id="intro" class="active">
-    <div class="logo"><img class="logo-intro" src="assets/logo_animacao.svg" alt="Logo sitio recanto da paz"><img class="logo-fixed" src="data:image/svg+xml;utf8,%3Csvg%20width%3D%22600%22%20height%3D%22200%22%20viewBox%3D%220%200%20600%20200%22%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%3E%0A%20%20%3Ctext%20x%3D%2250%25%22%20y%3D%2250%22%20text-anchor%3D%22middle%22%20fill%3D%22%23FFFFFF%22%20font-size%3D%2228%22%20letter-spacing%3D%226%22%20font-family%3D%22Arial%2C%20sans-serif%22%3ES%C3%8DTIO%3C%2Ftext%3E%0A%20%20%3Cline%20x1%3D%2280%22%20y1%3D%2250%22%20x2%3D%22200%22%20y2%3D%2250%22%20stroke%3D%22%23FFFFFF%22%20stroke-width%3D%221.5%22%2F%3E%0A%20%20%3Cline%20x1%3D%22400%22%20y1%3D%2250%22%20x2%3D%22520%22%20y2%3D%2250%22%20stroke%3D%22%23FFFFFF%22%20stroke-width%3D%221.5%22%2F%3E%0A%20%20%3Ctext%20x%3D%2250%25%22%20y%3D%22135%22%20dominant-baseline%3D%22middle%22%20text-anchor%3D%22middle%22%20fill%3D%22%23FFFFFF%22%20font-size%3D%2264%22%20font-family%3D%22Brush%20Script%20MT%2C%20cursive%22%3ERecanto%20da%20Paz%3C%2Ftext%3E%0A%3C%2Fsvg%3E" alt="Logo sitio recanto da paz"></div>
+    <div class="logo"><img src="icons/logo%20boa.png" alt="Logo Mi Casa Su Casa"></div>
     <button type="button" class="intro-menu-toggle" id="intro-menu-toggle" aria-expanded="false" aria-controls="intro-nav-principal" aria-label="Abrir menu de navegação">
       <span class="intro-menu-toggle-inner" aria-hidden="true"><span></span><span></span><span></span></span>
     </button>
@@ -47,9 +47,9 @@
               <div class="quartos-showcase-visual">
                 <div class="quartos-3d-wrapper">
                   <div class="quartos-3d-cena">
-                    <div class="quartos-3d-slide"><div class="quartos-3d-foto"><img src="imagem/16.jpg" alt="" width="960" height="640" decoding="async"></div></div>
-                    <div class="quartos-3d-slide"><div class="quartos-3d-foto"><img src="imagem/17.jpg" alt="" width="960" height="640" decoding="async"></div></div>
-                    <div class="quartos-3d-slide"><div class="quartos-3d-foto"><img src="imagem/18.jpg" alt="" width="960" height="640" decoding="async"></div></div>
+                    <div class="quartos-3d-slide"><div class="quartos-3d-foto"><img src="imagem/6.webp" alt="" width="960" height="640" decoding="async"></div></div>
+                    <div class="quartos-3d-slide"><div class="quartos-3d-foto"><img src="imagem/6.webp" alt="" width="960" height="640" decoding="async"></div></div>
+                    <div class="quartos-3d-slide"><div class="quartos-3d-foto"><img src="imagem/6.webp" alt="" width="960" height="640" decoding="async"></div></div>
                   </div>
                 </div>
               </div>
@@ -92,7 +92,7 @@
 
           <section id="painel-etapa-pessoas" class="reservar-etapa" hidden aria-labelledby="titulo-etapa-pessoas">
             <h2 id="titulo-etapa-pessoas">Hóspedes e valor</h2>
-            <p class="reservar-etapa-desc">Confira as noites e o valor estimado. Até 6 pessoas a diária base é R$ 600; acima disso há adicional por pessoa (tabela no resumo). Para mais de 6, use <strong>Quero levar mais de 6 pessoas</strong>.</p>
+            <p class="reservar-etapa-desc">Confira as noites e o valor estimado. A quantidade de hóspedes no quarto segue a <strong>capacidade de cada quarto</strong> (até o máximo indicado no seletor). Até 6 pessoas a diária base é R$ 600; acima disso há adicional por pessoa. Pode levar até <strong>3 pessoas a mais</strong> além dessa capacidade — use <strong>Quero adicionar até 3 pessoas a mais</strong>.</p>
             <div class="reservar-resumo-linha">
               <span>Noites</span>
               <strong id="reservar-preview-noites">—</strong>
@@ -104,25 +104,25 @@
             <div id="reservar-pessoas-simples" class="reservar-pessoas-simples">
               <div class="reservar-pessoas-row">
                 <div class="reservar-pessoas-row-stepper">
-                  <span class="reservar-stepper-label">Quantidade de pessoas (até 6)</span>
+                  <span id="reservar-stepper-label-cap" class="reservar-stepper-label">Quantidade de pessoas (até 2 no quarto)</span>
                   <div class="reservar-stepper">
                     <button type="button" id="reservar-pessoas-menos" class="reservar-stepper-btn" aria-label="Menos uma pessoa">−</button>
-                    <input type="number" id="reservar-input-pessoas" class="reservar-stepper-input" min="1" max="6" value="2" inputmode="numeric" aria-label="Número de pessoas, até 6">
+                    <input type="number" id="reservar-input-pessoas" class="reservar-stepper-input" min="1" max="6" value="2" inputmode="numeric" aria-label="Número de hóspedes no quarto, conforme capacidade">
                     <button type="button" id="reservar-pessoas-mais" class="reservar-stepper-btn" aria-label="Mais uma pessoa">+</button>
                   </div>
                 </div>
                 <div class="reservar-pessoas-row-side">
-                  <p class="reservar-pessoas-pergunta">Quer adicionar mais pessoas?</p>
-                  <button type="button" id="btn-quero-mais-pessoas" class="btn-reservar-texto">Quero levar mais de 6 pessoas</button>
+                  <p class="reservar-pessoas-pergunta">Quer levar mais pessoas além da capacidade do quarto?</p>
+                  <button type="button" id="btn-quero-mais-pessoas" class="btn-reservar-texto">Quero adicionar até 3 pessoas a mais</button>
                 </div>
               </div>
             </div>
 
             <div id="reservar-pessoas-grupo" class="reservar-pessoas-grupo" hidden>
-              <label class="reservar-label" for="reservar-input-pessoas-total">Quantas pessoas no total irá?</label>
+              <label class="reservar-label" for="reservar-input-pessoas-total">Quantas pessoas a mais? (máximo 3)</label>
               <div class="reservar-pessoas-grupo-linha">
-                <input type="text" id="reservar-input-pessoas-total" class="reservar-input reservar-input-pessoas-total" value="7" inputmode="numeric" autocomplete="off" aria-label="Total de pessoas no grupo. Deixe em branco até definir.">
-                <button type="button" id="btn-voltar-ate-seis" class="btn-reservar-secundario btn-reservar-secundario--inline">Até 6 pessoas</button>
+                <input type="number" id="reservar-input-pessoas-total" class="reservar-input reservar-input-pessoas-total" value="1" min="1" max="3" inputmode="numeric" autocomplete="off" aria-label="Pessoas a mais além da capacidade do quarto, de 1 a 3">
+                <button type="button" id="btn-voltar-ate-seis" class="btn-reservar-secundario btn-reservar-secundario--inline">Só capacidade do quarto</button>
               </div>
             </div>
 
@@ -190,14 +190,10 @@
           </section>
 
           <div class="reservar-regras-balao" aria-labelledby="reservar-regras-titulo">
-            <h3 id="reservar-regras-titulo" class="reservar-regras-balao-titulo">Regras do sítio / informações</h3>
+            <h3 id="reservar-regras-titulo" class="reservar-regras-balao-titulo">Regras da pousada / informações</h3>
             <ul class="reservar-regras-balao-lista">
-              <li><strong>Piscina aquecida</strong> para lazer e descanso dos hóspedes;</li>
-              <li>Possui <strong>Wi-Fi</strong> em toda a área interna da casa e área externa de lazer. Temos TV a cabo;</li>
+              <li>Possui <strong>Wi-Fi</strong> em toda a área interna da casa e área externa de lazer.</li>
               <li>Não é permitido fumar dentro da casa;</li>
-              <li>O caseiro está disponível a 200&nbsp;m da propriedade. O contato será disponibilizado assim como o contato com o proprietário;</li>
-              <li>Temos gerador. O mesmo somente será ligado pelo caseiro;</li>
-              <li>Há canoa para uso na represa, sendo necessário uso de coletes salva-vidas. É permitida pesca.</li>
             </ul>
           </div>
         </div>
@@ -240,7 +236,7 @@
   <footer class="rodape">
     <div class="rodape-inner">
       <div>
-        <div class="logo"><img src="assets/logo_animacao.svg" alt="Logo sitio recanto da paz"></div>
+        <div class="logo"><img src="imagem/branco.jpg" alt="Logo Mi Casa Su Casa"></div>
         <p>Um lugar de tranquilidade e conforto.</p>
       </div>
       <div>
@@ -257,7 +253,7 @@
         <h4>Contato</h4>
         <ul class="rodape-contato-links">
           <li><a href="mailto:micasasucasaben@gmail.com">micasasucasaben@gmail.com</a></li>
-          <li><a href="https://wa.me/559180781514?text=ol%C3%A1%2C%20gostaria%20de%20tira%20uma%20duivida%20sobre%20o%20sitio." target="_blank" rel="noopener noreferrer">(91) 8078-1514</a></li>
+          <li><a href="https://wa.me/559180781514?text=ol%C3%A1%2C%20gostaria%20de%20tirar%20uma%20d%C3%BAvida%20sobre%20a%20pousada." target="_blank" rel="noopener noreferrer">(91) 8078-1514</a></li>
         </ul>
         <p class="rodape-tambem-estamos">Também estamos em</p>
         <ul class="rodape-parceiros sobre-contato-redes" aria-label="Redes sociais da Mi Casa Su Casa">
