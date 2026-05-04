@@ -295,13 +295,26 @@
       var morphValue = 0;
       var rotateValue = 0;
 
+      /* Placeholder 1×1 transparente: cartões pequenos (~100px) não precisam do ficheiro grande logo aos 20. */
+      var IMG_PLACEHOLDER =
+        'data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7';
+
       for (var i = 0; i < TOTAL_IMAGES; i++) {
         var card = document.createElement('div');
         card.className = 'scroll-morph-card';
         card.setAttribute('data-index', i);
+        var eager = i < 4;
+        var srcAttr = eager ? ' src="' + IMAGES[i] + '"' : ' src="' + IMG_PLACEHOLDER + '" data-full-src="' + IMAGES[i] + '"';
+        var fetchPr = eager ? (i === 0 ? ' fetchpriority="high"' : ' fetchpriority="low"') : ' fetchpriority="low"';
+        var loadAttr = eager ? ' loading="eager"' : ' loading="lazy"';
         card.innerHTML = '<div class="scroll-morph-card-motion">' +
           '<div class="scroll-morph-card-surface">' +
-            '<img src="' + IMAGES[i] + '" alt="" width="320" height="452" decoding="async">' +
+            '<img' +
+            srcAttr +
+            ' alt="" width="200" height="280" decoding="async" sizes="120px"' +
+            fetchPr +
+            loadAttr +
+            '>' +
           '</div>' +
         '</div>';
         wrap.appendChild(card);
@@ -309,16 +322,56 @@
 
       var cards = wrap.querySelectorAll('.scroll-morph-card');
 
-      if (typeof ResizeObserver !== 'undefined') {
-        new ResizeObserver(function(entries) {
-          var r = entries[0].contentRect;
-          containerSize.width = r.width;
-          containerSize.height = r.height;
-        }).observe(container);
-      }
-
       var section = document.getElementById('scroll-morph-hero');
       if (!section) section = container.closest('section');
+
+      function hydrateScrollMorphImages() {
+        var imgs = wrap.querySelectorAll('img[data-full-src]');
+        var idx = 0;
+        var CHUNK = 4;
+        function loadChunk() {
+          var end = Math.min(idx + CHUNK, imgs.length);
+          for (; idx < end; idx++) {
+            var im = imgs[idx];
+            var full = im.getAttribute('data-full-src');
+            if (full) {
+              im.src = full;
+              im.removeAttribute('data-full-src');
+            }
+          }
+          if (idx < imgs.length) {
+            if (typeof requestIdleCallback === 'function') {
+              requestIdleCallback(loadChunk, { timeout: 900 });
+            } else {
+              window.setTimeout(loadChunk, 100);
+            }
+          }
+        }
+        if (imgs.length) {
+          if (typeof requestIdleCallback === 'function') {
+            requestIdleCallback(loadChunk, { timeout: 1200 });
+          } else {
+            window.setTimeout(loadChunk, 50);
+          }
+        }
+      }
+
+      if (typeof IntersectionObserver === 'function') {
+        var io = new IntersectionObserver(
+          function (entries, obs) {
+            entries.forEach(function (en) {
+              if (en.isIntersecting) {
+                obs.disconnect();
+                hydrateScrollMorphImages();
+              }
+            });
+          },
+          { root: null, rootMargin: '200px 0px', threshold: 0 }
+        );
+        io.observe(section || container);
+      } else {
+        hydrateScrollMorphImages();
+      }
 
       var rafScrollPin = null;
       function pinSectionScroll() {
@@ -340,6 +393,15 @@
 
       var animSpeed = 2.2;
 
+      var pendingMorphRaf = 0;
+      function scheduleMorphUpdate() {
+        if (pendingMorphRaf) return;
+        pendingMorphRaf = requestAnimationFrame(function () {
+          pendingMorphRaf = 0;
+          update();
+        });
+      }
+
       window.addEventListener('wheel', function(e) {
         if (!section) return;
         if (window.innerWidth < 768) return;
@@ -353,15 +415,36 @@
             e.preventDefault();
             virtualScroll = Math.min(virtualScroll + delta * animSpeed, MAX_SCROLL);
             pinSectionScroll();
+            scheduleMorphUpdate();
           }
         } else if (delta < 0) {
           if (virtualScroll > 0) {
             e.preventDefault();
             virtualScroll = Math.max(virtualScroll + delta * animSpeed, 0);
             pinSectionScroll();
+            scheduleMorphUpdate();
           }
         }
       }, { passive: false });
+
+      window.addEventListener(
+        'scroll',
+        function () {
+          scheduleMorphUpdate();
+        },
+        { passive: true }
+      );
+
+      window.addEventListener('resize', scheduleMorphUpdate, { passive: true });
+
+      if (typeof ResizeObserver !== 'undefined') {
+        new ResizeObserver(function (entries) {
+          var r = entries[0].contentRect;
+          containerSize.width = r.width;
+          containerSize.height = r.height;
+          scheduleMorphUpdate();
+        }).observe(container);
+      }
 
       function update() {
         var isMobile = containerSize.width < 768;
@@ -438,11 +521,7 @@
         }
       }
 
-      function tick() {
-        update();
-        requestAnimationFrame(tick);
-      }
-      tick();
+      scheduleMorphUpdate();
     })();
 
   </script>

@@ -34,7 +34,7 @@
   }
 
   var DEFAULT_CONFIG = {
-    valorDiaria: 600,
+    valorDiaria: 150,
     valorAdicionalPorPessoa: 50,
     pessoasIncluidas: 6
   };
@@ -58,17 +58,28 @@
 
   function getConfig() {
     var cfg = readJson(KEY_CONFIG, null) || {};
-    return {
-      valorDiaria: Number(cfg.valorDiaria) > 0 ? Number(cfg.valorDiaria) : DEFAULT_CONFIG.valorDiaria,
-      valorAdicionalPorPessoa:
-        Number(cfg.valorAdicionalPorPessoa) >= 0
-          ? Number(cfg.valorAdicionalPorPessoa)
-          : DEFAULT_CONFIG.valorAdicionalPorPessoa,
-      pessoasIncluidas:
-        Number(cfg.pessoasIncluidas) > 0
-          ? Math.floor(Number(cfg.pessoasIncluidas))
-          : DEFAULT_CONFIG.pessoasIncluidas
+    var valorDiaria =
+      Number(cfg.valorDiaria) > 0 ? Number(cfg.valorDiaria) : DEFAULT_CONFIG.valorDiaria;
+    if (valorDiaria === 600) {
+      valorDiaria = DEFAULT_CONFIG.valorDiaria;
+    }
+    var valorAdicionalPorPessoa =
+      Number(cfg.valorAdicionalPorPessoa) >= 0
+        ? Number(cfg.valorAdicionalPorPessoa)
+        : DEFAULT_CONFIG.valorAdicionalPorPessoa;
+    var pessoasIncluidas =
+      Number(cfg.pessoasIncluidas) > 0
+        ? Math.floor(Number(cfg.pessoasIncluidas))
+        : DEFAULT_CONFIG.pessoasIncluidas;
+    var merged = {
+      valorDiaria: valorDiaria,
+      valorAdicionalPorPessoa: valorAdicionalPorPessoa,
+      pessoasIncluidas: pessoasIncluidas
     };
+    if (Number(cfg.valorDiaria) === 600) {
+      writeJson(KEY_CONFIG, merged);
+    }
+    return merged;
   }
 
   function setConfig(next) {
@@ -85,6 +96,7 @@
     if (!(merged.valorDiaria > 0)) merged.valorDiaria = DEFAULT_CONFIG.valorDiaria;
     if (!(merged.valorAdicionalPorPessoa >= 0)) merged.valorAdicionalPorPessoa = DEFAULT_CONFIG.valorAdicionalPorPessoa;
     if (!(merged.pessoasIncluidas > 0)) merged.pessoasIncluidas = DEFAULT_CONFIG.pessoasIncluidas;
+    if (Number(merged.valorDiaria) === 600) merged.valorDiaria = DEFAULT_CONFIG.valorDiaria;
     writeJson(KEY_CONFIG, merged);
     return merged;
   }
@@ -423,6 +435,142 @@
     return map;
   }
 
+  var TABLE_QUARTOS = 'quartos_catalog';
+
+  function slugifyQuartoId(raw) {
+    var s = String(raw || '')
+      .trim()
+      .toLowerCase()
+      .replace(/\s+/g, '-')
+      .replace(/[^a-z0-9-]/g, '');
+    s = s.replace(/-+/g, '-').replace(/^-|-$/g, '');
+    return s || 'quarto';
+  }
+
+  function parseAmenitiesJson(val) {
+    if (val && typeof val === 'object' && !Array.isArray(val)) return val;
+    if (typeof val === 'string') {
+      try {
+        var o = JSON.parse(val);
+        return o && typeof o === 'object' ? o : {};
+      } catch (e) {
+        return {};
+      }
+    }
+    return {};
+  }
+
+  function limiteDescricaoQuarto(s) {
+    var lim =
+      global.QUARTOS_DESC_MAX > 0 ? Math.min(300, Math.floor(Number(global.QUARTOS_DESC_MAX))) : 300;
+    var t = String(s == null ? '' : s).trim();
+    return t.length > lim ? t.substring(0, lim) : t;
+  }
+
+  function mapRowToQuartoSite(row) {
+    var a = parseAmenitiesJson(row.amenities);
+    var id = String(row.id || '').trim();
+    return {
+      id: id,
+      titulo: row.titulo || '',
+      tipo: row.tipo || '',
+      desc: limiteDescricaoQuarto(row.descricao || ''),
+      capacidade: Number(row.capacidade) > 0 ? Math.floor(Number(row.capacidade)) : 2,
+      preco: row.preco_display || 'R$ 0',
+      precoLabel: row.preco_label || 'Noite',
+      img: row.imagem_principal || '',
+      alt: row.imagem_alt || row.titulo || '',
+      verQuartoHref: 'quartos.html#quarto-' + id,
+      href: 'reservar.html?quarto=' + encodeURIComponent(id),
+      amenities: a,
+      ordem: row.ordem != null ? Number(row.ordem) : 0
+    };
+  }
+
+  function mapQuartoSiteToRow(q, ordem) {
+    var id = slugifyQuartoId(q.id || q.slug);
+    var a = q.amenities && typeof q.amenities === 'object' ? q.amenities : {};
+    return {
+      id: id,
+      titulo: String(q.titulo || '').trim(),
+      tipo: String(q.tipo || '').trim(),
+      descricao: limiteDescricaoQuarto(q.desc || ''),
+      capacidade: Math.max(1, Math.floor(Number(q.capacidade) || 1)),
+      preco_display: String(q.preco || 'R$ 0').trim(),
+      preco_label: String(q.precoLabel || 'Noite').trim(),
+      imagem_principal: String(q.img || '').trim(),
+      imagem_alt: String(q.alt || q.titulo || '').trim(),
+      ordem: ordem != null ? Math.floor(Number(ordem)) : 0,
+      amenities: a,
+      updated_at: new Date().toISOString()
+    };
+  }
+
+  async function fetchQuartosCatalogRows() {
+    var sb = global.SupabaseClient;
+    if (!sb) return null;
+    var res = await sb.from(TABLE_QUARTOS).select('*').order('ordem', { ascending: true });
+    if (res.error) throw res.error;
+    return res.data || [];
+  }
+
+  async function hydrateQuartosSite() {
+    var fb = (global.QUARTOS_SITE_FALLBACK || []).slice();
+    try {
+      var rows = await fetchQuartosCatalogRows();
+      if (!rows || !rows.length) {
+        if (fb.length && global.SupabaseClient) {
+          try {
+            var ins = fb.map(function (q, i) {
+              return mapQuartoSiteToRow(q, i);
+            });
+            var insRes = await global.SupabaseClient.from(TABLE_QUARTOS).insert(ins);
+            if (!insRes.error) rows = await fetchQuartosCatalogRows();
+          } catch (seedErr) {
+            console.warn('seed quartos_catalog', seedErr);
+          }
+        }
+      }
+      if (rows && rows.length) {
+        global.QUARTOS_SITE = rows.map(mapRowToQuartoSite);
+        return global.QUARTOS_SITE;
+      }
+    } catch (e) {
+      console.warn('hydrateQuartosSite', e);
+    }
+    global.QUARTOS_SITE = fb.length ? fb : [];
+    return global.QUARTOS_SITE;
+  }
+
+  async function salvarQuartoCatalog(payload) {
+    var sb = global.SupabaseClient;
+    if (!sb) throw new Error('Supabase indisponivel.');
+    var rows = await fetchQuartosCatalogRows();
+    var id = slugifyQuartoId(payload.id);
+    var ordem = payload.ordem;
+    if (ordem == null && rows) {
+      var found = rows.find(function (r) {
+        return r.id === id;
+      });
+      if (found && found.ordem != null) ordem = found.ordem;
+      else ordem = rows.length;
+    }
+    if (ordem == null) ordem = 0;
+    var row = mapQuartoSiteToRow(Object.assign({}, payload, { id: id }), ordem);
+    var res = await sb.from(TABLE_QUARTOS).upsert(row, { onConflict: 'id' }).select('*');
+    if (res.error) throw res.error;
+    await hydrateQuartosSite();
+    return res.data;
+  }
+
+  async function apagarQuartoCatalog(id) {
+    var sb = global.SupabaseClient;
+    if (!sb) throw new Error('Supabase indisponivel.');
+    var res = await sb.from(TABLE_QUARTOS).delete().eq('id', String(id));
+    if (res.error) throw res.error;
+    await hydrateQuartosSite();
+  }
+
   function clearAll() {
     localStorage.removeItem(KEY_BLOQUEIOS);
     localStorage.removeItem(KEY_CONFIG);
@@ -450,6 +598,10 @@
     getOccupiedDateMap: getOccupiedDateMap,
     getOccupiedDateMapForQuarto: getOccupiedDateMapForQuarto,
     hasRangeConflictForQuarto: hasRangeConflictForQuarto,
-    clearAll: clearAll
+    clearAll: clearAll,
+    hydrateQuartosSite: hydrateQuartosSite,
+    salvarQuartoCatalog: salvarQuartoCatalog,
+    apagarQuartoCatalog: apagarQuartoCatalog,
+    fetchQuartosCatalogRows: fetchQuartosCatalogRows
   };
 })(window);

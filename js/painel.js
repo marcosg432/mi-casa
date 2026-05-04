@@ -10,8 +10,6 @@
     periodo: 'hoje',
     periodoMenuOpen: false
   };
-  var deferredInstallPrompt = null;
-  var installPromptListener = null;
 
   function esc(s) {
     return String(s == null ? '' : s)
@@ -53,6 +51,17 @@
     return parts.length ? parts[0] : '';
   }
 
+  /** Nome amigável do quarto na ficha/modal (catálogo em window.QUARTOS_SITE). */
+  function quartoTituloPorIdPainel(quartoId) {
+    var id = quartoId != null && String(quartoId).trim() !== '' ? String(quartoId).trim() : '';
+    if (!id) return 'Imóvel inteiro / quarto não especificado';
+    var list = window.QUARTOS_SITE || [];
+    for (var i = 0; i < list.length; i++) {
+      if (String(list[i].id) === id) return list[i].titulo || id;
+    }
+    return id;
+  }
+
   function getReservasAtivas() {
     return SystemStore.getReservas().filter(function (r) {
       return r.status !== 'cancelada';
@@ -91,7 +100,7 @@
 
   function setActiveTab(tab) {
     state.tab = tab;
-    document.querySelectorAll('.sys-nav-btn').forEach(function (btn) {
+    document.querySelectorAll('.sys-nav-btn[data-tab]').forEach(function (btn) {
       btn.classList.toggle('active', btn.getAttribute('data-tab') === tab);
     });
     document.querySelectorAll('.sys-tab').forEach(function (sec) {
@@ -106,13 +115,14 @@
   }
 
   function renderFaturamento() {
+    var el = document.getElementById('tab-faturamento');
+    if (!el) return;
     var reservasBase = getReservasAtivas();
     var reservas = filterReservasByPeriodo(reservasBase, state.periodo);
     var f = SystemStore.faturamentoPorPlataforma(reservas);
     var qtdReservas = reservas.length;
     var meiosPagamento = renderMeiosPagamento(reservas);
     var graficoReservas = renderGraficoReservasDia(reservas);
-    var el = document.getElementById('tab-faturamento');
     var periodoLabelMap = {
       hoje: 'Hoje',
       mes_passado: 'Mês passado',
@@ -429,13 +439,15 @@
   function renderRows(list, withOpen) {
     if (!list.length) return '<p class="sys-empty">Nenhuma reserva encontrada.</p>';
     var html = '<div class="sys-table-wrap">';
-    html += '<div class="sys-row header"><div>nome</div><div>numero</div><div>codigo</div><div>app</div><div>Total</div>';
+    html +=
+      '<div class="sys-row header"><div>nome</div><div>numero</div><div>codigo</div><div>quarto</div><div>app</div><div>Total</div>';
     html += withOpen ? '<div></div></div>' : '<div></div></div>';
     list.forEach(function (r) {
       html += '<div class="sys-row">';
       html += '<div class="sys-cell">' + esc(r.nome) + '</div>';
       html += '<div class="sys-cell">' + esc(r.telefone) + '</div>';
       html += '<div class="sys-cell">' + esc(r.codigo) + '</div>';
+      html += '<div class="sys-cell">' + esc(quartoTituloPorIdPainel(r.quartoId)) + '</div>';
       html += '<div class="sys-cell">' + esc((r.plataforma || 'site').toUpperCase()) + '</div>';
       html += '<div class="sys-cell">' + esc(money(r.valorTotal)) + '</div>';
       if (withOpen) {
@@ -470,6 +482,7 @@
       return true;
     });
     var el = document.getElementById('tab-ficha');
+    if (!el) return;
     var rows = list.length
       ? list
           .slice(0, 60)
@@ -480,6 +493,9 @@
               '<div class="sys-ficha-col-nome">' +
               '<span class="sys-nome-desktop">' + esc(r.nome || 'Sem nome') + '</span>' +
               '<span class="sys-nome-mobile">' + esc(firstNameOnly(r.nome || 'Sem nome')) + '</span>' +
+              '<div class="sys-ficha-quarto-line">Quarto: ' +
+              esc(quartoTituloPorIdPainel(r.quartoId)) +
+              '</div>' +
               '</div>' +
               '<div class="sys-ficha-col-valor">' +
               esc(money(r.valorTotal)) +
@@ -508,6 +524,9 @@
               '</span></div>' +
               '<div class="sys-h-pill">Nome: ' +
               esc(r.nome) +
+              '</div>' +
+              '<div class="sys-h-pill">Quarto: ' +
+              esc(quartoTituloPorIdPainel(r.quartoId)) +
               '</div>' +
               '<div class="sys-h-pill">Gmail: ' +
               esc(r.email) +
@@ -553,7 +572,7 @@
         : '') +
       '</div>' +
       (state.fichaView === 'historico'
-        ? '<div class="sys-ficha-table-head"><div>Nome</div><div>Preco</div><div>Status</div></div>' +
+        ? '<div class="sys-ficha-table-head"><div>Nome / quarto</div><div>Preco</div><div>Status</div></div>' +
           '<div class="sys-ficha-table-body">' +
           rows +
           '</div>'
@@ -577,6 +596,7 @@
 
   function renderCalendario() {
     var el = document.getElementById('tab-calendario');
+    if (!el) return;
     var months = [
       'JANEIRO', 'FEVEREIRO', 'MARCO', 'ABRIL', 'MAIO', 'JUNHO',
       'JULHO', 'AGOSTO', 'SETEMBRO', 'OUTUBRO', 'NOVEMBRO', 'DEZEMBRO'
@@ -602,6 +622,517 @@
     html += '</div>';
     html += '<div style="margin-top:1.4rem">' + renderConfigSection() + '</div>';
     el.innerHTML = html;
+  }
+
+  function countReservasAtivasSemQuarto() {
+    return SystemStore.getReservas().filter(function (r) {
+      if ((r.status || '').toLowerCase() === 'cancelada') return false;
+      var rq = r.quartoId != null && String(r.quartoId).trim() !== '' ? String(r.quartoId) : null;
+      return rq == null;
+    }).length;
+  }
+
+  function countReservasAtivasNoQuarto(quartoId) {
+    var qid = String(quartoId || '');
+    return SystemStore.getReservas().filter(function (r) {
+      if ((r.status || '').toLowerCase() === 'cancelada') return false;
+      var rq = r.quartoId != null && String(r.quartoId).trim() !== '' ? String(r.quartoId) : null;
+      if (rq == null) return false;
+      return rq === qid;
+    }).length;
+  }
+
+  var QUARTO_AMENITY_OPTS = [
+    { key: 'arCondicionado', label: 'Ar-condicionado' },
+    { key: 'wifi', label: 'Wi-Fi' },
+    { key: 'banheiroPrivativo', label: 'Banheiro privativo' },
+    { key: 'banheiroCompartilhado', label: 'Banheiro compartilhado' },
+    { key: 'cozinhaCompacta', label: 'Cozinha compacta privativa' },
+    { key: 'maquinaLavar', label: 'Máquina de lavar' },
+    { key: 'ventilador', label: 'Ventilador' },
+    { key: 'guardaRoupa', label: 'Guarda-roupa' }
+  ];
+
+  function getQuartoDescMaximo() {
+    var cap = Number(window.QUARTOS_DESC_MAX) > 0 ? Math.floor(Number(window.QUARTOS_DESC_MAX)) : 300;
+    return Math.min(Math.max(cap, 1), 300);
+  }
+
+  var quaEditorBlobUrl = null;
+
+  function revogarBlobQuartoEditor() {
+    if (quaEditorBlobUrl) {
+      try {
+        URL.revokeObjectURL(quaEditorBlobUrl);
+      } catch (eRev) {}
+      quaEditorBlobUrl = null;
+    }
+  }
+
+  function tryUploadQuartoCoverBlob(file) {
+    return new Promise(function (resolve) {
+      var sb = window.SupabaseClient;
+      if (!sb || !sb.storage) {
+        resolve(null);
+        return;
+      }
+      var rawExt = String(file.name || '')
+        .split('.')
+        .pop();
+      var ext = (rawExt || 'webp').toLowerCase().replace(/[^a-z0-9]/g, '');
+      if (!ext || ext.length > 5) ext = 'webp';
+      var key =
+        'quarto/' +
+        Date.now().toString(36) +
+        '-' +
+        Math.random().toString(36).slice(2, 9) +
+        '.' +
+        ext;
+      sb.storage
+        .from('site-midias')
+        .upload(key, file, {
+          contentType: file.type || 'image/jpeg',
+          cacheControl: '86400'
+        })
+        .then(function (res) {
+          if (res.error) {
+            console.warn('Storage upload:', res.error);
+            resolve(null);
+            return;
+          }
+          var pub = sb.storage.from('site-midias').getPublicUrl(key);
+          var url = pub && pub.data && pub.data.publicUrl ? pub.data.publicUrl : null;
+          resolve(url);
+        })
+        .catch(function (errUp) {
+          console.warn(errUp);
+          resolve(null);
+        });
+    });
+  }
+
+  function wireQuartoEditorImagemUI() {
+    revogarBlobQuartoEditor();
+    var inp = document.getElementById('qua-img');
+    var prev = document.getElementById('qua-img-preview');
+    var drop = document.getElementById('qua-img-dropzone');
+    var fileInp = document.getElementById('qua-img-file');
+    var grid = document.getElementById('qua-galeria-grid');
+    if (!inp || !prev || !drop || !fileInp) return;
+
+    function showPreviewSrc(src) {
+      if (!src) {
+        prev.hidden = true;
+        prev.removeAttribute('src');
+        return;
+      }
+      prev.hidden = false;
+      prev.src = src;
+    }
+
+    function syncFromInput() {
+      revogarBlobQuartoEditor();
+      showPreviewSrc(String(inp.value || '').trim());
+    }
+
+    function handleFile(file) {
+      if (!file || !/^image\//.test(file.type)) {
+        alert('Escolha um ficheiro de imagem (JPG, PNG, WebP, etc.).');
+        return;
+      }
+      if (file.size > 8 * 1024 * 1024) {
+        alert('Imagem demasiado grande (máximo 8 MB).');
+        return;
+      }
+      revogarBlobQuartoEditor();
+      quaEditorBlobUrl = URL.createObjectURL(file);
+      showPreviewSrc(quaEditorBlobUrl);
+
+      tryUploadQuartoCoverBlob(file).then(function (publicUrl) {
+        if (publicUrl) {
+          revogarBlobQuartoEditor();
+          inp.value = publicUrl;
+          showPreviewSrc(publicUrl);
+          return;
+        }
+        revogarBlobQuartoEditor();
+        if (!String(inp.value || '').trim()) showPreviewSrc('');
+        alert(
+          'Não foi possível enviar para o armazenamento em nuvem (crie o bucket «site-midias» no Supabase — ver supabase/storage_site_midias.sql).\n\n' +
+            'Pode: escolher uma miniatura da galeria abaixo, ou colocar a foto na pasta imagem/ do site e escrever o caminho no campo.'
+        );
+      });
+    }
+
+    inp.addEventListener('input', syncFromInput);
+    inp.addEventListener('change', syncFromInput);
+
+    drop.addEventListener('dragover', function (ev) {
+      ev.preventDefault();
+      drop.classList.add('sys-img-dropzone--hover');
+    });
+    drop.addEventListener('dragleave', function () {
+      drop.classList.remove('sys-img-dropzone--hover');
+    });
+    drop.addEventListener('drop', function (ev) {
+      ev.preventDefault();
+      drop.classList.remove('sys-img-dropzone--hover');
+      var f = ev.dataTransfer && ev.dataTransfer.files && ev.dataTransfer.files[0];
+      if (f) handleFile(f);
+    });
+
+    fileInp.addEventListener('change', function () {
+      var f = fileInp.files && fileInp.files[0];
+      if (f) handleFile(f);
+      fileInp.value = '';
+    });
+
+    if (grid && window.GALERIA_IMAGENS_URLS && window.GALERIA_IMAGENS_URLS.length) {
+      grid.innerHTML = window.GALERIA_IMAGENS_URLS.map(function (item) {
+        var u = item.url;
+        return (
+          '<button type="button" class="sys-galeria-thumb" data-img-path="' +
+          esc(u) +
+          '" title="' +
+          esc(u) +
+          '">' +
+          '<img src="' +
+          esc(u) +
+          '" alt="" loading="lazy" decoding="async" width="88" height="62" />' +
+          '</button>'
+        );
+      }).join('');
+      grid.addEventListener('click', function (ev) {
+        var b = ev.target.closest && ev.target.closest('.sys-galeria-thumb');
+        if (!b) return;
+        var p = b.getAttribute('data-img-path');
+        if (p) {
+          inp.value = p;
+          syncFromInput();
+        }
+      });
+    }
+
+    syncFromInput();
+  }
+
+  function closeQuartoEditorModal() {
+    revogarBlobQuartoEditor();
+    var m = document.getElementById('quarto-editor-modal');
+    if (m) m.setAttribute('hidden', '');
+    var card = document.getElementById('quarto-editor-card');
+    if (card) card.innerHTML = '';
+  }
+
+  function buildQuartoEditorFormHTML(q) {
+    var isEdit = !!(q && q.id);
+    var a = (q && q.amenities) || {};
+    var descMax = getQuartoDescMaximo();
+    var idVal = isEdit ? String(q.id) : '';
+    var idField =
+      '<label class="sys-label">Identificador no site (URL)<br />' +
+      (isEdit
+        ? '<input class="sys-input" type="text" id="qua-id" value="' +
+          esc(idVal) +
+          '" readonly required />'
+        : '<input class="sys-input" type="text" id="qua-id" required maxlength="80" placeholder="ex: meu-quarto" />') +
+      '</label>';
+    var checks = QUARTO_AMENITY_OPTS.map(function (opt) {
+      var on = a[opt.key] ? ' checked' : '';
+      return (
+        '<label><input type="checkbox" id="qua-am-' +
+        esc(opt.key) +
+        '"' +
+        on +
+        ' /> ' +
+        esc(opt.label) +
+        '</label>'
+      );
+    }).join('');
+    var galeriaLines = '';
+    if (a.galeria && Array.isArray(a.galeria)) {
+      galeriaLines = a.galeria
+        .map(function (u) {
+          return String(u || '').trim();
+        })
+        .filter(Boolean)
+        .join('\n');
+    }
+    var ordemVal = q && q.ordem != null ? String(q.ordem) : '';
+    return (
+      '<form id="form-quarto-editor" class="sys-form sys-quarto-editor-form">' +
+      '<h3>' +
+      esc(isEdit ? 'Editar quarto' : 'Novo quarto') +
+      '</h3>' +
+      '<p class="sys-help">Alterações gravam no Supabase (<code>quartos_catalog</code>) e aparecem no site, na reserva e no carrossel.</p>' +
+      '<input type="hidden" id="qua-ordem" value="' +
+      esc(ordemVal) +
+      '" />' +
+      idField +
+      '<label class="sys-label">Nome do quarto<br /><input class="sys-input" type="text" id="qua-titulo" required maxlength="120" value="' +
+      esc(q ? q.titulo || '' : '') +
+      '" /></label>' +
+      '<label class="sys-label">Subtítulo / estilo (linha abaixo do nome)<br /><input class="sys-input" type="text" id="qua-tipo" maxlength="200" value="' +
+      esc(q ? q.tipo || '' : '') +
+      '" /></label>' +
+      '<label class="sys-label">Descrição (máx. ' +
+      esc(String(descMax)) +
+      ' caracteres)<br /><textarea class="sys-input" id="qua-desc" maxlength="' +
+      esc(String(descMax)) +
+      '" rows="6">' +
+      esc(q ? String(q.desc || '').substring(0, descMax) : '') +
+      '</textarea></label>' +
+      '<div class="sys-quarto-editor-grid">' +
+      '<label class="sys-label">Capacidade (pessoas)<br /><input class="sys-input" type="number" id="qua-cap" min="1" max="30" value="' +
+      esc(String(q && q.capacidade != null ? q.capacidade : 2)) +
+      '" /></label>' +
+      '<label class="sys-label">Metros quadrados (m²)<br /><input class="sys-input" type="number" id="qua-m2" min="0" max="999" value="' +
+      esc(String(a.metros2 != null ? a.metros2 : '')) +
+      '" /></label>' +
+      '<label class="sys-label">Valor exibido (ex: R$ 150)<br /><input class="sys-input" type="text" id="qua-preco" maxlength="40" value="' +
+      esc(q ? q.preco || '' : '') +
+      '" /></label>' +
+      '<label class="sys-label">Rótulo do valor<br /><input class="sys-input" type="text" id="qua-preco-label" maxlength="40" value="' +
+      esc(q ? q.precoLabel || 'Noite' : 'Noite') +
+      '" /></label>' +
+      '<label class="sys-label">Camas de casal (quantidade)<br /><input class="sys-input" type="number" id="qua-camas-casal" min="0" max="20" value="' +
+      esc(String(a.camasCasal != null ? a.camasCasal : 0)) +
+      '" /></label>' +
+      '<label class="sys-label">Camas de solteiro (quantidade)<br /><input class="sys-input" type="number" id="qua-camas-solteiro" min="0" max="20" value="' +
+      esc(String(a.camasSolteiro != null ? a.camasSolteiro : 0)) +
+      '" /></label>' +
+      '</div>' +
+      '<fieldset><legend>Sobre o quarto — selecione o que se aplica</legend>' +
+      '<div class="sys-quarto-amenity-grid">' +
+      checks +
+      '</div></fieldset>' +
+      '<fieldset class="sys-quarto-img-fieldset"><legend>Foto principal do quarto</legend>' +
+      '<p class="sys-help">Arraste uma imagem para a área abaixo ou clique para escolher no computador. Se o armazenamento Supabase estiver configurado, o link público é preenchido automaticamente; caso contrário use a galeria do site ou o caminho <code>imagem/…</code>.</p>' +
+      '<label id="qua-img-dropzone" class="sys-img-dropzone" for="qua-img-file">' +
+      '<span class="sys-img-dropzone-text">Arrastar imagem aqui · ou clicar para abrir o explorador</span>' +
+      '<input type="file" id="qua-img-file" class="sys-img-dropzone-file" accept="image/*" />' +
+      '</label>' +
+      '<div class="sys-quarto-img-preview-wrap">' +
+      '<img id="qua-img-preview" class="sys-quarto-img-preview" alt="" width="240" height="160" loading="lazy" decoding="async" hidden />' +
+      '</div>' +
+      '<label class="sys-label">Caminho ou URL da imagem (gravado no quarto)<br /><input class="sys-input" type="text" id="qua-img" maxlength="2000" value="' +
+      esc(q ? q.img || '' : '') +
+      '" placeholder="imagem/6.webp ou URL pública" /></label>' +
+      '<details class="sys-galeria-site-picker"><summary>Fotos já no site (mesma galeria da página Galeria)</summary>' +
+      '<p class="sys-help">Clique numa miniatura para usar esse ficheiro no quarto.</p>' +
+      '<div id="qua-galeria-grid" class="sys-galeria-mini-grid"></div></details>' +
+      '</fieldset>' +
+      '<label class="sys-label">Texto alternativo da imagem<br />' +
+      '<span class="sys-help" style="display:block;margin:0.25rem 0 0.4rem">Descreve a foto para quem não a vê (leitores de ecrã) e para o Google. Ex.: «Quarto com cama de casal e vista para o jardim».</span>' +
+      '<input class="sys-input" type="text" id="qua-alt" maxlength="200" value="' +
+      esc(q ? q.alt || '' : '') +
+      '" /></label>' +
+      '<label class="sys-label">Mais imagens (uma URL por linha; opcional)<br /><textarea class="sys-input" id="qua-imagens-extra" rows="3" placeholder="https://...">' +
+      esc(galeriaLines) +
+      '</textarea></label>' +
+      '<div class="sys-quarto-editor-actions">' +
+      '<button type="button" class="sys-btn sys-btn--ghost" data-quarto-modal-close="true">Cancelar</button>' +
+      '<button type="submit" class="sys-btn">Salvar quarto</button>' +
+      '</div></form>'
+    );
+  }
+
+  function openQuartoEditor(id) {
+    var list = window.QUARTOS_SITE || [];
+    var q = id ? list.find(function (x) { return String(x.id) === String(id); }) : null;
+    if (id && !q) {
+      alert('Quarto não encontrado na lista atual.');
+      return;
+    }
+    var card = document.getElementById('quarto-editor-card');
+    var modal = document.getElementById('quarto-editor-modal');
+    if (!card || !modal) return;
+    card.innerHTML = buildQuartoEditorFormHTML(q);
+    wireQuartoEditorImagemUI();
+    modal.removeAttribute('hidden');
+  }
+
+  function tryDeleteQuarto(id) {
+    if (!id || !SystemStore.apagarQuartoCatalog) {
+      alert('Exclusão indisponível (Supabase ou função ausente).');
+      return;
+    }
+    var list = window.QUARTOS_SITE || [];
+    var q = list.find(function (x) { return String(x.id) === String(id); });
+    var titulo = q ? q.titulo : id;
+    var n = countReservasAtivasNoQuarto(id);
+    var msg =
+      'Apagar o quarto "' +
+      titulo +
+      '"?\n\nEle deixa de aparecer no site, na página Quartos, na reserva e neste painel.';
+    if (n > 0) {
+      msg += '\n\nHá ' + n + ' reserva(s) ativa(s) vinculada(s) a este quarto — continuam no sistema, mas o quarto some do catálogo.';
+    }
+    if (!window.confirm(msg)) return;
+    SystemStore.apagarQuartoCatalog(id)
+      .then(function () {
+        closeQuartoEditorModal();
+        renderAll();
+      })
+      .catch(function (err) {
+        console.error(err);
+        alert('Não foi possível apagar no Supabase (tabela ou permissões).');
+      });
+  }
+
+  function handleQuartoEditorSubmit() {
+    if (!SystemStore.salvarQuartoCatalog) {
+      alert('Salvar indisponível.');
+      return;
+    }
+    var idEl = document.getElementById('qua-id');
+    var tituloEl = document.getElementById('qua-titulo');
+    if (!idEl || !tituloEl) return;
+    var rawId = String(idEl.value || '').trim();
+    if (!rawId) {
+      alert('Informe o identificador do quarto.');
+      return;
+    }
+    var list = window.QUARTOS_SITE || [];
+    var existing = list.find(function (x) { return String(x.id) === String(rawId); });
+    var ordemEl = document.getElementById('qua-ordem');
+    var payload = {
+      id: rawId,
+      titulo: String(tituloEl.value || '').trim(),
+      tipo: String((document.getElementById('qua-tipo') && document.getElementById('qua-tipo').value) || '').trim(),
+      desc: String((document.getElementById('qua-desc') && document.getElementById('qua-desc').value) || '')
+        .trim()
+        .substring(0, getQuartoDescMaximo()),
+      capacidade: Math.max(1, Math.floor(Number(document.getElementById('qua-cap').value) || 1)),
+      preco: String((document.getElementById('qua-preco') && document.getElementById('qua-preco').value) || '').trim() || 'R$ 0',
+      precoLabel: String(
+        (document.getElementById('qua-preco-label') && document.getElementById('qua-preco-label').value) || 'Noite'
+      ).trim() || 'Noite',
+      img: String((document.getElementById('qua-img') && document.getElementById('qua-img').value) || '').trim(),
+      alt: String((document.getElementById('qua-alt') && document.getElementById('qua-alt').value) || '').trim()
+    };
+    var baseA = existing && existing.amenities && typeof existing.amenities === 'object' ? Object.assign({}, existing.amenities) : {};
+    QUARTO_AMENITY_OPTS.forEach(function (opt) {
+      var el = document.getElementById('qua-am-' + opt.key);
+      baseA[opt.key] = !!(el && el.checked);
+    });
+    baseA.camasCasal = Math.max(0, Math.floor(Number(document.getElementById('qua-camas-casal').value) || 0));
+    baseA.camasSolteiro = Math.max(0, Math.floor(Number(document.getElementById('qua-camas-solteiro').value) || 0));
+    var m2 = document.getElementById('qua-m2').value;
+    if (m2 !== '' && !isNaN(Number(m2))) baseA.metros2 = Math.max(0, Math.floor(Number(m2)));
+    else delete baseA.metros2;
+    var extraRaw = (document.getElementById('qua-imagens-extra') && document.getElementById('qua-imagens-extra').value) || '';
+    var extraLines = extraRaw
+      .split('\n')
+      .map(function (s) {
+        return String(s || '').trim();
+      })
+      .filter(Boolean);
+    if (extraLines.length) baseA.galeria = extraLines;
+    else delete baseA.galeria;
+    payload.amenities = baseA;
+    if (ordemEl && ordemEl.value !== '' && !isNaN(Number(ordemEl.value))) {
+      payload.ordem = Math.floor(Number(ordemEl.value));
+    }
+    SystemStore.salvarQuartoCatalog(payload)
+      .then(function () {
+        closeQuartoEditorModal();
+        renderAll();
+      })
+      .catch(function (err) {
+        console.error(err);
+        alert('Não foi possível salvar no Supabase.');
+      });
+  }
+
+  function renderQuartos() {
+    var el = document.getElementById('tab-quartos');
+    if (!el) return;
+    var list = window.QUARTOS_SITE && window.QUARTOS_SITE.length ? window.QUARTOS_SITE : [];
+    var sem = countReservasAtivasSemQuarto();
+    var avisoSem =
+      sem > 0
+        ? '<p class="sys-help sys-quartos-aviso">' +
+          esc(String(sem)) +
+          ' reserva(s) ativa(s) sem quarto específico — no calendário ocupam o imóvel inteiro (todos os quartos).</p>'
+        : '';
+    var toolbar =
+      '<div class="sys-quartos-toolbar">' +
+      '<button type="button" class="sys-btn" id="btn-quarto-novo">+ Novo quarto</button>' +
+      '<span class="sys-help">Descrição: no máximo ' +
+      esc(String(getQuartoDescMaximo())) +
+      ' caracteres.</span>' +
+      '</div>';
+    var cards = list
+      .map(function (q) {
+        var n = countReservasAtivasNoQuarto(q.id);
+        var hrefSite = esc(q.verQuartoHref || 'quartos.html');
+        var hrefRes = esc('reservar.html?quarto=' + encodeURIComponent(q.id));
+        var imgPath = q.img ? String(q.img).trim() : '';
+        var media =
+          imgPath !== ''
+            ? '<figure class="sys-quarto-media"><img src="' +
+              esc(imgPath) +
+              '" alt="' +
+              esc(q.alt || q.titulo || 'Quarto') +
+              '" width="640" height="360" loading="lazy" decoding="async" /></figure>'
+            : '';
+        return (
+          '<article class="sys-card sys-quarto-card">' +
+          media +
+          '<div class="sys-quarto-body">' +
+          '<div class="sys-quarto-card-head">' +
+          '<h3>' +
+          esc(q.titulo) +
+          '</h3>' +
+          '<span class="sys-quarto-id">' +
+          esc(q.id) +
+          '</span></div>' +
+          '<p class="sys-quarto-tipo">' +
+          esc(q.tipo || '') +
+          '</p>' +
+          '<p class="sys-help sys-quarto-desc">' +
+          esc(q.desc || '') +
+          '</p>' +
+          '<ul class="sys-quarto-meta">' +
+          '<li><strong>Capacidade:</strong> até ' +
+          esc(String(q.capacidade != null ? q.capacidade : '—')) +
+          ' pessoas</li>' +
+          '<li><strong>Valor no site:</strong> ' +
+          esc(q.preco || '—') +
+          ' / ' +
+          esc(q.precoLabel || 'noite') +
+          '</li>' +
+          '<li><strong>Reservas ativas neste quarto:</strong> ' +
+          esc(String(n)) +
+          '</li></ul>' +
+          '<div class="sys-quarto-links">' +
+          '<a class="sys-btn sys-btn--ghost" href="' +
+          hrefSite +
+          '" target="_blank" rel="noopener noreferrer">Ver no site</a>' +
+          '<a class="sys-btn sys-btn--ghost" href="' +
+          hrefRes +
+          '" target="_blank" rel="noopener noreferrer">Página reservar</a>' +
+          '</div>' +
+          '<div class="sys-quarto-admin">' +
+          '<button type="button" class="sys-btn sys-btn--small" data-quarto-edit="' +
+          esc(q.id) +
+          '">Editar</button>' +
+          '<button type="button" class="sys-btn sys-btn--small sys-btn--danger" data-quarto-delete="' +
+          esc(q.id) +
+          '">Apagar quarto</button>' +
+          '</div></div></article>'
+        );
+      })
+      .join('');
+    el.innerHTML =
+      '<h2 class="sys-section-title">Quartos</h2>' +
+      '<p class="sys-help" style="margin-bottom:1rem">Catálogo sincronizado com o Supabase (<strong>quartos_catalog</strong>), usado no site, na reserva e na página Quartos. Fallback em <strong>js/quartos-site.js</strong> se estiver offline.</p>' +
+      toolbar +
+      avisoSem +
+      (cards
+        ? '<div class="sys-quartos-grid">' + cards + '</div>'
+        : '<p class="sys-help">Nenhum quarto na lista. Use «Novo quarto» ou verifique a conexão com o Supabase.</p>');
   }
 
   function renderCalendarioReservaLike(label, y, m, months, occupied) {
@@ -681,7 +1212,6 @@
   function bindEvents() {
     var mobileToggle = document.getElementById('sys-mobile-toggle');
     var logoutBtn = document.getElementById('btn-logout');
-    var installBtn = document.getElementById('btn-instalar-app');
     document.querySelectorAll('.sys-nav-btn[data-tab]').forEach(function (btn) {
       btn.addEventListener('click', function () {
         setActiveTab(btn.getAttribute('data-tab'));
@@ -708,37 +1238,14 @@
     if (logoutBtn) {
       logoutBtn.addEventListener('click', async function () {
         try {
-          await window.Auth.signOut();
-        } finally {
-          try {
-            if ('serviceWorker' in navigator) {
-              var regs = await navigator.serviceWorker.getRegistrations();
-              regs.forEach(function (r) {
-                r.unregister();
-              });
-            }
-          } catch (e) {}
-          deferredInstallPrompt = null;
-          if (installPromptListener) {
-            window.removeEventListener('beforeinstallprompt', installPromptListener);
-            installPromptListener = null;
+          if ('serviceWorker' in navigator) {
+            var regs = await navigator.serviceWorker.getRegistrations();
+            regs.forEach(function (r) {
+              r.unregister();
+            });
           }
-          if (installBtn) installBtn.hidden = true;
-          window.location.href = 'login.html';
-        }
-      });
-    }
-
-    if (installBtn) {
-      installBtn.addEventListener('click', async function () {
-        if (!deferredInstallPrompt) {
-          alert('Instalacao indisponivel neste navegador.');
-          return;
-        }
-        deferredInstallPrompt.prompt();
-        await deferredInstallPrompt.userChoice;
-        deferredInstallPrompt = null;
-        installBtn.hidden = true;
+        } catch (e) {}
+        window.location.href = 'index.html';
       });
     }
 
@@ -782,6 +1289,24 @@
       if (rm) {
         SystemStore.removeBloqueio(rm);
         renderAll();
+        return;
+      }
+      if (ev.target.closest && ev.target.closest('[data-quarto-modal-close]')) {
+        closeQuartoEditorModal();
+        return;
+      }
+      if (ev.target.id === 'btn-quarto-novo' || (ev.target.closest && ev.target.closest('#btn-quarto-novo'))) {
+        openQuartoEditor(null);
+        return;
+      }
+      var elEditQuarto = ev.target.closest && ev.target.closest('[data-quarto-edit]');
+      if (elEditQuarto) {
+        openQuartoEditor(elEditQuarto.getAttribute('data-quarto-edit'));
+        return;
+      }
+      var elDelQuarto = ev.target.closest && ev.target.closest('[data-quarto-delete]');
+      if (elDelQuarto) {
+        tryDeleteQuarto(elDelQuarto.getAttribute('data-quarto-delete'));
         return;
       }
       var cancelId = ev.target.getAttribute('data-cancel-reserva');
@@ -861,6 +1386,10 @@
         ev.target.reset();
         renderAll();
       }
+      if (ev.target.id === 'form-quarto-editor') {
+        ev.preventDefault();
+        handleQuartoEditorSubmit();
+      }
     });
   }
 
@@ -876,6 +1405,7 @@
       '</h2>' +
       '<div class="sys-modal-grid">' +
       field('nome', reserva.nome) +
+      field('quarto', quartoTituloPorIdPainel(reserva.quartoId)) +
       field('datas', fmtDate(reserva.dataEntrada) + ' - ' + fmtDate(reserva.dataSaida)) +
       field('gmail', reserva.email) +
       field('valor adicional', money(reserva.valorAdicional)) +
@@ -918,28 +1448,44 @@
   }
 
   function renderAll() {
-    renderFaturamento();
-    renderFicha();
-    renderHistorico();
-    renderCalendario();
-    setActiveTab(state.tab);
+    try {
+      renderFaturamento();
+    } catch (e) {
+      console.error('renderFaturamento', e);
+    }
+    try {
+      renderFicha();
+    } catch (e) {
+      console.error('renderFicha', e);
+    }
+    try {
+      renderHistorico();
+    } catch (e) {
+      console.error('renderHistorico', e);
+    }
+    try {
+      renderCalendario();
+    } catch (e) {
+      console.error('renderCalendario', e);
+    }
+    try {
+      renderQuartos();
+    } catch (e) {
+      console.error('renderQuartos', e);
+    }
+    try {
+      setActiveTab(state.tab);
+    } catch (e) {
+      console.error('setActiveTab', e);
+    }
   }
 
   bindEvents();
+  renderAll();
 
-  async function enablePwaAfterAuth() {
+  function enablePwaAfterAuth() {
     if (!('serviceWorker' in navigator)) return;
-    try {
-      await navigator.serviceWorker.register('/sw.js', { scope: '/' });
-    } catch (e) {}
-
-    installPromptListener = function (ev) {
-      ev.preventDefault();
-      deferredInstallPrompt = ev;
-      var btn = document.getElementById('btn-instalar-app');
-      if (btn) btn.hidden = false;
-    };
-    window.addEventListener('beforeinstallprompt', installPromptListener);
+    navigator.serviceWorker.register('/sw.js', { scope: '/' }).catch(function () {});
   }
 
   document.addEventListener('visibilitychange', function () {
@@ -951,10 +1497,9 @@
     renderAll();
   });
   (async function boot() {
+    enablePwaAfterAuth();
     try {
-      var session = await window.RouteGuards.requireAuth({ loginPath: 'login.html' });
-      if (!session) return;
-      await enablePwaAfterAuth();
+      if (SystemStore.hydrateQuartosSite) await SystemStore.hydrateQuartosSite();
       if (SystemStore.init) await SystemStore.init();
       else if (SystemStore.listarReservas) await SystemStore.listarReservas();
     } catch (errBoot) {

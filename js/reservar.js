@@ -1,6 +1,14 @@
 (function () {
+  /** Não bloquear o parse do script: o catálogo de quartos hidrata em paralelo e é aplicado no início de init(). */
+  var hydrateQuartosPromise =
+    window.SystemStore && typeof SystemStore.hydrateQuartosSite === 'function'
+      ? SystemStore.hydrateQuartosSite().catch(function (e) {
+          console.warn('Quartos:', e);
+        })
+      : Promise.resolve();
+
   var config = window.SystemStore ? window.SystemStore.getConfig() : {
-    valorDiaria: 600,
+    valorDiaria: 150,
     valorAdicionalPorPessoa: 50,
     pessoasIncluidas: 6
   };
@@ -24,56 +32,20 @@
     'JULHO', 'AGOSTO', 'SETEMBRO', 'OUTUBRO', 'NOVEMBRO', 'DEZEMBRO'
   ];
 
-  var QUARTOS_RESERVA = [
-    {
-      id: 'tem-tem',
-      capacidade: 2,
-      titulo: 'TEM-TEM',
-      desc:
-        'Quarto Duplo com Banheiro Compartilhado. Quarto duplo aconchegante, ideal para casais que buscam conforto e tranquilidade. Cama de casal, vista para o jardim e banheiro compartilhado com chuveiro. Até 2 pessoas · 20 m².',
-      preco: 'R$ 150',
-      precoLabel: 'Noite',
-      img: 'imagem/6.webp',
-      alt: 'Quarto TEM-TEM — Mi Casa Su Casa',
-      verQuartoHref: 'quartos.html#quarto-tem-tem'
-    },
-    {
-      id: 'soco',
-      capacidade: 4,
-      titulo: 'soco',
-      desc:
-        'Quarto Família (4 Camas de Solteiro). Espaçoso, com quatro camas de solteiro, ar-condicionado, cozinha compacta privativa, vista para o jardim e banheiro compartilhado. Até 4 pessoas · 40 m².',
-      preco: 'R$ 150',
-      precoLabel: 'Noite',
-      img: 'imagem/6.webp',
-      alt: 'Quarto soco — Mi Casa Su Casa',
-      verQuartoHref: 'quartos.html#quarto-soco'
-    },
-    {
-      id: 'sabia',
-      capacidade: 5,
-      titulo: 'sabiá',
-      desc:
-        'Quarto Família (1 Cama de Casal + 3 de Solteiro). Amplo espaço, ar-condicionado, cozinha compacta privativa e vista para o jardim. Banheiro compartilhado. Até 5 pessoas · 40 m².',
-      preco: 'R$ 150',
-      precoLabel: 'Noite',
-      img: 'imagem/6.webp',
-      alt: 'Quarto sabiá — Mi Casa Su Casa',
-      verQuartoHref: 'quartos.html#quarto-sabia'
-    },
-    {
-      id: 'ararajuba',
-      capacidade: 2,
-      titulo: 'Ararajuba',
-      desc:
-        'Quarto Duplo. Confortável para casais ou viajantes: cama de casal, vista para o jardim e banheiro compartilhado com chuveiro. Até 2 pessoas · 20 m².',
-      preco: 'R$ 150',
-      precoLabel: 'Noite',
-      img: 'imagem/6.webp',
-      alt: 'Quarto Ararajuba — Mi Casa Su Casa',
-      verQuartoHref: 'quartos.html#quarto-ararajuba'
-    }
-  ];
+  var QUARTOS_RESERVA =
+    window.QUARTOS_SITE && Array.isArray(window.QUARTOS_SITE) && window.QUARTOS_SITE.length
+      ? window.QUARTOS_SITE.slice()
+      : [];
+  if (!QUARTOS_RESERVA.length) {
+    console.error('Inclua js/quartos-site.js antes de reservar.js.');
+  }
+
+  function atualizarListaQuartosReserva() {
+    QUARTOS_RESERVA =
+      window.QUARTOS_SITE && Array.isArray(window.QUARTOS_SITE) && window.QUARTOS_SITE.length
+        ? window.QUARTOS_SITE.slice()
+        : [];
+  }
 
   var state = {
     entradaMes: null,
@@ -81,7 +53,7 @@
     checkIn: null,
     checkOut: null,
     ocupadas: {},
-    quartoId: QUARTOS_RESERVA[0].id,
+    quartoId: QUARTOS_RESERVA[0] ? QUARTOS_RESERVA[0].id : '',
     pessoas: 2,
     modoGrupo: false,
     nome: '',
@@ -105,7 +77,7 @@
     for (var i = 0; i < QUARTOS_RESERVA.length; i++) {
       if (QUARTOS_RESERVA[i].id === s) return QUARTOS_RESERVA[i].id;
     }
-    return QUARTOS_RESERVA[0].id;
+    return QUARTOS_RESERVA[0] ? QUARTOS_RESERVA[0].id : '';
   }
 
   function quartoTituloPorId(id) {
@@ -540,6 +512,16 @@
   }
 
   async function init() {
+    try {
+      await hydrateQuartosPromise;
+    } catch (eHydr) {
+      console.warn('Quartos:', eHydr);
+    }
+    atualizarListaQuartosReserva();
+    if (!QUARTOS_RESERVA.length) {
+      console.error('Inclua js/quartos-site.js antes de reservar.js.');
+    }
+
     var params = new URLSearchParams(window.location.search);
     state.quartoId = resolveQuartoSlug(params.get('quarto'));
 
@@ -854,14 +836,18 @@
     if (grupo) grupo.hidden = !state.modoGrupo;
     syncPessoas();
 
-    /* Carregar reservas depois de ligar os botões: um await aqui bloqueava todos os cliques. */
-    if (window.SystemStore && window.SystemStore.init) {
-      try {
-        await window.SystemStore.init();
-      } catch (errInit) {
-        console.error('Falha ao carregar reservas no Supabase:', errInit);
-      }
+    /* Reservas em segundo plano: a página fica utilizável logo; o calendário atualiza quando os dados chegam. */
+    function repintarAposReservas() {
       pintarCalendariosEsumario();
+    }
+    if (window.SystemStore && window.SystemStore.init) {
+      window.SystemStore
+        .init()
+        .then(repintarAposReservas)
+        .catch(function (errInit) {
+          console.error('Falha ao carregar reservas no Supabase:', errInit);
+          repintarAposReservas();
+        });
     }
   }
 
@@ -871,6 +857,8 @@
 
     var QUARTOS = QUARTOS_RESERVA;
     var N = QUARTOS.length;
+
+    function bindShowcase() {
     var DUR_SLIDE_MS = 900;
     var richMotion = true;
     try {
@@ -891,15 +879,29 @@
       return (roomIdx + off) % N;
     }
 
+    var IMG_SIZES_HINT = '(max-width: 768px) 52vw, min(480px, 42vw)';
+
     function atualizarImagens(slides, centerIdx, roomIdx) {
-      for (var i = 0; i < slides.length; i++) {
+      function assignSlide(i) {
         var qi = indiceQuartoNoSlide(centerIdx, i, roomIdx);
         var q = QUARTOS[qi];
         var img = slides[i].querySelector('img');
-        if (img) {
-          img.src = q.img;
-          img.alt = q.alt;
-        }
+        if (!img || !q || !q.img) return;
+        img.src = q.img;
+        img.alt = q.alt || q.titulo || '';
+        img.sizes = IMG_SIZES_HINT;
+        img.decoding = 'async';
+      }
+      assignSlide(centerIdx);
+      var delay = 90;
+      for (var i = 0; i < slides.length; i++) {
+        if (i === centerIdx) continue;
+        (function (ii, ms) {
+          window.setTimeout(function () {
+            assignSlide(ii);
+          }, ms);
+        })(i, delay);
+        delay += 110;
       }
     }
 
@@ -986,9 +988,11 @@
         var slidePatch = (centerSlide + 2) % 3;
         var qAlvo = QUARTOS[(roomIdx + 2) % N];
         var imgP = slides[slidePatch].querySelector('img');
-        if (imgP) {
+        if (imgP && qAlvo) {
           imgP.src = qAlvo.img;
-          imgP.alt = qAlvo.alt;
+          imgP.alt = qAlvo.alt || qAlvo.titulo || '';
+          imgP.sizes = IMG_SIZES_HINT;
+          imgP.decoding = 'async';
         }
       }
 
@@ -1015,13 +1019,36 @@
     nextBtn.addEventListener('click', function () {
       ir(1);
     });
+    }
+
+    if (typeof IntersectionObserver === 'undefined') {
+      bindShowcase();
+      return;
+    }
+    var showcaseIo = new IntersectionObserver(
+      function (entries, observer) {
+        for (var si = 0; si < entries.length; si++) {
+          if (entries[si].isIntersecting) {
+            observer.disconnect();
+            bindShowcase();
+            return;
+          }
+        }
+      },
+      { root: null, rootMargin: '200px 0px 200px 0px', threshold: 0 }
+    );
+    showcaseIo.observe(root);
+  }
+
+  function agendarInitReservar() {
+    requestAnimationFrame(function () {
+      init();
+    });
   }
 
   if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', function () {
-      init();
-    });
+    document.addEventListener('DOMContentLoaded', agendarInitReservar);
   } else {
-    init();
+    agendarInitReservar();
   }
 })();

@@ -49,9 +49,9 @@
               <div class="quartos-showcase-visual">
                 <div class="quartos-3d-wrapper">
                   <div class="quartos-3d-cena">
-                    <div class="quartos-3d-slide"><div class="quartos-3d-foto"><img src="imagem/6.webp" alt="" width="960" height="640" decoding="async"></div></div>
-                    <div class="quartos-3d-slide"><div class="quartos-3d-foto"><img src="imagem/6.webp" alt="" width="960" height="640" decoding="async"></div></div>
-                    <div class="quartos-3d-slide"><div class="quartos-3d-foto"><img src="imagem/6.webp" alt="" width="960" height="640" decoding="async"></div></div>
+                    <div class="quartos-3d-slide"><div class="quartos-3d-foto"><img src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" alt="" width="640" height="427" decoding="async" loading="lazy" sizes="(max-width: 768px) 52vw, min(480px, 42vw)"></div></div>
+                    <div class="quartos-3d-slide"><div class="quartos-3d-foto"><img src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" alt="" width="640" height="427" decoding="async" loading="lazy" sizes="(max-width: 768px) 52vw, min(480px, 42vw)"></div></div>
+                    <div class="quartos-3d-slide"><div class="quartos-3d-foto"><img src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" alt="" width="640" height="427" decoding="async" loading="lazy" sizes="(max-width: 768px) 52vw, min(480px, 42vw)"></div></div>
                   </div>
                 </div>
               </div>
@@ -94,7 +94,7 @@
 
           <section id="painel-etapa-pessoas" class="reservar-etapa" hidden aria-labelledby="titulo-etapa-pessoas">
             <h2 id="titulo-etapa-pessoas">Hóspedes e valor</h2>
-            <p class="reservar-etapa-desc">Confira as noites e o valor estimado. A quantidade de hóspedes no quarto segue a <strong>capacidade de cada quarto</strong> (até o máximo indicado no seletor). Até 6 pessoas a diária base é R$ 600; acima disso há adicional por pessoa. Pode levar até <strong>3 pessoas a mais</strong> além dessa capacidade — use <strong>Quero adicionar até 3 pessoas a mais</strong>.</p>
+            <p class="reservar-etapa-desc">Confira as noites e o valor estimado. A quantidade de hóspedes no quarto segue a <strong>capacidade de cada quarto</strong> (até o máximo indicado no seletor). Até 6 pessoas a diária base é <strong>R$ 150</strong> (igual para todos os quartos); acima de 6 pessoas há adicional por pessoa. Pode levar até <strong>3 pessoas a mais</strong> além dessa capacidade — use <strong>Quero adicionar até 3 pessoas a mais</strong>.</p>
             <div class="reservar-resumo-linha">
               <span>Noites</span>
               <strong id="reservar-preview-noites">—</strong>
@@ -298,10 +298,11 @@
     </div>
   </div>
 
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-  <script src="js/supabase-client.js"></script>
-  <script src="js/system-store.js"></script>
-  <script src="js/reservar.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2" defer></script>
+  <script src="js/supabase-client.js" defer></script>
+  <script src="js/system-store.js" defer></script>
+  <script src="js/quartos-site.js" defer></script>
+  <script src="js/reservar.js" defer></script>
   <script>
     window.addEventListener('scroll', function () {
       var intro = document.getElementById('intro');
