@@ -7,7 +7,11 @@
   } catch (e) {}
 
   function irTopo() {
-    window.scrollTo(0, 0);
+    try {
+      window.scrollTo({ left: 0, top: 0, behavior: 'instant' });
+    } catch (err) {
+      window.scrollTo(0, 0);
+    }
     document.documentElement.scrollTop = 0;
     document.body.scrollTop = 0;
   }
@@ -17,6 +21,8 @@
     if (!e.persisted) irTopo();
   });
   window.addEventListener('load', function () {
-    requestAnimationFrame(irTopo);
+    requestAnimationFrame(function () {
+      if (window.scrollY <= 1) irTopo();
+    });
   });
 })();

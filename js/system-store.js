@@ -1,9 +1,19 @@
-/* Sistema com Supabase para reservas e local para apoio. */
+/* Reservas e catálogo: Supabase quando SupabaseClient existe; senão localStorage. */
 (function (global) {
   var KEY_CONFIG = 'srp_config_v1';
   var KEY_BLOQUEIOS = 'srp_bloqueios_v1';
   var KEY_METODO_PAGAMENTO = 'srp_metodo_pagamento_v1';
+  var KEY_QUARTOS_LOCAL = 'quartos_catalog_local_v1';
+  var KEY_RESERVAS_LOCAL = 'reservas_local_v1';
   var reservasCache = [];
+
+  function usarSupabaseRemoto() {
+    return !!global.SupabaseClient;
+  }
+
+  function persistirReservasLocal() {
+    writeJson(KEY_RESERVAS_LOCAL, reservasCache);
+  }
 
   function getMetodoPagamentoMap() {
     var map = readJson(KEY_METODO_PAGAMENTO, {});
@@ -137,8 +147,12 @@
   }
 
   async function listarReservas() {
+    if (!usarSupabaseRemoto()) {
+      var arr = readJson(KEY_RESERVAS_LOCAL, []);
+      reservasCache = Array.isArray(arr) ? arr.slice() : [];
+      return getReservas();
+    }
     var sb = global.SupabaseClient;
-    if (!sb) throw new Error('SupabaseClient indisponivel.');
     var query = sb
       .from('reservas')
       .select('*')
@@ -279,8 +293,6 @@
   }
 
   async function criarReserva(payload) {
-    var sb = global.SupabaseClient;
-    if (!sb) throw new Error('SupabaseClient indisponivel.');
     var config = getConfig();
     var dataEntrada = payload.dataEntrada;
     var dataSaida = payload.dataSaida;
@@ -319,6 +331,34 @@
     };
     if (payload.quartoId) insertPayload.quarto_id = String(payload.quartoId);
 
+    if (!usarSupabaseRemoto()) {
+      var newId =
+        'loc-' + Date.now().toString(36) + '-' + Math.random().toString(36).slice(2, 10);
+      var normLocal = {
+        id: newId,
+        codigo: reserva.codigo,
+        nome: reserva.nome,
+        email: reserva.email,
+        telefone: reserva.telefone,
+        pessoas: reserva.pessoas,
+        dataEntrada: reserva.dataEntrada,
+        dataSaida: reserva.dataSaida,
+        valorDiaria: reserva.valorDiaria,
+        valorAdicional: reserva.valorAdicional,
+        valorTotal: reserva.valorTotal,
+        plataforma: reserva.plataforma,
+        metodoPagamento: reserva.metodoPagamento,
+        criadoEm: reserva.criadoEm,
+        status: reserva.status,
+        quartoId: payload.quartoId ? String(payload.quartoId) : null
+      };
+      saveMetodoPagamento(normLocal, normLocal.metodoPagamento);
+      reservasCache.unshift(normLocal);
+      persistirReservasLocal();
+      return normLocal;
+    }
+
+    var sb = global.SupabaseClient;
     var inserted = await sb.from('reservas').insert(insertPayload).select('*').single();
     if (inserted.error && insertPayload.quarto_id) {
       delete insertPayload.quarto_id;
@@ -333,8 +373,17 @@
   }
 
   async function cancelarReserva(id) {
+    if (!usarSupabaseRemoto()) {
+      reservasCache = reservasCache.map(function (r) {
+        if (r.id !== id) return r;
+        return Object.assign({}, r, { status: 'cancelada' });
+      });
+      persistirReservasLocal();
+      return reservasCache.find(function (r) {
+        return r.id === id;
+      });
+    }
     var sb = global.SupabaseClient;
-    if (!sb) throw new Error('SupabaseClient indisponivel.');
     var updated = await sb
       .from('reservas')
       .update({ status: 'cancelada' })
@@ -507,8 +556,11 @@
   }
 
   async function fetchQuartosCatalogRows() {
+    if (!usarSupabaseRemoto()) {
+      var local = readJson(KEY_QUARTOS_LOCAL, null);
+      return Array.isArray(local) ? local : [];
+    }
     var sb = global.SupabaseClient;
-    if (!sb) return null;
     var res = await sb.from(TABLE_QUARTOS).select('*').order('ordem', { ascending: true });
     if (res.error) throw res.error;
     return res.data || [];
@@ -519,7 +571,13 @@
     try {
       var rows = await fetchQuartosCatalogRows();
       if (!rows || !rows.length) {
-        if (fb.length && global.SupabaseClient) {
+        if (fb.length && !usarSupabaseRemoto()) {
+          var seedLocal = fb.map(function (q, i) {
+            return mapQuartoSiteToRow(q, i);
+          });
+          writeJson(KEY_QUARTOS_LOCAL, seedLocal);
+          rows = seedLocal;
+        } else if (fb.length && global.SupabaseClient) {
           try {
             var ins = fb.map(function (q, i) {
               return mapQuartoSiteToRow(q, i);
@@ -543,8 +601,6 @@
   }
 
   async function salvarQuartoCatalog(payload) {
-    var sb = global.SupabaseClient;
-    if (!sb) throw new Error('Supabase indisponivel.');
     var rows = await fetchQuartosCatalogRows();
     var id = slugifyQuartoId(payload.id);
     var ordem = payload.ordem;
@@ -557,6 +613,21 @@
     }
     if (ordem == null) ordem = 0;
     var row = mapQuartoSiteToRow(Object.assign({}, payload, { id: id }), ordem);
+    if (!usarSupabaseRemoto()) {
+      var list = Array.isArray(rows) ? rows.slice() : [];
+      var ix = list.findIndex(function (r) {
+        return r.id === row.id;
+      });
+      if (ix >= 0) list[ix] = row;
+      else list.push(row);
+      list.sort(function (a, b) {
+        return (Number(a.ordem) || 0) - (Number(b.ordem) || 0);
+      });
+      writeJson(KEY_QUARTOS_LOCAL, list);
+      await hydrateQuartosSite();
+      return [row];
+    }
+    var sb = global.SupabaseClient;
     var res = await sb.from(TABLE_QUARTOS).upsert(row, { onConflict: 'id' }).select('*');
     if (res.error) throw res.error;
     await hydrateQuartosSite();
@@ -564,8 +635,16 @@
   }
 
   async function apagarQuartoCatalog(id) {
+    if (!usarSupabaseRemoto()) {
+      var list = readJson(KEY_QUARTOS_LOCAL, []) || [];
+      list = list.filter(function (r) {
+        return String(r.id) !== String(id);
+      });
+      writeJson(KEY_QUARTOS_LOCAL, list);
+      await hydrateQuartosSite();
+      return;
+    }
     var sb = global.SupabaseClient;
-    if (!sb) throw new Error('Supabase indisponivel.');
     var res = await sb.from(TABLE_QUARTOS).delete().eq('id', String(id));
     if (res.error) throw res.error;
     await hydrateQuartosSite();
@@ -575,6 +654,8 @@
     localStorage.removeItem(KEY_BLOQUEIOS);
     localStorage.removeItem(KEY_CONFIG);
     localStorage.removeItem(KEY_METODO_PAGAMENTO);
+    localStorage.removeItem(KEY_QUARTOS_LOCAL);
+    localStorage.removeItem(KEY_RESERVAS_LOCAL);
   }
 
   global.SystemStore = {

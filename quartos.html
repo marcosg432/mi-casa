@@ -101,8 +101,6 @@
     <p class="rodape-creditos">© Mi Casa Su Casa. Todos os direitos reservados.</p>
   </footer>
 
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-  <script src="js/supabase-client.js"></script>
   <script src="js/quartos-site.js"></script>
   <script src="js/system-store.js"></script>
   <script src="js/quartos-pagina-catalogo.js"></script>
@@ -117,16 +115,33 @@
       }
     });
 
+    function scrollToQuartoSeHash() {
+      var h = window.location.hash;
+      if (!h || h.length < 2) return;
+      var id = decodeURIComponent(h.slice(1));
+      if (!id || !/^quarto-[\w-]+$/i.test(id)) return;
+      window.requestAnimationFrame(function () {
+        var target = document.getElementById(id);
+        if (!target) return;
+        target.scrollIntoView({ behavior: 'auto', block: 'start' });
+      });
+    }
+
     document.addEventListener('DOMContentLoaded', async function () {
+      if (window.renderQuartosPaginaCatalogo) {
+        window.renderQuartosPaginaCatalogo('quartos-catalogo-mount');
+      }
+      scrollToQuartoSeHash();
       if (window.SystemStore && typeof SystemStore.hydrateQuartosSite === 'function') {
         try {
           await SystemStore.hydrateQuartosSite();
         } catch (e) {
           console.warn('Quartos:', e);
         }
-      }
-      if (window.renderQuartosPaginaCatalogo) {
-        window.renderQuartosPaginaCatalogo('quartos-catalogo-mount');
+        if (window.renderQuartosPaginaCatalogo) {
+          window.renderQuartosPaginaCatalogo('quartos-catalogo-mount');
+        }
+        scrollToQuartoSeHash();
       }
     });
   </script>

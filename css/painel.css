@@ -539,6 +539,10 @@ body.painel {
   pointer-events: none;
 }
 
+#tab-calendario .sys-config-bloqueios {
+  max-width: 720px;
+}
+
 #tab-configuracao .sys-columns-2 .sys-card {
   min-height: 330px;
 }

@@ -15,7 +15,7 @@
   /** Máximo de pessoas a mais além da capacidade do quarto. */
   var MAX_PESSOAS_EXTRAS = 3;
 
-  /** Evita que o clique em «Pagar» fique preso se o Supabase não responder. */
+  /** Evita que o clique em «Pagar» fique preso se a rede não responder. */
   function withTimeoutMs(promise, ms) {
     return Promise.race([
       promise,
@@ -512,11 +512,6 @@
   }
 
   async function init() {
-    try {
-      await hydrateQuartosPromise;
-    } catch (eHydr) {
-      console.warn('Quartos:', eHydr);
-    }
     atualizarListaQuartosReserva();
     if (!QUARTOS_RESERVA.length) {
       console.error('Inclua js/quartos-site.js antes de reservar.js.');
@@ -581,6 +576,18 @@
     }
 
     initShowcaseQuartosReservar(aplicarQuartoPorIndice);
+
+    hydrateQuartosPromise
+      .then(function () {
+        atualizarListaQuartosReserva();
+        var sz = document.querySelector('[data-reservar-quarto-showcase]');
+        if (sz && typeof sz._reservarShowcaseRefresh === 'function') {
+          sz._reservarShowcaseRefresh();
+        }
+      })
+      .catch(function (eH) {
+        console.warn('Quartos:', eH);
+      });
 
     var inpP = document.getElementById('reservar-input-pessoas');
     var inpTotal = document.getElementById('reservar-input-pessoas-total');
@@ -845,7 +852,7 @@
         .init()
         .then(repintarAposReservas)
         .catch(function (errInit) {
-          console.error('Falha ao carregar reservas no Supabase:', errInit);
+          console.error('Falha ao carregar reservas:', errInit);
           repintarAposReservas();
         });
     }
@@ -855,10 +862,12 @@
     var root = document.querySelector('[data-reservar-quarto-showcase]');
     if (!root || typeof onSelecionarQuarto !== 'function') return;
 
-    var QUARTOS = QUARTOS_RESERVA;
-    var N = QUARTOS.length;
-
     function bindShowcase() {
+    function listaQuartos() {
+      var g = window.QUARTOS_SITE;
+      if (g && Array.isArray(g) && g.length) return g;
+      return QUARTOS_RESERVA;
+    }
     var DUR_SLIDE_MS = 900;
     var richMotion = true;
     try {
@@ -876,7 +885,8 @@
 
     function indiceQuartoNoSlide(centerIdx, slideIdx, roomIdx) {
       var off = (slideIdx - centerIdx + 3) % 3;
-      return (roomIdx + off) % N;
+      var n = listaQuartos().length;
+      return n ? (roomIdx + off) % n : 0;
     }
 
     var IMG_SIZES_HINT = '(max-width: 768px) 52vw, min(480px, 42vw)';
@@ -884,13 +894,14 @@
     function atualizarImagens(slides, centerIdx, roomIdx) {
       function assignSlide(i) {
         var qi = indiceQuartoNoSlide(centerIdx, i, roomIdx);
-        var q = QUARTOS[qi];
+        var q = listaQuartos()[qi];
         var img = slides[i].querySelector('img');
         if (!img || !q || !q.img) return;
         img.src = q.img;
         img.alt = q.alt || q.titulo || '';
         img.sizes = IMG_SIZES_HINT;
         img.decoding = 'async';
+        if (i === centerIdx) img.loading = 'eager';
       }
       assignSlide(centerIdx);
       var delay = 90;
@@ -906,7 +917,7 @@
     }
 
     function preencherCopy(copyInner, roomIdx) {
-      var q = QUARTOS[roomIdx];
+      var q = listaQuartos()[roomIdx];
       if (!q || !copyInner) return;
       var tit = copyInner.querySelector('.quartos-showcase-titulo');
       var desc = copyInner.querySelector('.quartos-showcase-desc');
@@ -954,8 +965,9 @@
     if (!copyInner || !prevBtn || !nextBtn) return;
 
     var roomIdx = 0;
-    for (var ri = 0; ri < QUARTOS.length; ri++) {
-      if (QUARTOS[ri].id === state.quartoId) {
+    var L0 = listaQuartos();
+    for (var ri = 0; ri < L0.length; ri++) {
+      if (L0[ri].id === state.quartoId) {
         roomIdx = ri;
         break;
       }
@@ -977,16 +989,17 @@
     }
 
     function ir(dir) {
-      if (animando || N < 2) return;
+      var nQ = listaQuartos().length;
+      if (animando || nQ < 2) return;
       animando = true;
       setBusy(true);
 
-      var novoR = dir === 1 ? (roomIdx + 1) % N : (roomIdx + N - 1) % N;
+      var novoR = dir === 1 ? (roomIdx + 1) % nQ : (roomIdx + nQ - 1) % nQ;
       var novoC = dir === 1 ? (centerSlide + 1) % 3 : (centerSlide + 2) % 3;
 
       if (dir === 1) {
         var slidePatch = (centerSlide + 2) % 3;
-        var qAlvo = QUARTOS[(roomIdx + 2) % N];
+        var qAlvo = listaQuartos()[(roomIdx + 2) % nQ];
         var imgP = slides[slidePatch].querySelector('img');
         if (imgP && qAlvo) {
           imgP.src = qAlvo.img;
@@ -1019,6 +1032,21 @@
     nextBtn.addEventListener('click', function () {
       ir(1);
     });
+
+    root._reservarShowcaseRefresh = function () {
+      var L = listaQuartos();
+      if (!L.length) return;
+      roomIdx = 0;
+      for (var rj = 0; rj < L.length; rj++) {
+        if (L[rj].id === state.quartoId) {
+          roomIdx = rj;
+          break;
+        }
+      }
+      atualizarImagens(slides, centerSlide, roomIdx);
+      aplicarSlides(slides, centerSlide);
+      preencherCopy(copyInner, roomIdx);
+    };
     }
 
     if (typeof IntersectionObserver === 'undefined') {

@@ -758,8 +758,7 @@
         revogarBlobQuartoEditor();
         if (!String(inp.value || '').trim()) showPreviewSrc('');
         alert(
-          'Não foi possível enviar para o armazenamento em nuvem (crie o bucket «site-midias» no Supabase — ver supabase/storage_site_midias.sql).\n\n' +
-            'Pode: escolher uma miniatura da galeria abaixo, ou colocar a foto na pasta imagem/ do site e escrever o caminho no campo.'
+          'Upload para nuvem desligado. Escolha uma miniatura na galeria abaixo ou indique o caminho da foto (ex.: imagem/foto.webp) no campo URL.'
         );
       });
     }
@@ -864,7 +863,7 @@
       '<h3>' +
       esc(isEdit ? 'Editar quarto' : 'Novo quarto') +
       '</h3>' +
-      '<p class="sys-help">Alterações gravam no Supabase (<code>quartos_catalog</code>) e aparecem no site, na reserva e no carrossel.</p>' +
+      '<p class="sys-help">Alterações gravam neste navegador (armazenamento local) e aparecem no site, na reserva e no carrossel neste dispositivo.</p>' +
       '<input type="hidden" id="qua-ordem" value="' +
       esc(ordemVal) +
       '" />' +
@@ -907,7 +906,7 @@
       checks +
       '</div></fieldset>' +
       '<fieldset class="sys-quarto-img-fieldset"><legend>Foto principal do quarto</legend>' +
-      '<p class="sys-help">Arraste uma imagem para a área abaixo ou clique para escolher no computador. Se o armazenamento Supabase estiver configurado, o link público é preenchido automaticamente; caso contrário use a galeria do site ou o caminho <code>imagem/…</code>.</p>' +
+      '<p class="sys-help">Arraste uma imagem ou clique para escolher — o URL público só é preenchido se configurar envio para nuvem no futuro; use a galeria do site ou o caminho <code>imagem/…</code>.</p>' +
       '<label id="qua-img-dropzone" class="sys-img-dropzone" for="qua-img-file">' +
       '<span class="sys-img-dropzone-text">Arrastar imagem aqui · ou clicar para abrir o explorador</span>' +
       '<input type="file" id="qua-img-file" class="sys-img-dropzone-file" accept="image/*" />' +
@@ -954,7 +953,7 @@
 
   function tryDeleteQuarto(id) {
     if (!id || !SystemStore.apagarQuartoCatalog) {
-      alert('Exclusão indisponível (Supabase ou função ausente).');
+      alert('Exclusão indisponível (função ausente).');
       return;
     }
     var list = window.QUARTOS_SITE || [];
@@ -976,7 +975,7 @@
       })
       .catch(function (err) {
         console.error(err);
-        alert('Não foi possível apagar no Supabase (tabela ou permissões).');
+        alert('Não foi possível apagar o quarto.');
       });
   }
 
@@ -1041,7 +1040,7 @@
       })
       .catch(function (err) {
         console.error(err);
-        alert('Não foi possível salvar no Supabase.');
+        alert('Não foi possível salvar o quarto.');
       });
   }
 
@@ -1127,12 +1126,12 @@
       .join('');
     el.innerHTML =
       '<h2 class="sys-section-title">Quartos</h2>' +
-      '<p class="sys-help" style="margin-bottom:1rem">Catálogo sincronizado com o Supabase (<strong>quartos_catalog</strong>), usado no site, na reserva e na página Quartos. Fallback em <strong>js/quartos-site.js</strong> se estiver offline.</p>' +
+      '<p class="sys-help" style="margin-bottom:1rem">Catálogo guardado neste navegador (e no <strong>js/quartos-site.js</strong> como base). Usado no site, na reserva e na página Quartos.</p>' +
       toolbar +
       avisoSem +
       (cards
         ? '<div class="sys-quartos-grid">' + cards + '</div>'
-        : '<p class="sys-help">Nenhum quarto na lista. Use «Novo quarto» ou verifique a conexão com o Supabase.</p>');
+        : '<p class="sys-help">Nenhum quarto na lista. Use «Novo quarto».</p>');
   }
 
   function renderCalendarioReservaLike(label, y, m, months, occupied) {
@@ -1167,10 +1166,9 @@
   }
 
   function renderConfigSection() {
-    var cfg = SystemStore.getConfig();
     var bloqueios = SystemStore.getBloqueios();
     return (
-      '<div class="sys-columns-2">' +
+      '<div class="sys-config-bloqueios">' +
       '<article class="sys-card"><h3>fechamento de datas</h3><form id="form-bloqueio" class="sys-form">' +
       '<input class="sys-input" type="date" id="bloqueio-inicio" required />' +
       '<input class="sys-input" type="date" id="bloqueio-fim" required />' +
@@ -1194,17 +1192,6 @@
             .join('') +
           '</div>'
         : '<p class="sys-help">Sem datas bloqueadas.</p>') +
-      '</article>' +
-      '<article class="sys-card"><h3>Valores</h3><form id="form-config" class="sys-form">' +
-      '<label>Valor diária</label><input class="sys-input" id="cfg-diaria" type="number" min="1" step="0.01" value="' +
-      esc(cfg.valorDiaria) +
-      '" />' +
-      '<label>Valor adicional por pessoa</label><input class="sys-input" id="cfg-adicional" type="number" min="0" step="0.01" value="' +
-      esc(cfg.valorAdicionalPorPessoa) +
-      '" />' +
-      '<button class="sys-btn" type="submit">Salvar valores</button>' +
-      '</form>' +
-      '<p class="sys-help">Esses valores impactam novas reservas no site.</p>' +
       '</article></div>'
     );
   }
@@ -1319,7 +1306,7 @@
             renderAll();
           })
           .catch(function () {
-            alert('Nao foi possivel cancelar no Supabase.');
+            alert('Nao foi possivel cancelar a reserva.');
           });
         return;
       }
@@ -1361,17 +1348,6 @@
     });
 
     document.body.addEventListener('submit', function (ev) {
-      if (ev.target.id === 'form-config') {
-        ev.preventDefault();
-        var diaria = Number(document.getElementById('cfg-diaria').value);
-        var adicional = Number(document.getElementById('cfg-adicional').value);
-        SystemStore.setConfig({
-          valorDiaria: diaria,
-          valorAdicionalPorPessoa: adicional
-        });
-        alert('Valores salvos.');
-        renderAll();
-      }
       if (ev.target.id === 'form-bloqueio') {
         ev.preventDefault();
         var ini = document.getElementById('bloqueio-inicio').value;
@@ -1503,7 +1479,7 @@
       if (SystemStore.init) await SystemStore.init();
       else if (SystemStore.listarReservas) await SystemStore.listarReservas();
     } catch (errBoot) {
-      console.error('Falha ao carregar reservas do Supabase:', errBoot);
+      console.error('Falha ao carregar reservas:', errBoot);
       alert('Nao foi possivel carregar reservas do banco.');
     }
     renderAll();

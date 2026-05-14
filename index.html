@@ -126,7 +126,7 @@
                   <span class="quartos-showcase-preco-valor">R$ 150</span>
                   <span class="quartos-showcase-preco-label">Noite</span>
                 </div>
-                <a class="btn btn-reserva quartos-showcase-btn" href="reservar.html?quarto=tem-tem">Ver quarto</a>
+                <a class="btn btn-reserva quartos-showcase-btn" href="quartos.html#quarto-tem-tem">Ver quarto</a>
               </div>
             </div>
           </div>
@@ -143,6 +143,7 @@
             <p class="secao-reserva-desc">Escolha as datas da sua estadia e a quantidade de pessoas. veja se a disponibilidade na data escolhida.</p>
           </div>
           <form class="form-reserva" action="reservar.html" method="get" aria-label="Formulário de reserva">
+            <input type="hidden" class="form-reserva-quarto-id" name="quarto" value="tem-tem">
             <div class="form-reserva-grid">
               <div class="form-group">
                 <label for="reserva-entrada">Data de entrada</label>
@@ -320,7 +321,7 @@
                   <span class="quartos-showcase-preco-valor">R$ 150</span>
                   <span class="quartos-showcase-preco-label">Noite</span>
                 </div>
-                <a class="btn btn-reserva quartos-showcase-btn" href="reservar.html?quarto=tem-tem">Ver quarto</a>
+                <a class="btn btn-reserva quartos-showcase-btn" href="quartos.html#quarto-tem-tem">Ver quarto</a>
               </div>
             </div>
           </div>
@@ -337,6 +338,7 @@
             <p class="secao-reserva-desc">Escolha as datas da sua estadia e a quantidade de pessoas. veja se a disponibilidade na data escolhida.</p>
           </div>
           <form class="form-reserva" action="reservar.html" method="get" aria-label="Formulário de reserva">
+            <input type="hidden" class="form-reserva-quarto-id" name="quarto" value="tem-tem">
             <div class="form-reserva-grid">
               <div class="form-group">
                 <label for="reserva-entrada-dup">Data de entrada</label>
@@ -509,8 +511,6 @@
     <p class="rodape-creditos">© Mi Casa Su Casa. Todos os direitos reservados.</p>
   </footer>
 
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-  <script src="js/supabase-client.js"></script>
   <script src="js/quartos-site.js"></script>
   <script src="js/system-store.js"></script>
   <script src="js/quartos-showcase-carrossel.js"></script>
@@ -816,18 +816,20 @@
     })();
 
     (function carrosselQuartosShowcase() {
-      (async function bootShowcase() {
-        if (window.SystemStore && typeof SystemStore.hydrateQuartosSite === 'function') {
-          try {
-            await SystemStore.hydrateQuartosSite();
-          } catch (e) {
-            console.warn('Quartos:', e);
-          }
+      if (window.initQuartosShowcaseCarrossel) {
+        window.initQuartosShowcaseCarrossel();
+      }
+      var hp =
+        window.SystemStore && typeof SystemStore.hydrateQuartosSite === 'function'
+          ? SystemStore.hydrateQuartosSite()
+          : Promise.resolve();
+      hp.then(function () {
+        if (window.refreshQuartosShowcaseCarrossel) {
+          window.refreshQuartosShowcaseCarrossel();
         }
-        if (window.initQuartosShowcaseCarrossel) {
-          window.initQuartosShowcaseCarrossel();
-        }
-      })();
+      }).catch(function (e) {
+        console.warn('Quartos:', e);
+      });
     })();
   </script>
   <script>

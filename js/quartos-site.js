@@ -1,6 +1,6 @@
 /**
- * Catálogo base dos quartos (fallback se a tabela Supabase estiver vazia ou offline).
- * O painel e o SystemStore gravam em public.quartos_catalog — ver supabase/quartos_catalog.sql
+ * Catálogo base dos quartos (valores iniciais). O SystemStore pode sobrepor com dados
+ * guardados no navegador (localStorage) ou, se existir SupabaseClient, com o servidor.
  */
 (function (global) {
   var FALLBACK = [

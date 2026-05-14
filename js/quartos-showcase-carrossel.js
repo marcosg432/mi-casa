@@ -1,24 +1,32 @@
 /**
  * Carrossel 3D da secção Quartos (index e outras páginas com [data-quartos-showcase]).
- * Usa window.QUARTOS_SITE após SystemStore.hydrateQuartosSite().
+ * Usa window.QUARTOS_SITE (fallback imediato; após hydrate, refresh atualiza fotos/textos).
  */
 (function (global) {
-  global.initQuartosShowcaseCarrossel = function initQuartosShowcaseCarrossel() {
-    var src = global.QUARTOS_SITE || [];
-    var QUARTOS = src.map(function (q) {
+  function mapQuartosSite(src) {
+    return (src || []).map(function (q) {
+      var idRaw = q.id != null ? String(q.id).trim() : '';
       return {
+        id: q.id,
         titulo: q.titulo,
         desc: q.desc,
         preco: q.preco,
         precoLabel: q.precoLabel || 'Noite',
         img: q.img,
         alt: q.alt || q.titulo,
-        href: 'reservar.html?quarto=' + encodeURIComponent(q.id)
+        href: 'reservar.html?quarto=' + encodeURIComponent(idRaw),
+        verQuartoHref: idRaw
+          ? 'quartos.html#quarto-' + encodeURIComponent(idRaw)
+          : 'quartos.html'
       };
     });
-    var N = QUARTOS.length;
-    if (N < 1) return;
+  }
 
+  function listaQuartos() {
+    return mapQuartosSite(global.QUARTOS_SITE);
+  }
+
+  global.initQuartosShowcaseCarrossel = function initQuartosShowcaseCarrossel() {
     var DUR_SLIDE_MS = 900;
     var richMotion = true;
     try {
@@ -34,72 +42,7 @@
       }
     }
 
-    function indiceQuartoNoSlide(centerIdx, slideIdx, roomIdx) {
-      var off = (slideIdx - centerIdx + 3) % 3;
-      return (roomIdx + off) % N;
-    }
-
     var IMG_SIZES_HINT = '(max-width: 768px) 52vw, min(480px, 42vw)';
-
-    /** Evita pedir as 3 fotos em resolução total ao mesmo tempo: centro primeiro, laterais com pequeno atraso. */
-    function atualizarImagens(slides, centerIdx, roomIdx) {
-      function assignSlide(i) {
-        var qi = indiceQuartoNoSlide(centerIdx, i, roomIdx);
-        var q = QUARTOS[qi];
-        var img = slides[i].querySelector('img');
-        if (!img || !q || !q.img) return;
-        img.src = q.img;
-        img.alt = q.alt || q.titulo || '';
-        img.sizes = IMG_SIZES_HINT;
-        img.decoding = 'async';
-      }
-      assignSlide(centerIdx);
-      var delay = 90;
-      for (var i = 0; i < slides.length; i++) {
-        if (i === centerIdx) continue;
-        (function (ii, ms) {
-          window.setTimeout(function () {
-            assignSlide(ii);
-          }, ms);
-        })(i, delay);
-        delay += 110;
-      }
-    }
-
-    function preencherCopy(copyInner, roomIdx) {
-      var q = QUARTOS[roomIdx];
-      if (!q) return;
-      copyInner.querySelector('.quartos-showcase-titulo').textContent = q.titulo;
-      copyInner.querySelector('.quartos-showcase-desc').textContent = q.desc;
-      copyInner.querySelector('.quartos-showcase-preco-valor').textContent = q.preco;
-      var lbl = copyInner.querySelector('.quartos-showcase-preco-label');
-      if (lbl) lbl.textContent = q.precoLabel || 'Noite';
-      var a = copyInner.querySelector('.quartos-showcase-btn');
-      if (a) a.href = q.href;
-    }
-
-    function animarTexto(copyInner, novoRoomIdx) {
-      if (!richMotion) {
-        preencherCopy(copyInner, novoRoomIdx);
-        return;
-      }
-      copyInner.classList.add('quartos-copy--saida');
-      setTimeout(function () {
-        preencherCopy(copyInner, novoRoomIdx);
-        copyInner.classList.remove('quartos-copy--saida');
-        copyInner.classList.add('quartos-copy--entrada-pre');
-        void copyInner.offsetWidth;
-        requestAnimationFrame(function () {
-          requestAnimationFrame(function () {
-            copyInner.classList.remove('quartos-copy--entrada-pre');
-            copyInner.classList.add('quartos-copy--entrada');
-            setTimeout(function () {
-              copyInner.classList.remove('quartos-copy--entrada');
-            }, 580);
-          });
-        });
-      }, 340);
-    }
 
     function initRoot(root) {
       var slides = root.querySelectorAll('.quartos-3d-slide');
@@ -108,6 +51,90 @@
       var prevBtn = root.querySelector('.quartos-showcase-nav--prev');
       var nextBtn = root.querySelector('.quartos-showcase-nav--next');
       if (!copyInner || !prevBtn || !nextBtn) return;
+
+      function indiceQuartoNoSlide(centerIdx, slideIdx, roomIdx) {
+        var n = listaQuartos().length;
+        var off = (slideIdx - centerIdx + 3) % 3;
+        return n ? (roomIdx + off) % n : 0;
+      }
+
+      function atualizarImagens(slides, centerIdx, roomIdx) {
+        function assignSlide(i) {
+          var qi = indiceQuartoNoSlide(centerIdx, i, roomIdx);
+          var q = listaQuartos()[qi];
+          var img = slides[i].querySelector('img');
+          if (!img || !q || !q.img) return;
+          img.src = q.img;
+          img.alt = q.alt || q.titulo || '';
+          img.sizes = IMG_SIZES_HINT;
+          img.decoding = 'async';
+          if (i === centerIdx) img.loading = 'eager';
+        }
+        assignSlide(centerIdx);
+        var delay = 90;
+        for (var i = 0; i < slides.length; i++) {
+          if (i === centerIdx) continue;
+          (function (ii, ms) {
+            window.setTimeout(function () {
+              assignSlide(ii);
+            }, ms);
+          })(i, delay);
+          delay += 110;
+        }
+      }
+
+      function definirQuartoAtivoNoForm(rIdx) {
+        var q = listaQuartos()[rIdx];
+        var id = q && q.id != null ? String(q.id) : '';
+        root.setAttribute('data-quarto-ativo', id);
+        var secQuartos = root.closest('.secao.secao-quartos');
+        if (!secQuartos) return;
+        var el = secQuartos.nextElementSibling;
+        while (el) {
+          if (el.classList && el.classList.contains('secao-reserva')) {
+            var hid = el.querySelector('input.form-reserva-quarto-id[type="hidden"]');
+            if (hid) hid.value = id;
+            break;
+          }
+          el = el.nextElementSibling;
+        }
+      }
+
+      function preencherCopy(copyInner, roomIdx) {
+        var q = listaQuartos()[roomIdx];
+        if (!q) return;
+        copyInner.querySelector('.quartos-showcase-titulo').textContent = q.titulo;
+        copyInner.querySelector('.quartos-showcase-desc').textContent = q.desc;
+        copyInner.querySelector('.quartos-showcase-preco-valor').textContent = q.preco;
+        var lbl = copyInner.querySelector('.quartos-showcase-preco-label');
+        if (lbl) lbl.textContent = q.precoLabel || 'Noite';
+        var a = copyInner.querySelector('.quartos-showcase-btn');
+        if (a) a.href = q.verQuartoHref || q.href;
+        definirQuartoAtivoNoForm(roomIdx);
+      }
+
+      function animarTexto(copyInner, novoRoomIdx) {
+        if (!richMotion) {
+          preencherCopy(copyInner, novoRoomIdx);
+          return;
+        }
+        copyInner.classList.add('quartos-copy--saida');
+        setTimeout(function () {
+          preencherCopy(copyInner, novoRoomIdx);
+          copyInner.classList.remove('quartos-copy--saida');
+          copyInner.classList.add('quartos-copy--entrada-pre');
+          void copyInner.offsetWidth;
+          requestAnimationFrame(function () {
+            requestAnimationFrame(function () {
+              copyInner.classList.remove('quartos-copy--entrada-pre');
+              copyInner.classList.add('quartos-copy--entrada');
+              setTimeout(function () {
+                copyInner.classList.remove('quartos-copy--entrada');
+              }, 580);
+            });
+          });
+        }, 340);
+      }
 
       var roomIdx = 0;
       var centerSlide = 0;
@@ -126,16 +153,17 @@
       }
 
       function ir(dir) {
-        if (animando || N < 2) return;
+        var nQ = listaQuartos().length;
+        if (animando || nQ < 2) return;
         animando = true;
         setBusy(true);
 
-        var novoR = dir === 1 ? (roomIdx + 1) % N : (roomIdx + N - 1) % N;
+        var novoR = dir === 1 ? (roomIdx + 1) % nQ : (roomIdx + nQ - 1) % nQ;
         var novoC = dir === 1 ? (centerSlide + 1) % 3 : (centerSlide + 2) % 3;
 
         if (dir === 1) {
           var slidePatch = (centerSlide + 2) % 3;
-          var qAlvo = QUARTOS[(roomIdx + 2) % N];
+          var qAlvo = listaQuartos()[(roomIdx + 2) % nQ];
           var imgP = slides[slidePatch].querySelector('img');
           if (imgP && qAlvo) {
             imgP.src = qAlvo.img;
@@ -157,6 +185,8 @@
         }, DUR_SLIDE_MS);
       }
 
+      if (listaQuartos().length < 1) return;
+
       atualizarImagens(slides, centerSlide, roomIdx);
       aplicarSlides(slides, centerSlide);
       preencherCopy(copyInner, roomIdx);
@@ -167,6 +197,15 @@
       nextBtn.addEventListener('click', function () {
         ir(1);
       });
+
+      root._quartosShowcaseRefresh = function () {
+        var L = listaQuartos();
+        if (!L.length) return;
+        if (roomIdx >= L.length) roomIdx = 0;
+        atualizarImagens(slides, centerSlide, roomIdx);
+        aplicarSlides(slides, centerSlide);
+        preencherCopy(copyInner, roomIdx);
+      };
     }
 
     function whenQuartosShowcaseVisible(root, onReady) {
@@ -184,15 +223,25 @@
             }
           }
         },
-        { root: null, rootMargin: '200px 0px 200px 0px', threshold: 0 }
+        { root: null, rootMargin: '280px 0px 280px 0px', threshold: 0 }
       );
       io.observe(root);
     }
 
     document.querySelectorAll('[data-quartos-showcase]').forEach(function (root) {
+      if (root.dataset.quartosShowcaseBound === 'true') return;
+      root.dataset.quartosShowcaseBound = 'true';
       whenQuartosShowcaseVisible(root, function () {
         initRoot(root);
       });
+    });
+  };
+
+  global.refreshQuartosShowcaseCarrossel = function refreshQuartosShowcaseCarrossel() {
+    document.querySelectorAll('[data-quartos-showcase]').forEach(function (root) {
+      if (typeof root._quartosShowcaseRefresh === 'function') {
+        root._quartosShowcaseRefresh();
+      }
     });
   };
 })(window);

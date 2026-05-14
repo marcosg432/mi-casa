@@ -2,7 +2,7 @@
   "name": "mi-casa",
   "version": "1.0.0",
   "private": true,
-  "description": "Site institucional, reservas (Supabase), painel administrativo e PWA.",
+  "description": "Site institucional, reservas, painel administrativo e PWA.",
   "main": "server.js",
   "scripts": {
     "start": "node server.js",
