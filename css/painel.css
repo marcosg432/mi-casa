@@ -643,52 +643,9 @@ body.painel {
   opacity: 0.86;
 }
 
-/* Gráfico reservas/dia: linha no desktop, barras + scroll no mobile */
-.sys-reservas-chart-desktop {
+/* Gráfico reservas/dia: apenas no dashboard em ecrã largo (sem variante mobile) */
+.sys-reservas-chart-desktop-only {
   display: block;
-}
-
-.sys-reservas-chart-mobile {
-  display: none;
-}
-
-.sys-reservas-mobile-scroll {
-  overflow-x: auto;
-  overflow-y: hidden;
-  -webkit-overflow-scrolling: touch;
-  width: 100%;
-  margin-top: 0.1rem;
-  padding-bottom: 2px;
-}
-
-.sys-chart-wrap--bars-mobile {
-  overflow: visible;
-  min-width: min-content;
-}
-
-.sys-reservas-mobile-bars-svg {
-  width: auto;
-  max-width: none;
-  height: clamp(100px, 42vw, 220px);
-  min-height: 100px;
-  max-height: 220px;
-  display: block;
-}
-
-.sys-reservas-mobile-bar {
-  fill: url(#reservas-mobile-bars-grad);
-  stroke: rgba(31, 74, 53, 0.22);
-  stroke-width: 0.35;
-}
-
-.sys-reservas-mobile-day {
-  fill: var(--muted);
-  font-weight: 700;
-  font-family: 'Plus Jakarta Sans', system-ui, sans-serif;
-}
-
-.sys-reservas-chart-card--mobile-bars .sys-chart-hit--bar {
-  cursor: pointer;
 }
 
 .sys-reservas-chart-card::before {
@@ -699,9 +656,6 @@ body.painel {
   border-radius: 14px;
   padding: 0.85rem 0.95rem 0.95rem;
 }
-
-.sys-only-mobile { display: none; }
-.sys-only-desktop { display: block; }
 
 .sys-chart-head {
   font-size: 0.95rem;
@@ -730,6 +684,13 @@ body.painel {
   stroke-dasharray: 4 6;
 }
 
+.sys-chart-y-tick {
+  fill: var(--muted);
+  font-size: 11px;
+  font-weight: 600;
+  font-family: 'Plus Jakarta Sans', system-ui, sans-serif;
+}
+
 .sys-chart-line {
   fill: none;
   stroke: var(--primary);
@@ -746,8 +707,10 @@ body.painel {
 .sys-chart-x {
   margin-top: 0.45rem;
   display: grid;
-  grid-template-columns: repeat(var(--chart-days), minmax(30px, 1fr));
+  grid-template-columns: repeat(var(--chart-days), 26px);
+  justify-content: start;
   gap: 0;
+  width: 100%;
   overflow-x: auto;
   scrollbar-width: thin;
 }
@@ -2182,31 +2145,8 @@ a.sys-btn--ghost:hover {
     font-size: 0.82rem;
     width: 1.05rem;
   }
-  .sys-reservas-chart-desktop {
+  .sys-reservas-chart-desktop-only {
     display: none !important;
-  }
-
-  .sys-reservas-chart-mobile {
-    display: block;
-  }
-
-  .sys-reservas-mobile-bars-svg {
-    height: clamp(100px, 48vw, 220px) !important;
-  }
-
-  .sys-chart-svg {
-    height: 155px;
-  }
-  .sys-only-mobile { display: none; }
-  .sys-only-desktop { display: none; }
-  .sys-chart-x {
-    margin-top: 0.35rem;
-    grid-template-columns: repeat(var(--chart-days), minmax(22px, 1fr));
-  }
-  .sys-chart-x-item {
-    font-size: 0.58rem;
-    line-height: 1;
-    padding: 0.08rem 0;
   }
   .sys-row,
   .sys-history-cards,

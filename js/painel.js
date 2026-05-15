@@ -133,7 +133,6 @@
     var qtdReservas = reservas.length;
     var meiosPagamento = renderMeiosPagamento(reservas);
     var graficoReservas = renderGraficoReservasDia(reservas);
-    var graficoReservasMobile = renderGraficoReservasDiaBarrasMobile(reservas);
     var periodoLabelMap = {
       hoje: 'Hoje',
       mes_passado: 'Mês passado',
@@ -195,13 +194,8 @@
       '<div style="margin-top:3.6rem">' +
       meiosPagamento +
       '</div>' +
-      '<div style="margin-top:1.2rem">' +
-      '<div class="sys-reservas-chart-desktop">' +
+      '<div class="sys-reservas-chart-desktop-only" style="margin-top:1.2rem">' +
       graficoReservas +
-      '</div>' +
-      '<div class="sys-reservas-chart-mobile">' +
-      graficoReservasMobile +
-      '</div>' +
       '</div>';
     bindReservasChartTooltip();
   }
@@ -214,32 +208,6 @@
       esc(label) +
       '</div></article>'
     );
-  }
-
-  function reservasCountsPorDiaNoMesAtual(reservas) {
-    var now = new Date();
-    var year = now.getFullYear();
-    var month = now.getMonth();
-    var daysInMonth = new Date(year, month + 1, 0).getDate();
-    var counts = new Array(daysInMonth).fill(0);
-    (reservas || []).forEach(function (r) {
-      var criado = r && r.criadoEm ? new Date(r.criadoEm) : null;
-      if (!criado || isNaN(criado.getTime())) return;
-      if (criado.getFullYear() !== year || criado.getMonth() !== month) return;
-      counts[criado.getDate() - 1] += 1;
-    });
-    var maxCount = counts.reduce(function (acc, n) {
-      return n > acc ? n : acc;
-    }, 0);
-    var axisMax = Math.max(2, maxCount);
-    return {
-      year: year,
-      month: month,
-      daysInMonth: daysInMonth,
-      counts: counts,
-      maxCount: maxCount,
-      axisMax: axisMax
-    };
   }
 
   function renderMeiosPagamento(reservas) {
@@ -296,6 +264,32 @@
     );
   }
 
+  function reservasCountsPorDiaNoMesAtual(reservas) {
+    var now = new Date();
+    var year = now.getFullYear();
+    var month = now.getMonth();
+    var daysInMonth = new Date(year, month + 1, 0).getDate();
+    var counts = new Array(daysInMonth).fill(0);
+    (reservas || []).forEach(function (r) {
+      var criado = r && r.criadoEm ? new Date(r.criadoEm) : null;
+      if (!criado || isNaN(criado.getTime())) return;
+      if (criado.getFullYear() !== year || criado.getMonth() !== month) return;
+      counts[criado.getDate() - 1] += 1;
+    });
+    var maxCount = counts.reduce(function (acc, n) {
+      return n > acc ? n : acc;
+    }, 0);
+    var axisMax = Math.max(2, maxCount);
+    return {
+      year: year,
+      month: month,
+      daysInMonth: daysInMonth,
+      counts: counts,
+      maxCount: maxCount,
+      axisMax: axisMax
+    };
+  }
+
   function renderGraficoReservasDia(reservas) {
     var agg = reservasCountsPorDiaNoMesAtual(reservas);
     var daysInMonth = agg.daysInMonth;
@@ -304,7 +298,7 @@
 
     var width = 1080;
     var height = 260;
-    var left = 0;
+    var left = 38;
     var right = 0;
     var top = 14;
     var bottom = 36;
@@ -324,6 +318,20 @@
         '" y2="' +
         gy.toFixed(2) +
         '" class="sys-chart-grid-line" />';
+    }
+
+    var yAxisTicks = '';
+    for (var yi = 0; yi <= 5; yi++) {
+      var gyy = top + (plotH * yi) / 5;
+      var tickVal = Math.round((axisMax * (5 - yi)) / 5);
+      yAxisTicks +=
+        '<text class="sys-chart-y-tick" x="' +
+        (left - 8).toFixed(2) +
+        '" y="' +
+        (gyy + 4).toFixed(2) +
+        '" text-anchor="end">' +
+        tickVal +
+        '</text>';
     }
 
     var pointsArr = counts.map(function (value, idx) {
@@ -436,6 +444,7 @@
       '</linearGradient></defs>' +
       '<g>' +
       gridLines +
+      yAxisTicks +
       (areaPath
         ? '<path d="' + areaPath + '" class="sys-chart-area" fill="url(#reservas-chart-area-grad)" />'
         : '') +
@@ -463,120 +472,6 @@
       '">' +
       labels +
       '</div>' +
-      '<div class="sys-chart-tooltip" hidden></div>' +
-      '</article>'
-    );
-  }
-
-  function renderGraficoReservasDiaBarrasMobile(reservas) {
-    var agg = reservasCountsPorDiaNoMesAtual(reservas);
-    var daysInMonth = agg.daysInMonth;
-    var counts = agg.counts;
-    var axisMax = agg.axisMax;
-    var padT = 10;
-    var padB = 26;
-    var padL = 6;
-    var padR = 6;
-    var barW = 4;
-    var gap = 5;
-    var plotH = 108;
-    var vbH = padT + plotH + padB;
-    var monthStr = String(agg.month + 1).padStart(2, '0');
-    var n = daysInMonth;
-    var plotSpan = n * (barW + gap) - gap;
-    var totalW = padL + plotSpan + padR;
-
-    var gridLines = '';
-    var gi;
-    for (gi = 0; gi <= 4; gi++) {
-      var gy = padT + (plotH * gi) / 4;
-      gridLines +=
-        '<line class="sys-chart-grid-line" x1="' +
-        padL +
-        '" y1="' +
-        gy.toFixed(2) +
-        '" x2="' +
-        (padL + plotSpan).toFixed(2) +
-        '" y2="' +
-        gy.toFixed(2) +
-        '" />';
-    }
-
-    var barsAndLabels = '';
-    var i;
-    for (i = 0; i < n; i++) {
-      var count = counts[i];
-      var x = padL + i * (barW + gap);
-      var frac = (Number(count) || 0) / axisMax;
-      var bh = Math.max(frac * plotH, count > 0 ? 3 : 1);
-      var y = padT + plotH - bh;
-      var day = i + 1;
-      var lab = String(day).padStart(2, '0') + '/' + monthStr;
-      var hitW = barW + gap;
-      var tip =
-        lab +
-        ': ' +
-        count +
-        ' reserva' +
-        (count === 1 ? '' : 's') +
-        ' (pedido feito neste dia)';
-      barsAndLabels +=
-        '<g class="sys-reservas-mobile-day-group">' +
-        '<title>' +
-        esc(tip) +
-        '</title>' +
-        '<rect class="sys-reservas-mobile-bar" x="' +
-        x.toFixed(2) +
-        '" y="' +
-        y.toFixed(2) +
-        '" width="' +
-        barW +
-        '" height="' +
-        bh.toFixed(2) +
-        '" rx="1.5" />' +
-        '<text class="sys-reservas-mobile-day" x="' +
-        (x + barW / 2).toFixed(2) +
-        '" y="' +
-        (vbH - 5).toFixed(2) +
-        '" text-anchor="middle" font-size="7.5">' +
-        esc(lab) +
-        '</text>' +
-        '<rect class="sys-chart-hit sys-chart-hit--bar" x="' +
-        (x - 1).toFixed(2) +
-        '" y="' +
-        padT +
-        '" width="' +
-        hitW.toFixed(2) +
-        '" height="' +
-        plotH +
-        '" fill="transparent" data-use-bbox="1" data-date-label="' +
-        esc(lab) +
-        '" data-day="' +
-        day +
-        '" data-count="' +
-        count +
-        '" />' +
-        '</g>';
-    }
-
-    return (
-      '<article class="sys-card sys-reservas-chart-card sys-reservas-chart-card--mobile-bars">' +
-      '<div class="sys-chart-head">Reservas feitas por dia</div>' +
-      '<div class="sys-reservas-mobile-scroll">' +
-      '<div class="sys-chart-wrap sys-chart-wrap--bars-mobile">' +
-      '<svg viewBox="0 0 ' +
-      totalW +
-      ' ' +
-      vbH +
-      '" preserveAspectRatio="xMinYMin meet" class="sys-chart-svg sys-reservas-mobile-bars-svg" role="img" aria-label="Reservas por dia conforme data do pedido">' +
-      '<defs>' +
-      '<linearGradient id="reservas-mobile-bars-grad" x1="0" y1="0" x2="0" y2="1">' +
-      '<stop offset="0%" stop-color="#3d7d5c"/>' +
-      '<stop offset="100%" stop-color="#1f4a35"/>' +
-      '</linearGradient></defs>' +
-      gridLines +
-      barsAndLabels +
-      '</svg></div></div>' +
       '<div class="sys-chart-tooltip" hidden></div>' +
       '</article>'
     );
