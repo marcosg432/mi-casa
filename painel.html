@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta name="robots" content="noindex, nofollow">
   <link rel="manifest" href="/manifest.json">
-  <meta name="theme-color" content="#0F172A">
+  <meta name="theme-color" content="#1f4a35">
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <meta name="apple-mobile-web-app-title" content="Recanto">
@@ -18,22 +18,52 @@
   <button class="sys-mobile-toggle" id="sys-mobile-toggle" aria-label="Abrir menu" aria-expanded="false">☰ Menu</button>
   <div class="sys-shell">
     <aside class="sys-sidebar">
-      <div class="sys-logo-wrap">
-        <img src="assets/logo-footer-sitio.png" alt="Logo Recanto da Paz" class="sys-logo-img" />
+      <div class="sys-sidebar-brand">
+        <div class="sys-logo-wrap">
+          <img src="icons/logo%20boa.png" alt="Mi Casa Su Casa" class="sys-logo-img" width="120" height="48" decoding="async" />
+        </div>
+        <div class="sys-brand-text">
+          <strong>Mi Casa Su Casa</strong>
+          <span>Painel administrativo</span>
+        </div>
       </div>
-      <button class="sys-nav-btn active" data-tab="faturamento">faturamento</button>
-      <button class="sys-nav-btn" data-tab="ficha">ficha de reserva</button>
-      <button class="sys-nav-btn" data-tab="quartos">quartos</button>
-      <button class="sys-nav-btn" data-tab="calendario">configuração</button>
-      <button type="button" class="sys-nav-btn" id="btn-logout" data-sidebar-action="voltar">voltar ao site</button>
-      <a href="index.html" class="sys-voltar">← Voltar ao site</a>
+      <p class="sys-nav-group-label">Menu</p>
+      <nav class="sys-sidebar-nav" aria-label="Secções do painel">
+        <button type="button" class="sys-nav-btn active" data-tab="faturamento">Faturamento</button>
+        <button type="button" class="sys-nav-btn" data-tab="ficha">Ficha de reserva</button>
+        <button type="button" class="sys-nav-btn" data-tab="quartos">Quartos</button>
+        <button type="button" class="sys-nav-btn" data-tab="calendario">Configuração</button>
+      </nav>
+      <div class="sys-sidebar-footer">
+        <button type="button" class="sys-nav-btn sys-nav-btn--ghost" id="btn-logout" data-sidebar-action="voltar">Voltar ao site</button>
+        <a href="index.html" class="sys-voltar">← Voltar ao site</a>
+      </div>
     </aside>
 
     <main class="sys-main">
-      <section class="sys-tab active" id="tab-faturamento"></section>
-      <section class="sys-tab" id="tab-ficha"></section>
-      <section class="sys-tab" id="tab-quartos"></section>
-      <section class="sys-tab" id="tab-calendario"></section>
+      <header class="sys-main-head">
+        <nav class="sys-breadcrumb" aria-label="Localização no painel">
+          <span class="sys-breadcrumb-root">Painel</span>
+          <span class="sys-breadcrumb-sep" aria-hidden="true">›</span>
+          <span id="sys-breadcrumb-current" class="sys-breadcrumb-current">Faturamento</span>
+        </nav>
+        <div class="sys-main-head-center">
+          <div class="sys-app-search-decor" role="presentation">
+            <span class="sys-app-search-icon" aria-hidden="true"></span>
+            <span class="sys-app-search-ph">Buscar reservas, quartos ou código…</span>
+          </div>
+        </div>
+        <div class="sys-main-head-actions">
+          <span class="sys-head-icon sys-head-icon--bell" title="Notificações" aria-hidden="true"></span>
+          <span class="sys-head-icon sys-head-icon--user" title="Conta" aria-hidden="true"></span>
+        </div>
+      </header>
+      <div class="sys-main-body">
+        <section class="sys-tab active" id="tab-faturamento"></section>
+        <section class="sys-tab" id="tab-ficha"></section>
+        <section class="sys-tab" id="tab-quartos"></section>
+        <section class="sys-tab" id="tab-calendario"></section>
+      </div>
     </main>
   </div>
   <div class="sys-modal" id="reserva-modal" hidden>

@@ -106,6 +106,16 @@
     document.querySelectorAll('.sys-tab').forEach(function (sec) {
       sec.classList.toggle('active', sec.id === 'tab-' + tab);
     });
+    var crumb = document.getElementById('sys-breadcrumb-current');
+    if (crumb) {
+      var labels = {
+        faturamento: 'Faturamento',
+        ficha: 'Ficha de reserva',
+        quartos: 'Quartos',
+        calendario: 'Configuração'
+      };
+      crumb.textContent = labels[tab] || tab;
+    }
     if (window.innerWidth <= 980) {
       var shell = document.querySelector('.sys-shell');
       var toggle = document.getElementById('sys-mobile-toggle');
@@ -123,6 +133,7 @@
     var qtdReservas = reservas.length;
     var meiosPagamento = renderMeiosPagamento(reservas);
     var graficoReservas = renderGraficoReservasDia(reservas);
+    var graficoReservasMobile = renderGraficoReservasDiaBarrasMobile(reservas);
     var periodoLabelMap = {
       hoje: 'Hoje',
       mes_passado: 'Mês passado',
@@ -185,7 +196,12 @@
       meiosPagamento +
       '</div>' +
       '<div style="margin-top:1.2rem">' +
-      '<div class="sys-only-desktop">' + graficoReservas + '</div>' +
+      '<div class="sys-reservas-chart-desktop">' +
+      graficoReservas +
+      '</div>' +
+      '<div class="sys-reservas-chart-mobile">' +
+      graficoReservasMobile +
+      '</div>' +
       '</div>';
     bindReservasChartTooltip();
   }
@@ -198,6 +214,32 @@
       esc(label) +
       '</div></article>'
     );
+  }
+
+  function reservasCountsPorDiaNoMesAtual(reservas) {
+    var now = new Date();
+    var year = now.getFullYear();
+    var month = now.getMonth();
+    var daysInMonth = new Date(year, month + 1, 0).getDate();
+    var counts = new Array(daysInMonth).fill(0);
+    (reservas || []).forEach(function (r) {
+      var criado = r && r.criadoEm ? new Date(r.criadoEm) : null;
+      if (!criado || isNaN(criado.getTime())) return;
+      if (criado.getFullYear() !== year || criado.getMonth() !== month) return;
+      counts[criado.getDate() - 1] += 1;
+    });
+    var maxCount = counts.reduce(function (acc, n) {
+      return n > acc ? n : acc;
+    }, 0);
+    var axisMax = Math.max(2, maxCount);
+    return {
+      year: year,
+      month: month,
+      daysInMonth: daysInMonth,
+      counts: counts,
+      maxCount: maxCount,
+      axisMax: axisMax
+    };
   }
 
   function renderMeiosPagamento(reservas) {
@@ -255,23 +297,10 @@
   }
 
   function renderGraficoReservasDia(reservas) {
-    var now = new Date();
-    var year = now.getFullYear();
-    var month = now.getMonth();
-    var daysInMonth = new Date(year, month + 1, 0).getDate();
-    var counts = new Array(daysInMonth).fill(0);
-
-    (reservas || []).forEach(function (r) {
-      var criado = r && r.criadoEm ? new Date(r.criadoEm) : null;
-      if (!criado || isNaN(criado.getTime())) return;
-      if (criado.getFullYear() !== year || criado.getMonth() !== month) return;
-      counts[criado.getDate() - 1] += 1;
-    });
-
-    var maxCount = counts.reduce(function (acc, n) {
-      return n > acc ? n : acc;
-    }, 0);
-    var axisMax = Math.max(2, maxCount);
+    var agg = reservasCountsPorDiaNoMesAtual(reservas);
+    var daysInMonth = agg.daysInMonth;
+    var counts = agg.counts;
+    var axisMax = agg.axisMax;
 
     var width = 1080;
     var height = 260;
@@ -297,30 +326,70 @@
         '" class="sys-chart-grid-line" />';
     }
 
-    var pointsArr = counts
-      .map(function (value, idx) {
-        var x = left + (idx * plotW) / Math.max(1, counts.length - 1);
-        var y = top + plotH - (value / axisMax) * plotH;
-        return { x: x, y: y, day: idx + 1, count: value };
-      })
-    ;
+    var pointsArr = counts.map(function (value, idx) {
+      var x = left + (idx * plotW) / Math.max(1, counts.length - 1);
+      var y = top + plotH - (value / axisMax) * plotH;
+      return { x: x, y: y, day: idx + 1, count: value };
+    });
 
-    var points = pointsArr
-      .map(function (p) {
-        return p.x.toFixed(2) + ',' + p.y.toFixed(2);
-      })
-      .join(' ');
-
-    var smoothPath = '';
-    if (pointsArr.length) {
-      smoothPath = 'M ' + pointsArr[0].x.toFixed(2) + ' ' + pointsArr[0].y.toFixed(2);
-      for (var s = 1; s < pointsArr.length; s++) {
-        var prev = pointsArr[s - 1];
-        var curr = pointsArr[s];
-        var cx = ((prev.x + curr.x) / 2).toFixed(2);
-        smoothPath += ' Q ' + prev.x.toFixed(2) + ' ' + prev.y.toFixed(2) + ', ' + cx + ' ' + ((prev.y + curr.y) / 2).toFixed(2);
-        smoothPath += ' T ' + curr.x.toFixed(2) + ' ' + curr.y.toFixed(2);
+    function smoothLinePathCatmull(points) {
+      if (!points.length) return '';
+      function fx(n) {
+        return Number(n).toFixed(2);
       }
+      if (points.length === 1) {
+        return 'M ' + fx(points[0].x) + ' ' + fx(points[0].y);
+      }
+      if (points.length === 2) {
+        return (
+          'M ' +
+          fx(points[0].x) +
+          ' ' +
+          fx(points[0].y) +
+          ' L ' +
+          fx(points[1].x) +
+          ' ' +
+          fx(points[1].y)
+        );
+      }
+      var d = 'M ' + fx(points[0].x) + ' ' + fx(points[0].y);
+      for (var i = 0; i < points.length - 1; i++) {
+        var p0 =
+          i > 0
+            ? points[i - 1]
+            : { x: 2 * points[i].x - points[i + 1].x, y: 2 * points[i].y - points[i + 1].y };
+        var p1 = points[i];
+        var p2 = points[i + 1];
+        var p3 =
+          i + 2 < points.length
+            ? points[i + 2]
+            : { x: 2 * points[i + 1].x - points[i].x, y: 2 * points[i + 1].y - points[i].y };
+        var c1x = p1.x + (p2.x - p0.x) / 6;
+        var c1y = p1.y + (p2.y - p0.y) / 6;
+        var c2x = p2.x - (p3.x - p1.x) / 6;
+        var c2y = p2.y - (p3.y - p1.y) / 6;
+        d += ' C ' + fx(c1x) + ' ' + fx(c1y) + ', ' + fx(c2x) + ' ' + fx(c2y) + ', ' + fx(p2.x) + ' ' + fx(p2.y);
+      }
+      return d;
+    }
+
+    var smoothPath = smoothLinePathCatmull(pointsArr);
+    var baselineY = top + plotH;
+    var areaPath = '';
+    if (smoothPath && pointsArr.length >= 2) {
+      var lastPt = pointsArr[pointsArr.length - 1];
+      var firstPt = pointsArr[0];
+      areaPath =
+        smoothPath +
+        ' L ' +
+        lastPt.x.toFixed(2) +
+        ' ' +
+        baselineY.toFixed(2) +
+        ' L ' +
+        firstPt.x.toFixed(2) +
+        ' ' +
+        baselineY.toFixed(2) +
+        ' Z';
     }
 
     var labels = pointsArr
@@ -352,7 +421,7 @@
       .join('');
 
     return (
-      '<article class="sys-card sys-reservas-chart-card">' +
+      '<article class="sys-card sys-reservas-chart-card sys-reservas-chart-card--desktop">' +
       '<div class="sys-chart-head">Reservas feitas por dia</div>' +
       '<div class="sys-chart-wrap">' +
       '<svg viewBox="0 0 ' +
@@ -360,11 +429,19 @@
       ' ' +
       height +
       '" class="sys-chart-svg" role="img" aria-label="Grafico de reservas por dia">' +
+      '<defs>' +
+      '<linearGradient id="reservas-chart-area-grad" x1="0" y1="0" x2="0" y2="1">' +
+      '<stop offset="0%" stop-color="#2d6a4a" stop-opacity="0.28"/>' +
+      '<stop offset="100%" stop-color="#2d6a4a" stop-opacity="0"/>' +
+      '</linearGradient></defs>' +
       '<g>' +
       gridLines +
+      (areaPath
+        ? '<path d="' + areaPath + '" class="sys-chart-area" fill="url(#reservas-chart-area-grad)" />'
+        : '') +
       (smoothPath
-        ? '<path d="' + smoothPath + '" class="sys-chart-line" />'
-        : '<polyline points="' + points + '" class="sys-chart-line" />') +
+        ? '<path d="' + smoothPath + '" class="sys-chart-line" fill="none" />'
+        : '') +
       '<line class="sys-chart-crosshair" x1="' +
       left +
       '" y1="' +
@@ -391,6 +468,120 @@
     );
   }
 
+  function renderGraficoReservasDiaBarrasMobile(reservas) {
+    var agg = reservasCountsPorDiaNoMesAtual(reservas);
+    var daysInMonth = agg.daysInMonth;
+    var counts = agg.counts;
+    var axisMax = agg.axisMax;
+    var padT = 10;
+    var padB = 26;
+    var padL = 6;
+    var padR = 6;
+    var barW = 4;
+    var gap = 5;
+    var plotH = 108;
+    var vbH = padT + plotH + padB;
+    var monthStr = String(agg.month + 1).padStart(2, '0');
+    var n = daysInMonth;
+    var plotSpan = n * (barW + gap) - gap;
+    var totalW = padL + plotSpan + padR;
+
+    var gridLines = '';
+    var gi;
+    for (gi = 0; gi <= 4; gi++) {
+      var gy = padT + (plotH * gi) / 4;
+      gridLines +=
+        '<line class="sys-chart-grid-line" x1="' +
+        padL +
+        '" y1="' +
+        gy.toFixed(2) +
+        '" x2="' +
+        (padL + plotSpan).toFixed(2) +
+        '" y2="' +
+        gy.toFixed(2) +
+        '" />';
+    }
+
+    var barsAndLabels = '';
+    var i;
+    for (i = 0; i < n; i++) {
+      var count = counts[i];
+      var x = padL + i * (barW + gap);
+      var frac = (Number(count) || 0) / axisMax;
+      var bh = Math.max(frac * plotH, count > 0 ? 3 : 1);
+      var y = padT + plotH - bh;
+      var day = i + 1;
+      var lab = String(day).padStart(2, '0') + '/' + monthStr;
+      var hitW = barW + gap;
+      var tip =
+        lab +
+        ': ' +
+        count +
+        ' reserva' +
+        (count === 1 ? '' : 's') +
+        ' (pedido feito neste dia)';
+      barsAndLabels +=
+        '<g class="sys-reservas-mobile-day-group">' +
+        '<title>' +
+        esc(tip) +
+        '</title>' +
+        '<rect class="sys-reservas-mobile-bar" x="' +
+        x.toFixed(2) +
+        '" y="' +
+        y.toFixed(2) +
+        '" width="' +
+        barW +
+        '" height="' +
+        bh.toFixed(2) +
+        '" rx="1.5" />' +
+        '<text class="sys-reservas-mobile-day" x="' +
+        (x + barW / 2).toFixed(2) +
+        '" y="' +
+        (vbH - 5).toFixed(2) +
+        '" text-anchor="middle" font-size="7.5">' +
+        esc(lab) +
+        '</text>' +
+        '<rect class="sys-chart-hit sys-chart-hit--bar" x="' +
+        (x - 1).toFixed(2) +
+        '" y="' +
+        padT +
+        '" width="' +
+        hitW.toFixed(2) +
+        '" height="' +
+        plotH +
+        '" fill="transparent" data-use-bbox="1" data-date-label="' +
+        esc(lab) +
+        '" data-day="' +
+        day +
+        '" data-count="' +
+        count +
+        '" />' +
+        '</g>';
+    }
+
+    return (
+      '<article class="sys-card sys-reservas-chart-card sys-reservas-chart-card--mobile-bars">' +
+      '<div class="sys-chart-head">Reservas feitas por dia</div>' +
+      '<div class="sys-reservas-mobile-scroll">' +
+      '<div class="sys-chart-wrap sys-chart-wrap--bars-mobile">' +
+      '<svg viewBox="0 0 ' +
+      totalW +
+      ' ' +
+      vbH +
+      '" preserveAspectRatio="xMinYMin meet" class="sys-chart-svg sys-reservas-mobile-bars-svg" role="img" aria-label="Reservas por dia conforme data do pedido">' +
+      '<defs>' +
+      '<linearGradient id="reservas-mobile-bars-grad" x1="0" y1="0" x2="0" y2="1">' +
+      '<stop offset="0%" stop-color="#3d7d5c"/>' +
+      '<stop offset="100%" stop-color="#1f4a35"/>' +
+      '</linearGradient></defs>' +
+      gridLines +
+      barsAndLabels +
+      '</svg></div></div>' +
+      '<div class="sys-chart-tooltip" hidden></div>' +
+      '</article>'
+    );
+  }
+
   function bindReservasChartTooltip() {
     document.querySelectorAll('.sys-reservas-chart-card').forEach(function (card) {
       var tooltip = card.querySelector('.sys-chart-tooltip');
@@ -404,33 +595,61 @@
         if (crosshair) crosshair.setAttribute('hidden', 'hidden');
         if (dot) dot.setAttribute('hidden', 'hidden');
       }
+      var scroller = wrap.closest('.sys-reservas-mobile-scroll');
+      if (scroller) {
+        scroller.addEventListener('scroll', hideAll, { passive: true });
+      }
       hits.forEach(function (hit) {
         function show() {
           var day = hit.getAttribute('data-day');
           var count = hit.getAttribute('data-count');
-          var x = Number(hit.getAttribute('data-x') || 0);
-          var y = Number(hit.getAttribute('data-y') || 0);
-          tooltip.textContent = String(day).padStart(2, '0') + ' - ' + count + ' reserva' + (count === '1' ? '' : 's');
+          var useBbox = hit.getAttribute('data-use-bbox') === '1';
+          var dateLab = hit.getAttribute('data-date-label');
+          tooltip.textContent =
+            (dateLab || String(day).padStart(2, '0')) + ' - ' + count + ' reserva' + (count === '1' ? '' : 's');
           tooltip.hidden = false;
-          var rect = wrap.getBoundingClientRect();
-          var tipX = Math.max(8, Math.min(rect.width - 140, x - 24));
-          var tipY = Math.max(8, y - 48);
-          tooltip.style.left = tipX + 'px';
-          tooltip.style.top = tipY + 'px';
-          if (crosshair) {
-            crosshair.setAttribute('x1', String(x));
-            crosshair.setAttribute('x2', String(x));
-            crosshair.removeAttribute('hidden');
-          }
-          if (dot) {
-            dot.setAttribute('cx', String(x));
-            dot.setAttribute('cy', String(y));
-            dot.removeAttribute('hidden');
+          var wr = wrap.getBoundingClientRect();
+          var tipW = 140;
+          if (useBbox) {
+            var cr = card.getBoundingClientRect();
+            var hr = hit.getBoundingClientRect();
+            var tipX = Math.max(8, Math.min(cr.width - tipW - 8, hr.left + hr.width / 2 - cr.left - tipW / 2));
+            var tipY = Math.max(8, hr.top - cr.top - 36);
+            tooltip.style.left = tipX + 'px';
+            tooltip.style.top = tipY + 'px';
+            if (crosshair) crosshair.setAttribute('hidden', 'hidden');
+            if (dot) dot.setAttribute('hidden', 'hidden');
+          } else {
+            var x = Number(hit.getAttribute('data-x') || 0);
+            var y = Number(hit.getAttribute('data-y') || 0);
+            var cr = card.getBoundingClientRect();
+            var svgEl = wrap.querySelector('svg');
+            var vb =
+              svgEl && svgEl.viewBox && svgEl.viewBox.baseVal ? svgEl.viewBox.baseVal : { width: 1080, height: 260 };
+            var vbW = vb.width || 1080;
+            var vbH = vb.height || 260;
+            var scaleX = wr.width / vbW;
+            var scaleY = wr.height / vbH;
+            var tipX2 = Math.max(8, Math.min(cr.width - tipW - 8, wr.left - cr.left + x * scaleX - tipW / 2));
+            var tipY2 = Math.max(8, wr.top - cr.top + y * scaleY - 48);
+            tooltip.style.left = tipX2 + 'px';
+            tooltip.style.top = tipY2 + 'px';
+            if (crosshair) {
+              crosshair.setAttribute('x1', String(x));
+              crosshair.setAttribute('x2', String(x));
+              crosshair.removeAttribute('hidden');
+            }
+            if (dot) {
+              dot.setAttribute('cx', String(x));
+              dot.setAttribute('cy', String(y));
+              dot.removeAttribute('hidden');
+            }
           }
         }
         hit.addEventListener('mouseenter', show);
         hit.addEventListener('mousemove', show);
         hit.addEventListener('mouseleave', hideAll);
+        hit.addEventListener('touchstart', show, { passive: true });
       });
       wrap.addEventListener('mouseleave', hideAll);
     });
@@ -543,22 +762,54 @@
           .join('') +
         '</div>'
       : '<div class="sys-ficha-empty">Nenhuma ficha encontrada.</div>';
-    el.innerHTML =
-      '<div class="sys-ficha-board">' +
-      '<div class="sys-ficha-top-tabs">' +
-      '<button class="sys-ficha-tab' +
-      (state.fichaView === 'cliente' ? ' active' : '') +
-      '" data-ficha-view="cliente">Ficha de cliente</button>' +
-      '<button class="sys-ficha-tab' +
-      (state.fichaView === 'historico' ? ' active' : '') +
-      '" data-ficha-view="historico">Historico de ficha</button>' +
-      '</div>' +
-      '<div class="sys-ficha-filters">' +
-      '<input id="ficha-search" class="sys-ficha-search" placeholder="Pesquisar" value="' +
-      esc(state.fichaQuery) +
-      '" />' +
-      (state.fichaView === 'historico'
-        ? '<label class="sys-ficha-status-wrap"><span>Status</span><select id="ficha-status">' +
+
+    var mobileCards = list.length
+      ? list
+          .slice(0, 60)
+          .map(function (r) {
+            var statusTxt = (r.status || '').toLowerCase() === 'cancelada' ? 'Cancelada' : 'Ativa';
+            var stClass = statusTxt === 'Cancelada' ? 'sys-ficha-m-card__pill--off' : 'sys-ficha-m-card__pill--on';
+            return (
+              '<article class="sys-ficha-m-card">' +
+              '<div class="sys-ficha-m-card__top">' +
+              '<span class="sys-ficha-m-card__code">' +
+              esc(r.codigo || '—') +
+              '</span>' +
+              '<span class="sys-ficha-m-card__pill ' +
+              stClass +
+              '">' +
+              esc(statusTxt) +
+              '</span>' +
+              '</div>' +
+              '<div class="sys-ficha-m-card__nome">' +
+              esc(r.nome || 'Sem nome') +
+              '</div>' +
+              '<div class="sys-ficha-m-card__quarto">' +
+              esc(quartoTituloPorIdPainel(r.quartoId)) +
+              '</div>' +
+              '<div class="sys-ficha-m-card__row">' +
+              '<span class="sys-ficha-m-card__label">Total</span>' +
+              '<span class="sys-ficha-m-card__valor">' +
+              esc(money(r.valorTotal)) +
+              '</span>' +
+              '</div>' +
+              '<div class="sys-ficha-m-card__foot">' +
+              '<span class="sys-ficha-m-card__time">' +
+              esc(fmtTimeBrasilia(r.criadoEm)) +
+              '</span>' +
+              '<button type="button" class="sys-btn sys-ficha-m-card__btn" data-open="' +
+              esc(r.id) +
+              '">Abrir</button>' +
+              '</div>' +
+              '</article>'
+            );
+          })
+          .join('')
+      : '<div class="sys-ficha-empty sys-ficha-empty--mob">Nenhuma ficha encontrada.</div>';
+
+    var statusSelectHtml =
+      state.fichaView === 'historico'
+        ? '<label class="sys-ficha-status-wrap"><span>Status</span><select id="ficha-status" class="sys-ficha-status-select">' +
           '<option value="todos"' +
           (state.fichaStatus === 'todos' ? ' selected' : '') +
           '>Todos</option>' +
@@ -569,15 +820,79 @@
           (state.fichaStatus === 'cancelada' ? ' selected' : '') +
           '>Cancelada</option>' +
           '</select></label>'
-        : '') +
-      '</div>' +
-      (state.fichaView === 'historico'
+        : '';
+
+    var statusSelectMobileHtml =
+      state.fichaView === 'historico'
+        ? '<label class="sys-ficha-status-wrap sys-ficha-status-wrap--mob"><span>Status</span><select id="ficha-status-mobile" class="sys-ficha-status-select">' +
+          '<option value="todos"' +
+          (state.fichaStatus === 'todos' ? ' selected' : '') +
+          '>Todos</option>' +
+          '<option value="ativa"' +
+          (state.fichaStatus === 'ativa' ? ' selected' : '') +
+          '>Ativa</option>' +
+          '<option value="cancelada"' +
+          (state.fichaStatus === 'cancelada' ? ' selected' : '') +
+          '>Cancelada</option>' +
+          '</select></label>'
+        : '';
+
+    var tabsHtml =
+      '<div class="sys-ficha-top-tabs">' +
+      '<button type="button" class="sys-ficha-tab' +
+      (state.fichaView === 'cliente' ? ' active' : '') +
+      '" data-ficha-view="cliente">Ficha de cliente</button>' +
+      '<button type="button" class="sys-ficha-tab' +
+      (state.fichaView === 'historico' ? ' active' : '') +
+      '" data-ficha-view="historico">Historico de ficha</button>' +
+      '</div>';
+
+    var filtersDesktopHtml =
+      '<div class="sys-ficha-filters">' +
+      '<input id="ficha-search" class="sys-ficha-search sys-ficha-search-input" placeholder="Pesquisar" value="' +
+      esc(state.fichaQuery) +
+      '" />' +
+      statusSelectHtml +
+      '</div>';
+
+    var filtersMobileHtml =
+      '<div class="sys-ficha-filters sys-ficha-filters--mob">' +
+      '<input id="ficha-search-mobile" class="sys-ficha-search sys-ficha-search-input" placeholder="Pesquisar" value="' +
+      esc(state.fichaQuery) +
+      '" />' +
+      statusSelectMobileHtml +
+      '</div>';
+
+    var desktopBody =
+      state.fichaView === 'historico'
         ? '<div class="sys-ficha-table-head"><div>Nome / quarto</div><div>Preco</div><div>Status</div></div>' +
           '<div class="sys-ficha-table-body">' +
           rows +
           '</div>'
-        : cards) +
-      '</div>';
+        : cards;
+
+    el.innerHTML =
+      '<div class="sys-ficha-root">' +
+      '<div class="sys-ficha-view sys-ficha-view--desktop">' +
+      '<div class="sys-ficha-board">' +
+      tabsHtml +
+      filtersDesktopHtml +
+      desktopBody +
+      '</div></div>' +
+      '<div class="sys-ficha-view sys-ficha-view--mobile">' +
+      '<div class="sys-ficha-board sys-ficha-board--mobile">' +
+      '<div class="sys-ficha-top-tabs sys-ficha-top-tabs--mob">' +
+      '<button type="button" class="sys-ficha-tab' +
+      (state.fichaView === 'cliente' ? ' active' : '') +
+      '" data-ficha-view="cliente">Cliente</button>' +
+      '<button type="button" class="sys-ficha-tab' +
+      (state.fichaView === 'historico' ? ' active' : '') +
+      '" data-ficha-view="historico">Historico</button>' +
+      '</div>' +
+      filtersMobileHtml +
+      '<div class="sys-ficha-m-scroll">' +
+      mobileCards +
+      '</div></div></div></div>';
   }
 
   function renderHistorico() {
@@ -1318,13 +1633,14 @@
     document.body.addEventListener('input', function (ev) {
       if (ev.target.id === 'history-search') {
         state.historyQuery = ev.target.value;
-        if (state.tab === 'ficha') renderFicha();
-      } else if (ev.target.id === 'ficha-search') {
+        renderHistorico();
+      } else if (ev.target.classList.contains('sys-ficha-search-input')) {
         var cursorPos = ev.target.selectionStart;
+        var activeId = ev.target.id;
         state.fichaQuery = ev.target.value;
         if (state.tab === 'ficha') {
           renderFicha();
-          var input = document.getElementById('ficha-search');
+          var input = document.getElementById(activeId);
           if (input) {
             input.focus();
             var pos = Math.max(0, Math.min(Number(cursorPos) || 0, input.value.length));
@@ -1341,7 +1657,7 @@
       } else if (ev.target.id === 'cal-year') {
         state.calendarYear = Number(ev.target.value);
         renderCalendario();
-      } else if (ev.target.id === 'ficha-status') {
+      } else if (ev.target.classList.contains('sys-ficha-status-select')) {
         state.fichaStatus = ev.target.value;
         if (state.tab === 'ficha') renderFicha();
       }
@@ -1376,13 +1692,14 @@
     if (!reserva) return;
     var card = document.getElementById('reserva-modal-card');
     card.innerHTML =
-      '<h2 class="sys-section-title" style="margin-bottom:0.8rem">Código ' +
+      '<div class="sys-ficha-detalhe">' +
+      '<h2 class="sys-ficha-detalhe__title">Código ' +
       esc(reserva.codigo) +
       '</h2>' +
-      '<div class="sys-modal-grid">' +
+      '<div class="sys-ficha-detalhe__grid">' +
       field('nome', reserva.nome) +
       field('quarto', quartoTituloPorIdPainel(reserva.quartoId)) +
-      field('datas', fmtDate(reserva.dataEntrada) + ' - ' + fmtDate(reserva.dataSaida)) +
+      field('datas', fmtDate(reserva.dataEntrada) + ' – ' + fmtDate(reserva.dataSaida)) +
       field('gmail', reserva.email) +
       field('valor adicional', money(reserva.valorAdicional)) +
       field('numero', reserva.telefone) +
@@ -1390,20 +1707,27 @@
       field('n. pessoas', reserva.pessoas) +
       field('plataforma', (reserva.plataforma || 'site').toUpperCase()) +
       field('valor total', money(reserva.valorTotal)) +
-      field('metodo de pagamento', formatMetodoPagamento(reserva.metodoPagamento)) +
-      '</div><div style="margin-top:0.9rem;display:flex;justify-content:space-between;gap:0.75rem;align-items:center">' +
+      field('metodo de pagamento', formatMetodoPagamento(reserva.metodoPagamento), true) +
+      '</div><div class="sys-ficha-detalhe__actions">' +
       (reserva.status === 'cancelada'
-        ? '<button class="sys-btn" style="background:rgba(114,114,114,0.6);cursor:default">reserva cancelada</button>'
-        : '<button class="sys-btn" data-cancel-reserva="' +
+        ? '<button type="button" class="sys-ficha-detalhe__btn sys-ficha-detalhe__btn--muted" disabled>reserva cancelada</button>'
+        : '<button type="button" class="sys-ficha-detalhe__btn sys-ficha-detalhe__btn--danger" data-cancel-reserva="' +
           esc(reserva.id) +
-          '" style="background:rgba(180,54,54,0.78)">cancelar reserva</button>') +
-      '<button class="sys-btn" data-close-modal="true">fechar</button></div>';
+          '">cancelar reserva</button>') +
+      '<button type="button" class="sys-ficha-detalhe__btn sys-ficha-detalhe__btn--primary" data-close-modal="true">fechar</button></div></div>';
     document.getElementById('reserva-modal').hidden = false;
   }
 
-  function field(label, value) {
+  function field(label, value, fullWidth) {
+    var fw = fullWidth ? ' sys-ficha-detalhe__field--full' : '';
     return (
-      '<div class="sys-modal-field"><b>' + esc(label) + '</b><span>' + esc(value) + '</span></div>'
+      '<div class="sys-ficha-detalhe__field' +
+      fw +
+      '"><span class="sys-ficha-detalhe__label">' +
+      esc(label) +
+      '</span><span class="sys-ficha-detalhe__value">' +
+      esc(value) +
+      '</span></div>'
     );
   }
 
