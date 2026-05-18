@@ -1,8 +1,9 @@
 /**
- * Mesma lista que galeria.html (pasta imagem/). Usada no painel para escolher fotos já no site.
+ * Fotos da pasta imagem/ — galeria, painel e animação 3D.
+ * Números: 1–37 (só os que existem na pasta). Séries ep + extras.
  */
 (function (global) {
-  var N = [
+  var NUMS = [
     [1, 'webp'],
     [2, 'webp'],
     [3, 'webp'],
@@ -38,7 +39,55 @@
     [36, 'webp'],
     [37, 'webp']
   ];
-  global.GALERIA_IMAGENS_URLS = N.map(function (x) {
-    return { url: 'imagem/' + x[0] + '.' + x[1], num: x[0] };
+
+  var EP = [
+    [1, 'webp'],
+    [2, 'webp'],
+    [3, 'webp'],
+    [4, 'webp'],
+    [5, 'webp'],
+    [6, 'webp'],
+    [7, 'webp'],
+    [8, 'webp'],
+    [9, 'webp'],
+    [10, 'webp'],
+    [11, 'webp'],
+    [12, 'webp'],
+    [15, 'webp'],
+    [16, 'webp'],
+    [17, 'webp'],
+    [18, 'webp'],
+    [19, 'webp']
+  ];
+
+  var EXTRAS = [['azul', 'webp']];
+
+  var list = [];
+
+  NUMS.forEach(function (x) {
+    list.push({
+      url: 'imagem/' + x[0] + '.' + x[1],
+      num: x[0],
+      label: String(x[0])
+    });
   });
+
+  EP.forEach(function (x) {
+    var file = 'ep ' + x[0] + '.' + x[1];
+    list.push({
+      url: 'imagem/' + encodeURIComponent(file),
+      num: null,
+      label: 'ep ' + x[0]
+    });
+  });
+
+  EXTRAS.forEach(function (x) {
+    list.push({
+      url: 'imagem/' + x[0] + '.' + x[1],
+      num: null,
+      label: x[0]
+    });
+  });
+
+  global.GALERIA_IMAGENS_URLS = list;
 })(window);

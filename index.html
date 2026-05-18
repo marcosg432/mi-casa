@@ -13,6 +13,7 @@
   <link rel="apple-touch-icon" href="/icons/icon-192.png">
   <title>Mi Casa Su Casa — Início</title>
   <link rel="stylesheet" href="css/estilo.css">
+  <link rel="stylesheet" href="css/google-reviews.css">
   <script src="js/topo-ao-carregar.js" defer></script>
   <script src="js/intro-nav-mobile.js" defer></script>
 </head>
@@ -453,6 +454,43 @@
     </section>
     </div>
 
+    <section class="reviews-section secao" id="avaliacoes-google" data-google-reviews aria-labelledby="google-reviews-titulo">
+      <header class="reviews-section__header container">
+        <p class="secao-subtitulo">Avaliações</p>
+        <h2 id="google-reviews-titulo" class="secao-titulo">Comentários do Google</h2>
+        <p class="reviews-section__intro">Experiências reais de hóspedes que já descansaram na nossa pousada.</p>
+      </header>
+
+      <div class="reviews-section__summary" data-reviews-summary hidden>
+        <span class="reviews-section__score" data-reviews-score>5.0</span>
+        <span class="reviews-section__count" data-reviews-count>Avaliações no Google</span>
+      </div>
+
+      <p class="reviews-section__loading" data-reviews-loading>Carregando avaliações…</p>
+
+      <div class="reviews-section__rows" data-reviews-rows>
+        <div class="reviews-row reviews-row--fast" data-reviews-row>
+          <div class="reviews-track"></div>
+        </div>
+        <div class="reviews-row reviews-row--medium" data-reviews-row>
+          <div class="reviews-track"></div>
+        </div>
+      </div>
+
+      <div class="reviews-section__cta">
+        <a
+          class="btn reviews-section__btn"
+          data-reviews-google-link
+          href="https://www.google.com/maps/search/?api=1&amp;query=Pousada+Mi+Casa+Su+Casa,+Rua+Na%C3%A7%C3%B5es+Unidas+111,+Benevides,+PA"
+          target="_blank"
+          rel="noopener noreferrer"
+        >
+          <img class="reviews-section__btn-icon" src="assets/google-logo.svg" alt="" width="22" height="22" decoding="async" aria-hidden="true">
+          Ver no Google
+        </a>
+      </div>
+    </section>
+
   </main>
 
   <footer class="rodape">
@@ -511,6 +549,8 @@
     <p class="rodape-creditos">© Mi Casa Su Casa. Todos os direitos reservados.</p>
   </footer>
 
+  <script src="js/google-reviews-cards.js" defer></script>
+  <script src="js/google-reviews.js" defer></script>
   <script src="js/quartos-site.js"></script>
   <script src="js/system-store.js"></script>
   <script src="js/quartos-showcase-carrossel.js"></script>

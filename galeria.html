@@ -45,7 +45,7 @@
           <p class="scroll-morph-content-desc">Descubra os ambientes da Mi Casa Su Casa. Role para ver os cartões em arco.</p>
         </div>
         <div class="scroll-morph-cards-wrap" id="scroll-morph-cards-wrap">
-          <!-- Anel 3D: só as primeiras 20 imagens da lista (mosaico abaixo mantém todas) -->
+          <!-- Anel 3D: primeiras 20 da lista (mosaico exibe todas: números + ep + extras) -->
         </div>
       </div>
     </section>
@@ -130,6 +130,7 @@
     <p class="rodape-creditos">© Mi Casa Su Casa. Todos os direitos reservados.</p>
   </footer>
 
+  <script src="js/galeria-imagens-lista.js"></script>
   <script>
     window.addEventListener('scroll', function() {
       const intro = document.getElementById('intro');
@@ -141,20 +142,17 @@
       }
     });
 
-    /* Galeria só por número: 1 … 37 (imagem/N.ext). Um ficheiro por número; 4, 12 e 13 sem ficheiro na pasta ficam de fora. */
-    var _GALERIA_NUMS = [
-      [1, 'webp'], [2, 'webp'], [3, 'webp'], [5, 'webp'], [6, 'webp'], [7, 'webp'], [8, 'webp'], [9, 'webp'], [10, 'webp'], [11, 'webp'],
-      [14, 'webp'], [15, 'webp'], [16, 'webp'], [17, 'webp'], [18, 'webp'], [19, 'webp'], [20, 'webp'], [21, 'webp'], [22, 'webp'], [23, 'jpg'],
-      [24, 'webp'], [25, 'webp'], [26, 'webp'], [27, 'webp'], [28, 'webp'], [29, 'jpg'], [30, 'webp'], [31, 'jpg'], [32, 'webp'], [33, 'jpg'],
-      [34, 'webp'], [35, 'jpeg'], [36, 'webp'], [37, 'webp']
-    ];
-
-    var IMAGENS_PASTA = _GALERIA_NUMS.map(function (x) {
-      return 'imagem/' + x[0] + '.' + x[1];
+    /* Lista em js/galeria-imagens-lista.js — números, série ep e extras */
+    var GALERIA_IMAGENS = (window.GALERIA_IMAGENS_URLS || []).map(function (item) {
+      return {
+        src: item.url,
+        number: item.num,
+        label: item.label || (item.num != null ? String(item.num) : '')
+      };
     });
 
-    var GALERIA_IMAGENS = _GALERIA_NUMS.map(function (x) {
-      return { src: 'imagem/' + x[0] + '.' + x[1], number: x[0] };
+    var IMAGENS_PASTA = GALERIA_IMAGENS.map(function (item) {
+      return item.src;
     });
 
     (function montarGaleriaMosaico() {
@@ -173,7 +171,7 @@
         desktopItem.setAttribute('data-index', String(index));
         desktopItem.setAttribute('tabindex', '0');
         desktopItem.setAttribute('role', 'button');
-        desktopItem.innerHTML = '<img src="' + image.src + '" alt="Imagem ' + (image.number || index) + '" loading="lazy" decoding="async">';
+        desktopItem.innerHTML = '<img src="' + image.src + '" alt="Foto ' + (image.label || image.number || index) + ' — Mi Casa Su Casa" loading="lazy" decoding="async">';
         desktop.appendChild(desktopItem);
 
         var mobileItem = document.createElement('div');
@@ -181,7 +179,7 @@
         mobileItem.setAttribute('data-index', String(index));
         mobileItem.setAttribute('tabindex', '0');
         mobileItem.setAttribute('role', 'button');
-        mobileItem.innerHTML = '<img src="' + image.src + '" alt="Imagem ' + (image.number || index) + '" loading="lazy" decoding="async">';
+        mobileItem.innerHTML = '<img src="' + image.src + '" alt="Foto ' + (image.label || image.number || index) + ' — Mi Casa Su Casa" loading="lazy" decoding="async">';
         mobile.appendChild(mobileItem);
       });
     })();
@@ -216,7 +214,7 @@
         indexAtual = (i % total + total) % total;
         var item = GALERIA_IMAGENS[indexAtual];
         var src = item ? item.src : '';
-        var alt = 'Imagem ' + (item && item.number ? item.number : indexAtual);
+        var alt = 'Foto ' + (item && (item.label || item.number) ? (item.label || item.number) : indexAtual) + ' — Mi Casa Su Casa';
         if (imgEl.src !== src) {
           imgEl.classList.remove('entrando-esq', 'entrando-dir', 'sainte-esq', 'sainte-dir');
           imgEl.offsetHeight;
