@@ -1,6 +1,8 @@
 /**
  * Catálogo base dos quartos (valores iniciais). O SystemStore pode sobrepor com dados
  * guardados no navegador (localStorage) ou, se existir SupabaseClient, com o servidor.
+ *
+ * Fotos do carrossel: pasta imagem/imagem quartos/{id}/ — ver js/quartos-imagens-pastas.js
  */
 (function (global) {
   var FALLBACK = [
@@ -13,7 +15,7 @@
         'Quarto Duplo com Banheiro Compartilhado. Quarto duplo aconchegante, ideal para casais que buscam conforto e tranquilidade. Cama de casal, vista para o jardim e banheiro compartilhado com chuveiro. Até 2 pessoas · 20 m².',
       preco: 'R$ 150',
       precoLabel: 'Noite',
-      img: 'imagem/6.webp',
+      img: 'imagem/imagem quartos/tem-tem/quarto_detalhe_web.webp',
       alt: 'Quarto TEM-TEM — Mi Casa Su Casa',
       verQuartoHref: 'quartos.html#quarto-tem-tem',
       amenities: {
@@ -36,7 +38,7 @@
         'Quarto Família (4 Camas de Solteiro). Espaçoso, com quatro camas de solteiro, ar-condicionado, cozinha compacta privativa, vista para o jardim e banheiro compartilhado. Até 4 pessoas · 40 m².',
       preco: 'R$ 150',
       precoLabel: 'Noite',
-      img: 'imagem/6.webp',
+      img: 'imagem/imagem quartos/soco/10933a8a-60dd-4808-b943-0b3ab0c21c42.webp',
       alt: 'Quarto soco — Mi Casa Su Casa',
       verQuartoHref: 'quartos.html#quarto-soco',
       amenities: {
@@ -59,7 +61,7 @@
         'Quarto Família (1 Cama de Casal + 3 de Solteiro). Amplo espaço, ar-condicionado, cozinha compacta privativa e vista para o jardim. Banheiro compartilhado. Até 5 pessoas · 40 m².',
       preco: 'R$ 150',
       precoLabel: 'Noite',
-      img: 'imagem/6.webp',
+      img: 'imagem/imagem quartos/sabia/quarto_convertido.webp',
       alt: 'Quarto sabiá — Mi Casa Su Casa',
       verQuartoHref: 'quartos.html#quarto-sabia',
       amenities: {
@@ -82,7 +84,7 @@
         'Quarto Duplo. Confortável para casais ou viajantes: cama de casal, vista para o jardim e banheiro compartilhado com chuveiro. Até 2 pessoas · 20 m².',
       preco: 'R$ 150',
       precoLabel: 'Noite',
-      img: 'imagem/6.webp',
+      img: 'imagem/imagem quartos/ararajuba/quarto_web.webp',
       alt: 'Quarto Ararajuba — Mi Casa Su Casa',
       verQuartoHref: 'quartos.html#quarto-ararajuba',
       amenities: {

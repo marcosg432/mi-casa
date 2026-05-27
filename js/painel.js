@@ -213,10 +213,8 @@
   function renderMeiosPagamento(reservas) {
     var methods = [
       { key: 'pix', icon: '◈', label: 'Pix', value: 0 },
-      { key: 'boleto', icon: '▥', label: 'Boleto', value: 0 },
       { key: 'cartao_credito', icon: '▭', label: 'Cartão de crédito', value: 0 },
-      { key: 'cartao_debito', icon: '▭', label: 'Cartão de débito', value: 0 },
-      { key: 'transferencia', icon: '⇄', label: 'Transferência', value: 0 }
+      { key: 'cartao_debito', icon: '▭', label: 'Cartão de débito', value: 0 }
     ];
     var byKey = {};
     methods.forEach(function (m) {

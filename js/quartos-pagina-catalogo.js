@@ -42,6 +42,79 @@
     return String(q.desc || '').trim();
   }
 
+  function quartoImagensLista(q) {
+    var id = String((q && q.id) || '').trim();
+    if (id && typeof global.quartoImagensDaPasta === 'function') {
+      var daPasta = global.quartoImagensDaPasta(id);
+      if (daPasta.length) return daPasta.slice();
+    }
+
+    var lista = [];
+    var principal = String((q && q.img) || '').trim();
+    if (principal) lista.push(principal);
+    var gal =
+      q && q.amenities && Array.isArray(q.amenities.galeria) ? q.amenities.galeria : [];
+    gal.forEach(function (src) {
+      src = String(src || '').trim();
+      if (src && lista.indexOf(src) === -1) lista.push(src);
+    });
+    return lista;
+  }
+
+  global.quartoImagensLista = quartoImagensLista;
+
+  function renderQuartoMedia(q) {
+    var imgs = quartoImagensLista(q);
+    var altBase = String(q.alt || q.titulo || 'Quarto').trim();
+
+    if (!imgs.length) {
+      return '<div class="quarto-modelo-media quarto-modelo-media--vazio" aria-hidden="true"></div>';
+    }
+
+    if (imgs.length === 1) {
+      return (
+        '<div class="quarto-modelo-media">' +
+        '<img src="' +
+        esc(imgs[0]) +
+        '" alt="' +
+        esc(altBase) +
+        '" width="1280" height="720" loading="lazy" decoding="async">' +
+        '</div>'
+      );
+    }
+
+    var slides = imgs
+      .map(function (src, i) {
+        var alt = altBase + ' — foto ' + (i + 1);
+        return (
+          '<div class="swiper-slide">' +
+          '<img src="' +
+          esc(src) +
+          '" alt="' +
+          esc(alt) +
+          '" width="1280" height="720" loading="' +
+          (i === 0 ? 'eager' : 'lazy') +
+          '" decoding="async">' +
+          '</div>'
+        );
+      })
+      .join('');
+
+    return (
+      '<div class="quarto-modelo-media" data-quarto-carrossel>' +
+      '<div class="quarto-swiper swiper" aria-label="Fotos do quarto ' +
+      esc(q.titulo) +
+      '">' +
+      '<div class="swiper-wrapper">' +
+      slides +
+      '</div>' +
+      '<div class="quarto-swiper-pagination swiper-pagination" aria-label="Indicador do carrossel — ' +
+      imgs.length +
+      ' fotos"></div>' +
+      '</div></div>'
+    );
+  }
+
   global.renderQuartosPaginaCatalogo = function (mountId) {
     var el = document.getElementById(mountId || 'quartos-catalogo-mount');
     if (!el) return;
@@ -69,11 +142,9 @@
           id +
           '" class="quarto-modelo-card' +
           invert +
-          '"><div class="quarto-modelo-media"><img src="' +
-          esc(q.img || '') +
-          '" alt="' +
-          esc(q.alt || q.titulo) +
-          '" width="1280" height="720" loading="lazy" decoding="async"></div><div class="quarto-modelo-info"><h3 id="tit-' +
+          '">' +
+          renderQuartoMedia(q) +
+          '<div class="quarto-modelo-info"><h3 id="tit-' +
           id +
           '">' +
           esc(q.titulo) +
@@ -90,5 +161,9 @@
       })
       .join('');
     el.innerHTML = html;
+
+    if (typeof global.initQuartosCardCarrosseis === 'function') {
+      global.initQuartosCardCarrosseis(el);
+    }
   };
 })(window);

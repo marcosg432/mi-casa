@@ -1,0 +1,395 @@
+/* ----- Transfer / Van — seção premium ----- */
+.secao-transfer {
+  padding: clamp(3.5rem, 8vw, 5.5rem) 0;
+  background: linear-gradient(
+    180deg,
+    var(--cor-fundo-pagina) 0%,
+    #faf9f6 42%,
+    var(--cor-fundo-pagina) 100%
+  );
+}
+
+.secao-transfer .container {
+  max-width: min(1440px, 98vw);
+  padding-left: clamp(0.65rem, 1.5vw, 1.25rem);
+  padding-right: clamp(0.65rem, 1.5vw, 1.25rem);
+}
+
+.secao-transfer-cabecalho {
+  text-align: center;
+  margin-bottom: clamp(2rem, 4vw, 3rem);
+}
+
+.secao-transfer-cabecalho .secao-subtitulo {
+  letter-spacing: 0.28em;
+  text-transform: uppercase;
+  font-size: 0.68rem;
+  color: var(--cor-dourado);
+  margin-bottom: 0.65rem;
+}
+
+.secao-transfer-cabecalho .secao-titulo {
+  font-family: var(--font-display);
+  font-size: clamp(2.1rem, 5vw, 3rem);
+  font-weight: 500;
+  line-height: 1.12;
+  margin-bottom: 0.85rem;
+}
+
+.secao-transfer-intro {
+  max-width: 52ch;
+  margin: 0 auto;
+  font-size: 1.02rem;
+  line-height: 1.65;
+  color: var(--cor-texto-suave);
+}
+
+.transfer-card {
+  display: grid;
+  grid-template-columns: minmax(0, 42%) minmax(0, 58%);
+  gap: 0;
+  align-items: stretch;
+  min-height: clamp(340px, 36vw, 520px);
+  border-radius: 28px;
+  overflow: hidden;
+  background: transparent;
+  border: none;
+  box-shadow:
+    0 4px 24px rgba(15, 31, 26, 0.06),
+    0 28px 64px -20px rgba(15, 31, 26, 0.14);
+  transition:
+    transform 0.55s cubic-bezier(0.4, 0, 0.2, 1),
+    box-shadow 0.55s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.transfer-card:hover {
+  transform: translateY(-3px);
+  box-shadow:
+    0 6px 28px rgba(15, 31, 26, 0.08),
+    0 36px 72px -18px rgba(15, 31, 26, 0.16);
+}
+
+.revelar-quando-visivel:not(.esta-revelada) .transfer-card {
+  opacity: 0;
+  transform: translateY(28px);
+}
+
+.revelar-quando-visivel.esta-revelada .transfer-card {
+  opacity: 1;
+  transform: translateY(0);
+  transition:
+    opacity 0.9s cubic-bezier(0.4, 0, 0.2, 1) 0.08s,
+    transform 0.9s cubic-bezier(0.4, 0, 0.2, 1) 0.08s,
+    box-shadow 0.55s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.transfer-card-visual {
+  position: relative;
+  margin: 0;
+  padding: 0;
+  min-height: 0;
+  height: 100%;
+  align-self: stretch;
+  overflow: hidden;
+  background: #0f1f1a;
+  border-radius: 0;
+}
+
+.transfer-swiper {
+  position: absolute;
+  inset: 0;
+  width: 100% !important;
+  height: 100% !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  border-radius: 0 !important;
+}
+
+.transfer-swiper .swiper-wrapper {
+  height: 100% !important;
+  min-height: 100%;
+}
+
+.transfer-swiper .swiper-slide {
+  position: relative;
+  width: 100% !important;
+  height: 100% !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  border-radius: 0 !important;
+  overflow: hidden;
+}
+
+.transfer-slide-media {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  margin: 0;
+  padding: 0;
+  border-radius: 0;
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+}
+
+.transfer-swiper.swiper-fade .swiper-wrapper,
+.transfer-swiper.swiper-fade .swiper-slide {
+  height: 100% !important;
+}
+
+.transfer-swiper.swiper-fade .swiper-slide {
+  left: 0 !important;
+  top: 0 !important;
+}
+
+.transfer-slide-media::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    105deg,
+    rgba(12, 22, 18, 0.42) 0%,
+    rgba(12, 22, 18, 0.18) 48%,
+    rgba(12, 22, 18, 0.32) 100%
+  );
+  pointer-events: none;
+}
+
+.transfer-card-info {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  min-height: 100%;
+  height: 100%;
+  padding: clamp(1.25rem, 2.5vw, 1.75rem);
+  gap: clamp(1rem, 2vw, 1.35rem);
+  background: rgba(255, 255, 255, 0.92);
+  border-left: 1px solid rgba(0, 0, 0, 0.05);
+}
+
+.transfer-features-grid {
+  list-style: none;
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: clamp(0.6rem, 1.4vw, 0.9rem);
+  flex: 1;
+  align-content: start;
+}
+
+.transfer-feature-card {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.6rem;
+  padding: clamp(0.7rem, 1.5vw, 0.85rem) clamp(0.65rem, 1.2vw, 0.8rem);
+  background: #fff;
+  border-radius: 14px;
+  border: 1px solid rgba(0, 0, 0, 0.06);
+  box-shadow: 0 2px 10px rgba(15, 31, 26, 0.05);
+  transition:
+    box-shadow 0.35s ease,
+    transform 0.35s ease;
+}
+
+.transfer-feature-card:hover {
+  box-shadow: 0 6px 18px rgba(15, 31, 26, 0.08);
+  transform: translateY(-1px);
+}
+
+.transfer-feature-icone {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 2.15rem;
+  height: 2.15rem;
+  border-radius: 50%;
+  background: rgba(61, 107, 79, 0.12);
+  color: var(--cor-dourado);
+  flex-shrink: 0;
+}
+
+.transfer-feature-icone svg {
+  width: 1rem;
+  height: 1rem;
+}
+
+.transfer-feature-card > div {
+  min-width: 0;
+}
+
+.transfer-feature-titulo {
+  font-family: var(--font-body);
+  font-size: 0.62rem;
+  font-weight: 600;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--cor-dourado);
+  margin-bottom: 0.22rem;
+  line-height: 1.25;
+}
+
+.transfer-feature-texto {
+  font-size: clamp(0.78rem, 0.9vw, 0.86rem);
+  line-height: 1.45;
+  color: var(--cor-texto-suave);
+}
+
+.transfer-card-rodape {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.6rem;
+  width: 100%;
+  padding-top: 0.15rem;
+}
+
+.transfer-pagamento {
+  font-size: 0.78rem;
+  letter-spacing: 0.04em;
+  text-align: center;
+  color: rgba(0, 0, 0, 0.55);
+}
+
+.transfer-pagamento strong {
+  font-weight: 500;
+  color: var(--cor-texto);
+}
+
+.transfer-cta-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.55rem;
+  width: min(100%, 300px);
+  padding: 1.05rem 1.5rem;
+  font-family: var(--font-body);
+  font-size: 0.82rem;
+  font-weight: 500;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  text-decoration: none;
+  color: #fff;
+  background: linear-gradient(135deg, #3d6b4f 0%, #2d5a3d 100%);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 14px;
+  box-shadow: 0 12px 32px -8px rgba(45, 90, 61, 0.45);
+  transition:
+    transform 0.4s cubic-bezier(0.4, 0, 0.2, 1),
+    box-shadow 0.4s cubic-bezier(0.4, 0, 0.2, 1),
+    background 0.4s ease,
+    color 0.35s ease;
+}
+
+.transfer-cta-btn:hover {
+  color: #fff;
+  transform: translateY(-2px);
+  box-shadow: 0 16px 40px -6px rgba(45, 90, 61, 0.5);
+  background: linear-gradient(135deg, #467a58 0%, #326848 100%);
+}
+
+.transfer-cta-btn:focus-visible {
+  outline: 2px solid var(--cor-dourado);
+  outline-offset: 3px;
+}
+
+.transfer-cta-btn svg {
+  width: 1.15rem;
+  height: 1.15rem;
+  flex-shrink: 0;
+  opacity: 0.92;
+}
+
+.transfer-swiper-pagination {
+  position: absolute !important;
+  left: 50% !important;
+  right: auto !important;
+  bottom: 1.1rem !important;
+  width: auto !important;
+  transform: translateX(-50%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  z-index: 4;
+  padding: 0.35rem 0.65rem;
+  border-radius: 999px;
+  background: rgba(12, 22, 18, 0.28);
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
+}
+
+.transfer-swiper-pagination .swiper-pagination-bullet {
+  width: 8px;
+  height: 8px;
+  margin: 0 !important;
+  background: rgba(255, 255, 255, 0.5);
+  opacity: 1;
+  border-radius: 50%;
+  cursor: pointer;
+  transition: transform 0.35s ease, background 0.35s ease;
+}
+
+.transfer-swiper-pagination .swiper-pagination-bullet-active {
+  background: #fff;
+  transform: scale(1.2);
+}
+
+@media (max-width: 900px) {
+  .transfer-card {
+    grid-template-columns: 1fr;
+    min-height: 0;
+    border-radius: 22px;
+  }
+
+  .transfer-card-visual {
+    position: relative;
+    min-height: clamp(260px, 52vw, 340px);
+    height: clamp(260px, 52vw, 340px);
+  }
+
+  .transfer-swiper {
+    position: absolute;
+    inset: 0;
+  }
+
+  .transfer-card-info {
+    border-left: none;
+    border-top: 1px solid rgba(0, 0, 0, 0.05);
+  }
+
+  .transfer-card-info {
+    padding: 1.35rem 1.15rem 1.5rem;
+  }
+
+  .transfer-cta-btn {
+    width: 100%;
+    max-width: none;
+    padding: 1rem 1.25rem;
+  }
+}
+
+@media (max-width: 560px) {
+  .transfer-features-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (min-width: 901px) and (max-width: 1040px) {
+  .transfer-feature-texto {
+    font-size: 0.74rem;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .transfer-card,
+  .transfer-card:hover,
+  .revelar-quando-visivel.esta-revelada .transfer-card {
+    transform: none;
+    transition: none;
+  }
+
+  .transfer-cta-btn:hover,
+  .transfer-feature-card:hover {
+    transform: none;
+  }
+}

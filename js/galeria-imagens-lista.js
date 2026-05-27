@@ -1,6 +1,6 @@
 /**
  * Fotos da pasta imagem/ — galeria, painel e animação 3D.
- * Números: 1–37 (só os que existem na pasta). Séries ep + extras.
+ * Números: 1–37 (só os que existem na pasta). Série ep.
  */
 (function (global) {
   var NUMS = [
@@ -60,8 +60,6 @@
     [19, 'webp']
   ];
 
-  var EXTRAS = [['azul', 'webp']];
-
   var list = [];
 
   NUMS.forEach(function (x) {
@@ -78,14 +76,6 @@
       url: 'imagem/' + encodeURIComponent(file),
       num: null,
       label: 'ep ' + x[0]
-    });
-  });
-
-  EXTRAS.forEach(function (x) {
-    list.push({
-      url: 'imagem/' + x[0] + '.' + x[1],
-      num: null,
-      label: x[0]
     });
   });
 

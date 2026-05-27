@@ -1923,6 +1923,49 @@ body.lightbox-aberto .cabecalho {
   z-index: 1;
 }
 
+.quartos-showcase-fotos-dots {
+  position: absolute;
+  left: 50%;
+  bottom: 0.85rem;
+  transform: translateX(-50%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.45rem;
+  z-index: 5;
+  padding: 0.35rem 0.65rem;
+  border-radius: 999px;
+  background: rgba(12, 22, 18, 0.28);
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
+}
+
+.quartos-showcase-fotos-dots[hidden] {
+  display: none !important;
+}
+
+.quartos-showcase-foto-dot {
+  width: 8px;
+  height: 8px;
+  padding: 0;
+  margin: 0;
+  border: none;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.5);
+  cursor: pointer;
+  transition: transform 0.35s ease, background 0.35s ease;
+}
+
+.quartos-showcase-foto-dot.is-active {
+  background: #fff;
+  transform: scale(1.2);
+}
+
+.quartos-showcase-foto-dot:focus-visible {
+  outline: 2px solid var(--cor-dourado);
+  outline-offset: 2px;
+}
+
 .quartos-showcase-nav {
   display: flex;
   align-items: center;
@@ -2117,6 +2160,9 @@ body.lightbox-aberto .cabecalho {
   display: grid;
   grid-template-columns: minmax(300px, 1.15fr) minmax(340px, 1fr);
   align-items: stretch;
+  height: 420px;
+  min-height: 420px;
+  max-height: 420px;
   background: #e8e6e3;
   border: 1px solid rgba(0, 0, 0, 0.07);
   border-radius: 18px;
@@ -2133,7 +2179,14 @@ body.lightbox-aberto .cabecalho {
 }
 
 .quarto-modelo-media {
-  min-height: 400px;
+  position: relative;
+  min-height: 0;
+  height: 100%;
+  overflow: hidden;
+}
+
+.quarto-modelo-media--vazio {
+  background: #d8d6d2;
 }
 
 .quarto-modelo-media img {
@@ -2143,12 +2196,84 @@ body.lightbox-aberto .cabecalho {
   display: block;
 }
 
+.quarto-modelo-media[data-quarto-carrossel] {
+  background: #0f1f1a;
+}
+
+.quarto-swiper {
+  position: absolute;
+  inset: 0;
+  width: 100% !important;
+  height: 100% !important;
+  margin: 0 !important;
+  padding: 0 !important;
+}
+
+.quarto-swiper .swiper-wrapper,
+.quarto-swiper .swiper-slide {
+  height: 100% !important;
+}
+
+.quarto-swiper .swiper-slide {
+  overflow: hidden;
+}
+
+.quarto-swiper .swiper-slide img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.quarto-swiper.swiper-fade .swiper-slide {
+  left: 0 !important;
+  top: 0 !important;
+}
+
+.quarto-swiper-pagination {
+  position: absolute !important;
+  left: 50% !important;
+  right: auto !important;
+  bottom: 1.1rem !important;
+  width: auto !important;
+  transform: translateX(-50%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  z-index: 4;
+  padding: 0.35rem 0.65rem;
+  border-radius: 999px;
+  background: rgba(12, 22, 18, 0.28);
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
+}
+
+.quarto-swiper-pagination .swiper-pagination-bullet {
+  width: 8px;
+  height: 8px;
+  margin: 0 !important;
+  background: rgba(255, 255, 255, 0.5);
+  opacity: 1;
+  border-radius: 50%;
+  cursor: pointer;
+  transition: transform 0.35s ease, background 0.35s ease;
+}
+
+.quarto-swiper-pagination .swiper-pagination-bullet-active {
+  background: #fff;
+  transform: scale(1.2);
+}
+
 .quarto-modelo-info {
-  padding: 2.35rem 2.15rem;
+  padding: 2rem 2.15rem;
   background: #f3f2ef;
   display: flex;
   flex-direction: column;
-  justify-content: center;
+  justify-content: flex-start;
+  min-height: 0;
+  height: 100%;
+  overflow: hidden;
+  box-sizing: border-box;
 }
 
 .quarto-modelo-info h3 {
@@ -2157,36 +2282,48 @@ body.lightbox-aberto .cabecalho {
   font-size: clamp(1.6rem, 2.8vw, 2rem);
   line-height: 1.15;
   color: #111;
+  flex-shrink: 0;
 }
 
 .quarto-modelo-info .quarto-modelo-lead {
-  margin: 0 0 0.85rem;
+  margin: 0 0 0.65rem;
   font-family: var(--font-body);
   font-size: 1.02rem;
   font-weight: 600;
   color: #2a332e;
   line-height: 1.35;
+  flex-shrink: 0;
 }
 
 .quarto-modelo-info p {
-  margin: 0 0 1.35rem;
+  margin: 0 0 0.85rem;
   color: rgba(17, 17, 17, 0.86);
-  line-height: 1.65;
+  line-height: 1.55;
+  font-size: 0.95rem;
+  flex-shrink: 0;
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
 }
 
 .quarto-modelo-meta {
-  margin: 0 0 1.5rem;
+  margin: 0 0 1rem;
   padding: 0;
   list-style: none;
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 0.65rem 1rem;
+  gap: 0.5rem 1rem;
+  flex: 1 1 auto;
+  min-height: 0;
+  overflow-y: auto;
+  align-content: start;
 }
 
 .quarto-modelo-meta li {
-  font-size: 0.98rem;
+  font-size: 0.92rem;
   color: #1b1b1b;
-  line-height: 1.35;
+  line-height: 1.3;
 }
 
 .quarto-modelo-info a.btn.btn-reserva {
@@ -2199,6 +2336,8 @@ body.lightbox-aberto .cabecalho {
   position: relative;
   z-index: 2;
   cursor: pointer;
+  flex-shrink: 0;
+  margin-top: auto;
   transition:
     background 0.25s ease,
     color 0.25s ease,
@@ -2227,6 +2366,9 @@ body.lightbox-aberto .cabecalho {
   .quarto-modelo-card,
   .quarto-modelo-card--invert {
     grid-template-columns: 1fr;
+    height: auto;
+    min-height: 0;
+    max-height: none;
   }
 
   .quarto-modelo-card--invert .quarto-modelo-media,
@@ -2236,10 +2378,23 @@ body.lightbox-aberto .cabecalho {
 
   .quarto-modelo-media {
     min-height: 280px;
+    height: 280px;
   }
 
   .quarto-modelo-info {
     padding: 1.75rem 1.5rem;
+    height: auto;
+    overflow: visible;
+  }
+
+  .quarto-modelo-info p {
+    -webkit-line-clamp: unset;
+    display: block;
+    overflow: visible;
+  }
+
+  .quarto-modelo-meta {
+    overflow-y: visible;
   }
 
   .quarto-modelo-meta {
@@ -4242,10 +4397,9 @@ body.lightbox-aberto .cabecalho {
   margin-top: 0.5rem;
 }
 
-/* Sobre / Galeria / Quartos: herói sem foto — verde natureza (mesma família de cores do site) */
+/* Sobre / Galeria: herói sem foto — verde natureza (mesma família de cores do site) */
 .pagina-hero--sobre,
-.pagina-hero--galeria,
-.pagina-hero--quartos {
+.pagina-hero--galeria {
   min-height: clamp(240px, 34vh, 380px);
   background: linear-gradient(
     155deg,
@@ -4253,6 +4407,22 @@ body.lightbox-aberto .cabecalho {
     var(--cor-dourado) 48%,
     var(--cor-dourado-hover) 100%
   );
+  padding: 5.75rem 2rem 2.5rem;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+}
+
+.pagina-hero--quartos {
+  min-height: clamp(240px, 34vh, 380px);
+  background:
+    linear-gradient(
+      155deg,
+      rgba(15, 48, 36, 0.68) 0%,
+      rgba(45, 90, 61, 0.52) 48%,
+      rgba(29, 58, 45, 0.72) 100%
+    ),
+    url('../imagem/ep%2019.webp') center/cover no-repeat;
   padding: 5.75rem 2rem 2.5rem;
   justify-content: center;
   align-items: center;
@@ -4318,8 +4488,26 @@ body.lightbox-aberto .cabecalho {
   position: absolute;
   width: 100px;
   height: 141px;
-  cursor: default;
+  cursor: pointer;
+  z-index: 3;
   transition: opacity 0.5s ease;
+}
+
+.scroll-morph-card:focus {
+  outline: none;
+}
+
+.scroll-morph-card:focus-visible .scroll-morph-card-surface {
+  outline: 2px solid var(--cor-dourado);
+  outline-offset: 3px;
+}
+
+.scroll-morph-card:hover .scroll-morph-card-surface {
+  box-shadow: 0 14px 36px rgba(0, 0, 0, 0.28);
+}
+
+.scroll-morph-card:active .scroll-morph-card-surface {
+  transform: scale(0.97);
 }
 
 .scroll-morph-card-motion {
@@ -4339,6 +4527,7 @@ body.lightbox-aberto .cabecalho {
   overflow: hidden;
   background: #e5e5e5;
   box-shadow: 0 10px 30px rgba(0, 0, 0, 0.18);
+  transition: box-shadow 0.35s ease, transform 0.2s ease;
 }
 
 .scroll-morph-card-surface img {

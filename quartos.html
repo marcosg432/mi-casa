@@ -7,6 +7,7 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <title>Mi Casa Su Casa — Quartos</title>
   <link rel="stylesheet" href="css/estilo.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css">
   <script src="js/topo-ao-carregar.js" defer></script>
   <script src="js/intro-nav-mobile.js" defer></script>
 </head>
@@ -48,7 +49,7 @@
   <footer class="rodape">
     <div class="rodape-inner">
       <div>
-        <div class="logo"><img src="imagem/branco.jpg" alt="Logo Mi Casa Su Casa"></div>
+        <div class="logo"><img src="icons/logo%20boa.png" alt="Logo Mi Casa Su Casa" width="220" height="78" decoding="async"></div>
         <p>Um lugar de tranquilidade e conforto.</p>
       </div>
       <div>
@@ -102,8 +103,11 @@
   </footer>
 
   <script src="js/quartos-site.js"></script>
+  <script src="js/quartos-imagens-pastas.js"></script>
   <script src="js/system-store.js"></script>
   <script src="js/quartos-pagina-catalogo.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js" defer></script>
+  <script src="js/quartos-card-carrossel.js" defer></script>
   <script>
     window.addEventListener('scroll', function() {
       const intro = document.getElementById('intro');
@@ -128,6 +132,9 @@
     }
 
     document.addEventListener('DOMContentLoaded', async function () {
+      if (window.carregarImagensQuartosPastas) {
+        await window.carregarImagensQuartosPastas();
+      }
       if (window.renderQuartosPaginaCatalogo) {
         window.renderQuartosPaginaCatalogo('quartos-catalogo-mount');
       }
@@ -137,6 +144,9 @@
           await SystemStore.hydrateQuartosSite();
         } catch (e) {
           console.warn('Quartos:', e);
+        }
+        if (window.carregarImagensQuartosPastas) {
+          await window.carregarImagensQuartosPastas();
         }
         if (window.renderQuartosPaginaCatalogo) {
           window.renderQuartosPaginaCatalogo('quartos-catalogo-mount');
