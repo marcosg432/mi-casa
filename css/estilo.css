@@ -133,8 +133,22 @@ a:hover {
   padding-inline: 1rem;
   box-sizing: border-box;
   display: flex;
+  flex-direction: column;
   justify-content: center;
   align-items: center;
+  cursor: pointer;
+}
+
+#intro:not(.active) .logo::after {
+  content: 'Toque para entrar';
+  display: block;
+  margin-top: 1rem;
+  font-size: 0.78rem;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: rgba(255, 255, 255, 0.72);
+  font-family: var(--font-body, sans-serif);
+  font-weight: 500;
 }
 
 #intro:not(.active) .logo img {

@@ -17,6 +17,7 @@
   <link rel="stylesheet" href="css/transfer-van.css">
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css">
   <script src="js/topo-ao-carregar.js" defer></script>
+  <script src="js/intro-splash.js" defer></script>
   <script src="js/intro-nav-mobile.js" defer></script>
 </head>
 <body>
@@ -667,26 +668,6 @@
   <script src="js/quartos-showcase-engine.js"></script>
   <script src="js/quartos-showcase-carrossel.js"></script>
   <script>
-    (function controlarIntro() {
-      var intro = document.getElementById('intro');
-      if (!intro) return;
-      var navEntries = (typeof performance !== 'undefined' && performance.getEntriesByType) ? performance.getEntriesByType('navigation') : [];
-      var isReload = navEntries.length > 0 && navEntries[0].type === 'reload';
-      if (isReload) {
-        try { sessionStorage.removeItem('introPlayed'); } catch (e) {}
-      }
-      var alreadyVisited = null;
-      try { alreadyVisited = sessionStorage.getItem('introPlayed'); } catch (e) {}
-      if (!alreadyVisited) {
-        setTimeout(function() {
-          intro.classList.add('active');
-          try { sessionStorage.setItem('introPlayed', 'true'); } catch (e) {}
-        }, 2000);
-      } else {
-        intro.classList.add('active');
-      }
-    })();
-
     window.addEventListener('scroll', function() {
       const intro = document.getElementById('intro');
       if (!intro.classList.contains('active')) return;
