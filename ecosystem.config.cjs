@@ -10,8 +10,9 @@ module.exports = {
       watch: false,
       max_memory_restart: '200M',
       env: {
-        NODE_ENV: 'production',
-        PORT: 3014
+        NODE_ENV: 'development',
+        PORT: 3014,
+        DISABLE_PANEL_AUTH: '1'
       }
     }
   ]

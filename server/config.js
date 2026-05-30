@@ -34,14 +34,13 @@ var config = {
 };
 
 function assertProductionConfig() {
+  if (config.disablePanelAuth) return;
   required('SUPABASE_URL');
   required('SUPABASE_SERVICE_ROLE_KEY');
-  if (!config.disablePanelAuth) {
-    required('JWT_SECRET');
-    required('ADMIN_PASSWORD_HASH');
-    if (config.jwtSecret.length < 32) {
-      throw new Error('JWT_SECRET deve ter pelo menos 32 caracteres.');
-    }
+  required('JWT_SECRET');
+  required('ADMIN_PASSWORD_HASH');
+  if (config.jwtSecret.length < 32) {
+    throw new Error('JWT_SECRET deve ter pelo menos 32 caracteres.');
   }
   if (config.isProduction && !config.turnstileSecretKey) {
     throw new Error('TURNSTILE_SECRET_KEY é obrigatória em produção.');
