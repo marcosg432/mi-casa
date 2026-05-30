@@ -1,4 +1,40 @@
-(function () {
+﻿(function () {
+  var CHAVE_POS_WHATS = 'reservarPosWhatsApp';
+
+  function fecharOverlaySucesso() {
+    var ov = document.getElementById('reservar-sucesso');
+    if (ov) ov.hidden = true;
+    document.body.style.overflow = '';
+  }
+
+  function voltarInicioAposReserva() {
+    try {
+      sessionStorage.removeItem(CHAVE_POS_WHATS);
+    } catch (e) {}
+    fecharOverlaySucesso();
+    window.location.replace('index.html');
+  }
+
+  function verificarRetornoDoWhatsApp() {
+    var ov = document.getElementById('reservar-sucesso');
+    var overlayAberto = ov && !ov.hidden;
+    var voltouDoWhats = false;
+    try {
+      voltouDoWhats = sessionStorage.getItem(CHAVE_POS_WHATS) === '1';
+    } catch (e) {}
+
+    if (overlayAberto || voltouDoWhats) {
+      voltarInicioAposReserva();
+      return true;
+    }
+    return false;
+  }
+
+  window.addEventListener('pageshow', function () {
+    verificarRetornoDoWhatsApp();
+  });
+
+  /** Não bloquear o parse do script: o catálogo de quartos hidrata em paralelo e é aplicado no início de init(). */
   var hydrateQuartosPromise =
     window.SystemStore && typeof SystemStore.hydrateQuartosSite === 'function'
       ? SystemStore.hydrateQuartosSite().catch(function (e) {
@@ -13,6 +49,10 @@
   };
   /** Máximo de pessoas a mais além da capacidade do quarto. */
   var MAX_PESSOAS_EXTRAS = 3;
+  var MSG_ORCAMENTO =
+    window.ReservaPrecos && window.ReservaPrecos.MSG_ORCAMENTO
+      ? window.ReservaPrecos.MSG_ORCAMENTO
+      : 'Entre em contato para solicitar um orçamento personalizado.';
 
   /** Evita que o clique em «Pagar» fique preso se a rede não responder. */
   function withTimeoutMs(promise, ms) {
@@ -55,7 +95,7 @@
     quartoId: QUARTOS_RESERVA[0] ? QUARTOS_RESERVA[0].id : '',
     adultos: 2,
     criancas: 0,
-    pessoas: 2,
+    pessoasAlémCap: 0,
     modoGrupo: false,
     nome: '',
     email: '',
@@ -83,14 +123,16 @@
 
   function quartoTituloPorId(id) {
     for (var i = 0; i < QUARTOS_RESERVA.length; i++) {
-      if (QUARTOS_RESERVA[i].id === id) return QUARTOS_RESERVA[i].titulo;
+      if (QUARTOS_RESERVA[i].id === id) {
+        return String(QUARTOS_RESERVA[i].titulo || '').trim().toLocaleUpperCase('pt-BR');
+      }
     }
     return '—';
   }
 
   function capacidadeQuartoId(id) {
-    if (window.ReservaPrecos && typeof window.ReservaPrecos.getCapacidade === 'function') {
-      return window.ReservaPrecos.getCapacidade(id);
+    if (window.ReservaPrecos && window.ReservaPrecos.capacidadeQuarto) {
+      return window.ReservaPrecos.capacidadeQuarto(id);
     }
     for (var i = 0; i < QUARTOS_RESERVA.length; i++) {
       if (QUARTOS_RESERVA[i].id === id) {
@@ -101,57 +143,35 @@
     return 4;
   }
 
-  function lerHospedesDoFormulario() {
-    var adultosEl = document.getElementById('reservar-adultos');
-    var criancasEl = document.getElementById('reservar-criancas');
-    var adultos = parseInt(adultosEl && adultosEl.value, 10);
-    var criancas = parseInt(criancasEl && criancasEl.value, 10);
-    if (isNaN(adultos) || adultos < 1) adultos = 1;
-    if (isNaN(criancas) || criancas < 0) criancas = 0;
-    return { adultos: adultos, criancas: criancas };
+  /** Máximo de adultos considerando crianças já selecionadas e a capacidade do quarto. */
+  function maxAdultosParaCap(cap, criancas) {
+    return Math.max(1, cap - criancas);
   }
 
-  function syncHospedesState() {
-    var h = lerHospedesDoFormulario();
-    var cap = capacidadeQuartoId(state.quartoId);
-    if (h.adultos + h.criancas > cap) {
-      if (h.adultos > cap) {
-        h.adultos = cap;
-        h.criancas = 0;
-      } else {
-        h.criancas = Math.max(0, cap - h.adultos);
-      }
-    }
-    state.adultos = h.adultos;
-    state.criancas = h.criancas;
-    state.pessoas = h.adultos + h.criancas;
-    var adultosEl = document.getElementById('reservar-adultos');
-    var criancasEl = document.getElementById('reservar-criancas');
-    if (adultosEl) {
-      adultosEl.value = String(h.adultos);
-      adultosEl.max = String(cap);
-    }
-    if (criancasEl) {
-      criancasEl.value = String(h.criancas);
-      criancasEl.max = String(Math.max(0, cap - h.adultos));
-    }
+  /** Máximo de crianças considerando adultos já selecionados e a capacidade do quarto. */
+  function maxCriancasParaCap(cap, adultos) {
+    return Math.max(0, cap - adultos);
+  }
+
+  function clampHospedesAoCap(cap, adultos, criancas) {
+    var a = Math.max(1, Math.floor(Number(adultos) || 1));
+    var c = Math.max(0, Math.floor(Number(criancas) || 0));
+    c = Math.min(c, maxCriancasParaCap(cap, a));
+    a = Math.min(a, maxAdultosParaCap(cap, c));
+    c = Math.min(c, maxCriancasParaCap(cap, a));
+    return { adultos: a, criancas: c };
   }
 
   function calcPrecoAtual() {
-    syncHospedesState();
-    if (!window.ReservaPrecos) {
-      return {
-        noites: nights(),
-        valorTotal: nights() > 0 ? nights() * 150 : 0,
-        requerOrcamento: nights() >= 5,
-        erro: null
-      };
+    if (!window.ReservaPrecos || !window.ReservaPrecos.calcReserva) {
+      return { valorTotal: 0, requerOrcamento: false, noites: nights() };
     }
-    return window.ReservaPrecos.calcular({
+    return window.ReservaPrecos.calcReserva({
       quartoId: state.quartoId,
       noites: nights(),
       adultos: state.adultos,
-      criancas: state.criancas
+      criancas: state.criancas,
+      pessoasAlémCap: state.modoGrupo ? state.pessoasAlémCap : 0
     });
   }
 
@@ -208,72 +228,17 @@
   }
 
   function refreshOcupadasMap() {
-    return refreshOcupadasMapAsync();
-  }
-
-  function refreshOcupadasMapAsync() {
-    if (!window.SystemStore || !state.quartoId) {
+    if (!window.SystemStore) {
       state.ocupadas = {};
-      return Promise.resolve();
+      return;
     }
-    if (window.SystemStore.getOccupiedDateMapForQuarto) {
-      return window.SystemStore
-        .getOccupiedDateMapForQuarto(state.quartoId)
-        .then(function (map) {
-          state.ocupadas = map || {};
-        })
-        .catch(function () {
-          state.ocupadas = {};
-        });
+    if (state.quartoId && window.SystemStore.getOccupiedDateMapForQuarto) {
+      state.ocupadas = window.SystemStore.getOccupiedDateMapForQuarto(state.quartoId) || {};
+    } else if (window.SystemStore.getOccupiedDateMap) {
+      state.ocupadas = window.SystemStore.getOccupiedDateMap() || {};
+    } else {
+      state.ocupadas = {};
     }
-    state.ocupadas = {};
-    return Promise.resolve();
-  }
-
-  function periodoTemConflitoLocal(entradaIso, saidaIso) {
-    var conflito = false;
-    var cur = state.checkIn;
-    if (entradaIso && saidaIso) {
-      var a = entradaIso.split('-');
-      var b = saidaIso.split('-');
-      cur = new Date(Number(a[0]), Number(a[1]) - 1, Number(a[2]));
-      var end = new Date(Number(b[0]), Number(b[1]) - 1, Number(b[2]));
-      while (cur < end) {
-        var iso =
-          cur.getFullYear() +
-          '-' +
-          String(cur.getMonth() + 1).padStart(2, '0') +
-          '-' +
-          String(cur.getDate()).padStart(2, '0');
-        if (state.ocupadas[iso]) conflito = true;
-        cur.setDate(cur.getDate() + 1);
-      }
-    }
-    return conflito;
-  }
-
-  function getTurnstileToken() {
-    var el = document.querySelector('[name="cf-turnstile-response"]');
-    return el && el.value ? String(el.value) : '';
-  }
-
-  function mountTurnstileWidget() {
-    var wrap = document.getElementById('reservar-turnstile-wrap');
-    if (!wrap || wrap.dataset.mounted === '1') return;
-    if (!window.SystemStore || !window.SystemStore.fetchPublicConfig) return;
-    window.SystemStore.fetchPublicConfig()
-      .then(function (cfg) {
-        if (!cfg || !cfg.turnstileSiteKey) return;
-        wrap.innerHTML =
-          '<div class="cf-turnstile" data-sitekey="' +
-          cfg.turnstileSiteKey +
-          '" data-theme="light"></div>';
-        wrap.dataset.mounted = '1';
-        if (window.turnstile && window.turnstile.render) {
-          window.turnstile.render(wrap.querySelector('.cf-turnstile'));
-        }
-      })
-      .catch(function () {});
   }
 
   function nights() {
@@ -281,12 +246,18 @@
     return n > 0 ? n : 0;
   }
 
-  /** Valor da diária base + adicional por pessoa extra. */
+  /** Valor da diária base + adicional por pessoa extra. @deprecated use calcPrecoAtual */
   function precoDiariaPorPessoas(p) {
-    var n = Math.floor(Number(p));
-    if (n < 1) return 0;
-    var extras = Math.max(0, n - config.pessoasIncluidas);
-    return config.valorDiaria + extras * config.valorAdicionalPorPessoa;
+    var calc = calcPrecoAtual();
+    if (calc.requerOrcamento) return 0;
+    var n = nights();
+    if (n <= 0) return 0;
+    return calc.valorTotal / n;
+  }
+
+  function valorTotalSoAdicional() {
+    var calc = calcPrecoAtual();
+    return calc.valorAdicional > 0 ? calc.valorAdicional : null;
   }
 
   /** Modo “pessoas a mais”: 1 a MAX_PESSOAS_EXTRAS (além da capacidade do quarto). */
@@ -298,208 +269,38 @@
     return { valid: true, value: v };
   }
 
-  function getPessoasParaCalculo() {
-    if (state.modoGrupo) {
-      var inp = document.getElementById('reservar-input-pessoas-total');
-      var parsed = parsePessoasExtras(inp && inp.value);
-      if (!parsed.valid) return null;
-      return capacidadeQuartoId(state.quartoId) + parsed.value;
-    }
-    return state.pessoas;
-  }
-
   function totalValor() {
     var p = calcPrecoAtual();
-    if (p.requerOrcamento) return null;
-    return p.valorTotal != null ? p.valorTotal : 0;
+    if (p.requerOrcamento || p.valorTotal == null) return null;
+    return p.valorTotal;
   }
 
-  /** Total estimado só do adicional (acima da diária base de 6 pessoas), em toda a estadia. */
-  function valorTotalSoAdicional() {
-    var p = getPessoasParaCalculo();
-    var n = nights();
-    if (p == null || n <= 0 || p <= config.pessoasIncluidas) return null;
-    var porDia = precoDiariaPorPessoas(p) - config.valorDiaria;
-    if (porDia <= 0) return null;
-    return porDia * n;
+  function requerOrcamentoPersonalizado() {
+    return !!calcPrecoAtual().requerOrcamento;
+  }
+
+  function formatValorReserva() {
+    var calc = calcPrecoAtual();
+    if (calc.requerOrcamento) {
+      if (
+        window.ReservaPrecos &&
+        window.ReservaPrecos.formatFaixaOrcamentoTexto &&
+        calc.valorMin > 0 &&
+        calc.valorMax > 0
+      ) {
+        return window.ReservaPrecos.formatFaixaOrcamentoTexto(calc);
+      }
+      if (calc.valorTotal != null && calc.valorTotal > 0) {
+        return formatMoney(calc.valorTotal) + ' · valor médio (orçamento)';
+      }
+      return MSG_ORCAMENTO;
+    }
+    var v = calc.valorTotal;
+    return v != null && v > 0 ? formatMoney(v) : '—';
   }
 
   function formatMoney(v) {
     return v.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
-  }
-
-  function lerDadosContatoDoFormulario() {
-    var nomeEl = document.getElementById('reservar-nome');
-    var emailEl = document.getElementById('reservar-email');
-    var telEl = document.getElementById('reservar-telefone');
-    return {
-      nome: nomeEl ? nomeEl.value.trim() : '',
-      email: emailEl ? emailEl.value.trim() : '',
-      telefone: telEl ? telEl.value.trim() : ''
-    };
-  }
-
-  function contatoValido(dados) {
-    if (!dados.nome || !dados.email || !dados.telefone) return false;
-    if (dados.nome.trim().length < 2) return false;
-    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(dados.email)) return false;
-    if (!telefoneComDddValido(dados.telefone)) return false;
-    return true;
-  }
-
-  function motivosBtnReservaBloqueado() {
-    var motivos = [];
-    var dados = lerDadosContatoDoFormulario();
-    var preco = calcPrecoAtual();
-    if (!state.checkIn || !state.checkOut || nights() <= 0) {
-      motivos.push('escolha as datas de entrada e saída');
-    }
-    if (preco.erro) motivos.push(preco.erro.toLowerCase());
-    if (!dados.nome || dados.nome.trim().length < 2) motivos.push('informe seu nome');
-    if (!dados.email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(dados.email)) {
-      motivos.push('informe um e-mail válido');
-    }
-    if (!dados.telefone || !telefoneComDddValido(dados.telefone)) {
-      motivos.push('informe telefone com DDD');
-    }
-    return motivos;
-  }
-
-  function montarMensagemWhatsApp(reservaSalva) {
-    var dados = lerDadosContatoDoFormulario();
-    syncHospedesState();
-    var preco = calcPrecoAtual();
-    var valorTxt =
-      preco.requerOrcamento && window.ReservaPrecos
-        ? window.ReservaPrecos.MSG_ORCAMENTO
-        : preco.valorTotal != null
-          ? formatMoney(preco.valorTotal)
-          : '—';
-    var idReserva = reservaSalva && reservaSalva.codigo ? reservaSalva.codigo : '—';
-    return (
-      'Olá! Gostaria de fazer uma reserva na Mi Casa Su Casa.\n\n' +
-      'Nome: ' +
-      dados.nome +
-      '\n' +
-      'E-mail: ' +
-      dados.email +
-      '\n' +
-      'Telefone: ' +
-      dados.telefone +
-      '\n' +
-      'Quarto: ' +
-      quartoTituloPorId(state.quartoId) +
-      '\n' +
-      'Entrada: ' +
-      fmtData(state.checkIn) +
-      '\n' +
-      'Saída: ' +
-      fmtData(state.checkOut) +
-      '\n' +
-      'Noites: ' +
-      nights() +
-      '\n' +
-      'Adultos: ' +
-      state.adultos +
-      '\n' +
-      'Crianças: ' +
-      state.criancas +
-      '\n' +
-      'Valor Total: ' +
-      valorTxt +
-      '\n' +
-      'ID da Reserva: #' +
-      idReserva
-    );
-  }
-
-  async function fazerReserva() {
-    var dados = lerDadosContatoDoFormulario();
-    syncHospedesState();
-    var preco = calcPrecoAtual();
-    if (!state.checkIn || !state.checkOut || nights() <= 0) {
-      alert('Escolha as datas de entrada e saída.');
-      return;
-    }
-    if (preco.erro) {
-      alert(preco.erro);
-      return;
-    }
-    if (!contatoValido(dados)) {
-      alert('Verifique nome, e-mail válido e telefone com DDD.');
-      return;
-    }
-    if (!window.SystemStore || !window.SystemStore.criarReserva) {
-      alert('Sistema de reservas indisponível. Tente novamente.');
-      return;
-    }
-
-    var btn = document.getElementById('btn-fazer-reserva');
-    if (btn) {
-      btn.disabled = true;
-      btn.textContent = 'Salvando…';
-    }
-
-    var entradaIso = toIsoDate(state.checkIn);
-    var saidaIso = toIsoDate(state.checkOut);
-
-    try {
-      await refreshOcupadasMapAsync();
-      if (periodoTemConflitoLocal(entradaIso, saidaIso)) {
-        alert('Esse período já está reservado ou bloqueado para este quarto. Escolha outras datas.');
-        return;
-      }
-
-      var reservaSalva = await withTimeoutMs(
-        window.SystemStore.criarReserva({
-          nome: dados.nome,
-          email: dados.email,
-          telefone: dados.telefone,
-          adultos: state.adultos,
-          criancas: state.criancas,
-          pessoas: state.adultos + state.criancas,
-          dataEntrada: entradaIso,
-          dataSaida: saidaIso,
-          quartoId: state.quartoId,
-          plataforma: 'site',
-          metodoPagamento: 'whatsapp',
-          valorDiaria: preco.valorDiaria || 0,
-          valorAdicional: preco.valorAdicional || 0,
-          valorTotal: preco.requerOrcamento ? 0 : preco.valorTotal,
-          requerOrcamento: !!preco.requerOrcamento,
-          turnstileToken: getTurnstileToken()
-        }),
-        15000
-      );
-
-      state.nome = dados.nome;
-      state.email = dados.email;
-      state.telefone = dados.telefone;
-      updateSidebar();
-
-      var url =
-        window.MiCasaContato && typeof window.MiCasaContato.buildWhatsAppUrl === 'function'
-          ? window.MiCasaContato.buildWhatsAppUrl(montarMensagemWhatsApp(reservaSalva))
-          : 'https://wa.me/559180781514?text=' +
-            encodeURIComponent(montarMensagemWhatsApp(reservaSalva));
-      var popup = window.open(url, '_blank', 'noopener,noreferrer');
-      if (!popup) {
-        alert(
-          'Reserva #' +
-            (reservaSalva.codigo || '') +
-            ' registrada. O WhatsApp foi bloqueado — use este link: ' +
-            url
-        );
-      }
-    } catch (err) {
-      console.error(err);
-      alert('Não foi possível registrar a reserva. Tente novamente.');
-    } finally {
-      if (btn) {
-        btn.textContent = 'Fazer Reserva';
-        updateBtnReserva();
-      }
-    }
   }
 
   function hasNomeESobrenome(nome) {
@@ -544,31 +345,54 @@
     var el = document.getElementById('reservar-msg-adicional');
     var wrap = document.getElementById('reservar-valor-adicional-wrap');
     var strong = document.getElementById('reservar-valor-adicional');
+    var msgOrc = document.getElementById('reservar-msg-orcamento');
+    var calc = calcPrecoAtual();
+
+    if (msgOrc) {
+      if (calc.requerOrcamento) {
+        msgOrc.hidden = false;
+        msgOrc.textContent = MSG_ORCAMENTO;
+      } else {
+        msgOrc.hidden = true;
+        msgOrc.textContent = '';
+      }
+    }
+
     if (!el) return;
-    var p = getPessoasParaCalculo();
-    if (p == null || p <= config.pessoasIncluidas) {
+    if (!calc.pessoasAlémCap || calc.pessoasAlémCap <= 0) {
       el.textContent = '';
       el.hidden = true;
       if (wrap) wrap.hidden = true;
       return;
     }
-    var x = p - config.pessoasIncluidas;
+    var x = calc.pessoasAlémCap;
     el.hidden = false;
     el.textContent =
       'Será cobrado adicional de ' +
       x +
       ' ' +
       (x === 1 ? 'pessoa' : 'pessoas') +
-      '.';
+      ' além da capacidade do quarto.';
     var va = valorTotalSoAdicional();
     if (wrap && strong) {
-      if (va != null) {
+      if (va != null && !calc.requerOrcamento) {
         wrap.hidden = false;
         strong.textContent = formatMoney(va);
       } else {
         wrap.hidden = true;
       }
     }
+  }
+
+  function hospedesValidos() {
+    if (state.modoGrupo) {
+      return parsePessoasExtras(
+        document.getElementById('reservar-input-pessoas-total') &&
+          document.getElementById('reservar-input-pessoas-total').value
+      ).valid;
+    }
+    var cap = capacidadeQuartoId(state.quartoId);
+    return state.adultos >= 1 && state.adultos + state.criancas <= cap;
   }
 
   function updateBtnContinuarPessoas() {
@@ -578,12 +402,7 @@
       btn.disabled = true;
       return;
     }
-    if (state.modoGrupo) {
-      var inp = document.getElementById('reservar-input-pessoas-total');
-      btn.disabled = !parsePessoasExtras(inp && inp.value).valid;
-    } else {
-      btn.disabled = false;
-    }
+    btn.disabled = !hospedesValidos();
   }
 
   function setModoGrupo(on) {
@@ -596,10 +415,13 @@
     if (on) {
       var inpT = document.getElementById('reservar-input-pessoas-total');
       if (inpT) inpT.value = '1';
+      state.pessoasAlémCap = 1;
     } else {
+      state.pessoasAlémCap = 0;
       var cap = capacidadeQuartoId(state.quartoId);
-      var inpP = document.getElementById('reservar-input-pessoas');
-      if (inpP) inpP.value = String(Math.min(cap, Math.max(1, state.pessoas)));
+      var clamped = clampHospedesAoCap(cap, state.adultos, state.criancas);
+      state.adultos = clamped.adultos;
+      state.criancas = clamped.criancas;
     }
     syncPessoas();
   }
@@ -619,7 +441,8 @@
     var elIn = document.getElementById('reservar-sum-checkin');
     var elOut = document.getElementById('reservar-sum-checkout');
     var elN = document.getElementById('reservar-sum-noites');
-    var elP = document.getElementById('reservar-sum-pessoas');
+    var elA = document.getElementById('reservar-sum-adultos');
+    var elC = document.getElementById('reservar-sum-criancas');
     var elT = document.getElementById('reservar-sum-total');
     var elResumo = document.getElementById('reservar-sum-resumo-contato');
     var elQuarto = document.getElementById('reservar-sum-quarto-nome');
@@ -627,29 +450,9 @@
     if (elIn) elIn.textContent = state.checkIn ? fmtData(state.checkIn) : '—';
     if (elOut) elOut.textContent = state.checkOut ? fmtData(state.checkOut) : '—';
     if (elN) elN.textContent = nights() > 0 ? String(nights()) : '—';
-    var elAd = document.getElementById('reservar-sum-adultos');
-    var elCr = document.getElementById('reservar-sum-criancas');
-    if (elAd) elAd.textContent = String(state.adultos);
-    if (elCr) elCr.textContent = String(state.criancas);
-    var preco = calcPrecoAtual();
-    if (elT) {
-      if (nights() <= 0) elT.textContent = '—';
-      else if (preco.requerOrcamento && window.ReservaPrecos) {
-        elT.textContent = window.ReservaPrecos.MSG_ORCAMENTO;
-      } else if (preco.erro) {
-        elT.textContent = '—';
-      } else {
-        elT.textContent = formatMoney(preco.valorTotal);
-      }
-    }
-    var avisoOrc = document.getElementById('reservar-orcamento-aviso');
-    if (avisoOrc) {
-      avisoOrc.hidden = !(nights() > 0 && preco.requerOrcamento);
-    }
-    var elTarifa = document.getElementById('reservar-sum-tarifa-dica');
-    if (elTarifa && window.ReservaPrecos && typeof window.ReservaPrecos.descricaoTarifaReserva === 'function') {
-      elTarifa.textContent = window.ReservaPrecos.descricaoTarifaReserva(nights(), state.quartoId);
-    }
+    if (elA) elA.textContent = String(state.adultos);
+    if (elC) elC.textContent = String(state.criancas);
+    if (elT) elT.textContent = nights() > 0 && hospedesValidos() ? formatValorReserva() : '—';
     if (elResumo) {
       if (state.nome || state.email || state.telefone) {
         elResumo.hidden = false;
@@ -756,50 +559,37 @@
             return;
           }
           if (picked <= state.checkIn) return;
-          refreshOcupadasMapAsync().then(function () {
-            if (periodoTemConflitoLocal(toIsoDate(state.checkIn), toIsoDate(picked))) {
-              alert('Esse período contém datas já reservadas ou bloqueadas para este quarto.');
-              return;
-            }
-            state.checkOut = picked;
-            renderCalendar('cal-entrada', 'entrada');
-            renderCalendar('cal-saida', 'saida');
-            updateSidebar();
-            updateBtnReserva();
-          });
-          return;
+          if (
+            window.SystemStore &&
+            window.SystemStore.hasRangeConflictForQuarto &&
+            window.SystemStore.hasRangeConflictForQuarto(
+              toIsoDate(state.checkIn),
+              toIsoDate(picked),
+              state.quartoId
+            )
+          ) {
+            alert('Esse período contém datas já reservadas ou bloqueadas para este quarto.');
+            return;
+          }
+          state.checkOut = picked;
         }
         renderCalendar('cal-entrada', 'entrada');
         renderCalendar('cal-saida', 'saida');
         updateSidebar();
-        updateBtnReserva();
+        updateContinuarDatas();
       });
     });
   }
 
-  function updateBtnReserva() {
-    var btn = document.getElementById('btn-fazer-reserva');
-    if (!btn) return;
-    var motivos = motivosBtnReservaBloqueado();
-    btn.disabled = motivos.length > 0;
-    var hint = document.getElementById('reservar-reserva-hint');
-    if (hint) {
-      if (motivos.length) {
-        hint.textContent = 'Para continuar: ' + motivos.join(', ') + '.';
-      } else {
-        hint.textContent =
-          'Tudo certo — ao clicar, a reserva será salva no painel e o WhatsApp abrirá com a mensagem pronta.';
-      }
-    }
-  }
-
   function updateContinuarDatas() {
-    updateBtnReserva();
+    var btn = document.getElementById('btn-step-datas');
+    if (!btn) return;
+    var ok = state.checkIn && state.checkOut && state.checkOut > state.checkIn;
+    btn.disabled = !ok;
   }
 
   function showStep(step) {
-    step = 1;
-    var ids = ['painel-etapa-datas', 'painel-etapa-pessoas', 'painel-etapa-contato', 'painel-etapa-pagamento'];
+    var ids = ['painel-etapa-datas', 'painel-etapa-pessoas', 'painel-etapa-contato', 'painel-etapa-confirmacao'];
     ids.forEach(function (id, i) {
       var el = document.getElementById(id);
       if (!el) return;
@@ -809,27 +599,65 @@
     if (aviso) aviso.hidden = step !== 4;
 
     var ind = document.getElementById('reservar-passo-indicador');
-    if (ind) ind.textContent = 'Reserva online';
+    if (ind) ind.textContent = 'Passo ' + step + ' de 4';
 
     var sideAc = document.querySelector('.reservar-painel-acoes');
-    if (sideAc) sideAc.style.display = '';
+    if (sideAc) sideAc.style.display = step === 1 ? '' : 'none';
 
     if (step === 2) {
       updateBtnContinuarPessoas();
     }
+    if (step === 4) {
+      renderConfirmacaoResumo();
+    }
 
     if (window.innerWidth <= 768) {
-      var ids = ['painel-etapa-datas', 'painel-etapa-pessoas', 'painel-etapa-contato', 'painel-etapa-pagamento'];
       var target = document.getElementById(ids[step - 1]);
       if (target) {
         window.setTimeout(function () {
-          target.scrollIntoView({ behavior: 'auto', block: 'start' });
+          target.scrollIntoView({ behavior: 'smooth', block: 'start' });
         }, 80);
       }
     }
   }
 
+  function renderConfirmacaoResumo() {
+    var box = document.getElementById('reservar-confirmacao-resumo');
+    if (!box) return;
+    var calc = calcPrecoAtual();
+    box.innerHTML =
+      '<p><strong>Quarto:</strong> ' +
+      quartoTituloPorId(state.quartoId) +
+      '</p>' +
+      '<p><strong>Entrada:</strong> ' +
+      (state.checkIn ? fmtData(state.checkIn) : '—') +
+      ' · <strong>Saída:</strong> ' +
+      (state.checkOut ? fmtData(state.checkOut) : '—') +
+      '</p>' +
+      '<p><strong>Noites:</strong> ' +
+      nights() +
+      ' · <strong>Adultos:</strong> ' +
+      state.adultos +
+      ' · <strong>Crianças:</strong> ' +
+      state.criancas +
+      '</p>' +
+      '<p><strong>' +
+      (calc.requerOrcamento ? 'Orçamento (de 5 dias ou mais)' : 'Valor') +
+      ':</strong> ' +
+      formatValorReserva() +
+      '</p>' +
+      '<p><strong>Contato:</strong> ' +
+      [state.nome, state.email, state.telefone].filter(Boolean).join(' · ') +
+      '</p>';
+    if (calc.pessoasAlémCap > 0) {
+      box.innerHTML +=
+        '<p><em>Inclui ' + calc.pessoasAlémCap + ' pessoa(s) além da capacidade do quarto.</em></p>';
+    }
+  }
+
   async function init() {
+    if (verificarRetornoDoWhatsApp()) return;
+
     atualizarListaQuartosReserva();
     if (!QUARTOS_RESERVA.length) {
       console.error('Inclua js/quartos-site.js antes de reservar.js.');
@@ -846,12 +674,11 @@
     state.modoGrupo = false;
 
     function pintarCalendariosEsumario() {
-      refreshOcupadasMapAsync().then(function () {
-        renderCalendar('cal-entrada', 'entrada');
-        renderCalendar('cal-saida', 'saida');
-        updateSidebar();
-        updateContinuarDatas();
-      });
+      refreshOcupadasMap();
+      renderCalendar('cal-entrada', 'entrada');
+      renderCalendar('cal-saida', 'saida');
+      updateSidebar();
+      updateContinuarDatas();
     }
 
     function aplicarQuartoPorIndice(roomIdx) {
@@ -859,8 +686,11 @@
       if (!q) return;
       state.quartoId = q.id;
       var capQ = capacidadeQuartoId(state.quartoId);
-      if (state.pessoas > capQ) state.pessoas = capQ;
-      if (state.pessoas < 1) state.pessoas = 1;
+      if (!state.modoGrupo) {
+        var clampQ = clampHospedesAoCap(capQ, state.adultos, state.criancas);
+        state.adultos = clampQ.adultos;
+        state.criancas = clampQ.criancas;
+      }
       state.checkIn = null;
       state.checkOut = null;
       var hoje = startOfToday();
@@ -875,7 +705,10 @@
       } catch (eUrl) {}
       pintarCalendariosEsumario();
       showStep(1);
-      syncHospedesState();
+      var ipAd = document.getElementById('reservar-input-adultos');
+      var ipCr = document.getElementById('reservar-input-criancas');
+      if (ipAd) ipAd.value = String(state.adultos);
+      if (ipCr) ipCr.value = String(state.criancas);
     }
 
     pintarCalendariosEsumario();
@@ -887,7 +720,14 @@
       state.checkOut = pSaida;
       state.entradaMes = new Date(pEntrada.getFullYear(), pEntrada.getMonth(), 1);
       state.saidaMes = new Date(pSaida.getFullYear(), pSaida.getMonth(), 1);
+      var capUrl = capacidadeQuartoId(state.quartoId);
+      if (!state.modoGrupo) {
+        var clampUrl = clampHospedesAoCap(capUrl, state.adultos, state.criancas);
+        state.adultos = clampUrl.adultos;
+        state.criancas = clampUrl.criancas;
+      }
       pintarCalendariosEsumario();
+      showStep(2);
     }
 
     if (window.carregarImagensQuartosPastas) {
@@ -898,9 +738,6 @@
     hydrateQuartosPromise
       .then(function () {
         atualizarListaQuartosReserva();
-        if (window.carregarImagensQuartosPastas) {
-          return window.carregarImagensQuartosPastas();
-        }
       })
       .then(function () {
         var sz = document.querySelector('[data-reservar-quarto-showcase]');
@@ -912,26 +749,24 @@
         console.warn('Quartos:', eH);
       });
 
+    var inpAdultos = document.getElementById('reservar-input-adultos');
+    var inpCriancas = document.getElementById('reservar-input-criancas');
+    var inpTotal = document.getElementById('reservar-input-pessoas-total');
+    var adultosMenos = document.getElementById('reservar-adultos-menos');
+    var adultosMais = document.getElementById('reservar-adultos-mais');
+    var criancasMenos = document.getElementById('reservar-criancas-menos');
+    var criancasMais = document.getElementById('reservar-criancas-mais');
+    var btnMaisPessoas = document.getElementById('btn-quero-mais-pessoas');
+    var btnVoltarAteSeis = document.getElementById('btn-voltar-ate-seis');
+    var btnDatas = document.getElementById('btn-step-datas');
+    var btnPessoas = document.getElementById('btn-step-pessoas');
+    var btnContato = document.getElementById('btn-step-contato');
     var btnFazerReserva = document.getElementById('btn-fazer-reserva');
+    var btnSucessoInicio = document.getElementById('reservar-sucesso-inicio');
+    var voltar2 = document.getElementById('btn-voltar-pessoas');
+    var voltar3 = document.getElementById('btn-voltar-contato');
+    var voltar4 = document.getElementById('btn-voltar-confirmacao');
     var inpTelefone = document.getElementById('reservar-telefone');
-    var inpNome = document.getElementById('reservar-nome');
-    var inpEmail = document.getElementById('reservar-email');
-    var inpAdultos = document.getElementById('reservar-adultos');
-    var inpCriancas = document.getElementById('reservar-criancas');
-    var btnAdultosMenos = document.getElementById('reservar-adultos-menos');
-    var btnAdultosMais = document.getElementById('reservar-adultos-mais');
-    var btnCriancasMenos = document.getElementById('reservar-criancas-menos');
-    var btnCriancasMais = document.getElementById('reservar-criancas-mais');
-
-    function onFormularioAlterado() {
-      syncHospedesState();
-      var dados = lerDadosContatoDoFormulario();
-      state.nome = dados.nome;
-      state.email = dados.email;
-      state.telefone = dados.telefone;
-      updateSidebar();
-      updateBtnReserva();
-    }
 
     if (inpTelefone) {
       inpTelefone.addEventListener('input', function () {
@@ -941,75 +776,299 @@
         var newLen = inpTelefone.value.length;
         var nextPos = Math.max(0, (pos || 0) + (newLen - oldLen));
         inpTelefone.setSelectionRange(nextPos, nextPos);
-        onFormularioAlterado();
       });
       inpTelefone.addEventListener('blur', function () {
         inpTelefone.value = formatTelefoneBr(inpTelefone.value);
-        onFormularioAlterado();
       });
     }
-    if (inpNome) {
-      inpNome.addEventListener('input', onFormularioAlterado);
-      inpNome.addEventListener('blur', onFormularioAlterado);
+
+    function atualizarUIPessoasCapacidade() {
+      var cap = capacidadeQuartoId(state.quartoId);
+      var label = document.getElementById('reservar-stepper-label-cap');
+      if (label) {
+        label.textContent = 'Capacidade do quarto: até ' + cap + ' pessoas (adultos + crianças).';
+      }
+      if (state.modoGrupo) {
+        if (inpAdultos) inpAdultos.setAttribute('max', String(Math.max(1, cap + MAX_PESSOAS_EXTRAS)));
+        if (inpCriancas) inpCriancas.setAttribute('max', String(Math.max(0, cap + MAX_PESSOAS_EXTRAS)));
+        return;
+      }
+      var maxA = maxAdultosParaCap(cap, state.criancas);
+      var maxC = maxCriancasParaCap(cap, state.adultos);
+      if (inpAdultos) inpAdultos.setAttribute('max', String(maxA));
+      if (inpCriancas) inpCriancas.setAttribute('max', String(maxC));
+      if (adultosMais) adultosMais.disabled = state.adultos >= maxA;
+      if (adultosMenos) adultosMenos.disabled = state.adultos <= 1;
+      if (criancasMais) criancasMais.disabled = state.criancas >= maxC;
+      if (criancasMenos) criancasMenos.disabled = state.criancas <= 0;
     }
-    if (inpEmail) {
-      inpEmail.addEventListener('input', onFormularioAlterado);
-      inpEmail.addEventListener('blur', onFormularioAlterado);
+
+    function syncPessoas() {
+      var cap = capacidadeQuartoId(state.quartoId);
+      if (state.modoGrupo) {
+        var raw = inpTotal && inpTotal.value;
+        var parsed = parsePessoasExtras(raw);
+        if (parsed.valid) state.pessoasAlémCap = parsed.value;
+      } else {
+        var a = parseInt(inpAdultos && inpAdultos.value, 10);
+        var c = parseInt(inpCriancas && inpCriancas.value, 10);
+        var clamped = clampHospedesAoCap(cap, a, c);
+        a = clamped.adultos;
+        c = clamped.criancas;
+        if (inpAdultos) inpAdultos.value = String(a);
+        if (inpCriancas) inpCriancas.value = String(c);
+        state.adultos = a;
+        state.criancas = c;
+        state.pessoasAlémCap = 0;
+      }
+
+      var prN = document.getElementById('reservar-preview-noites');
+      var prV = document.getElementById('reservar-preview-valor');
+      if (prN) prN.textContent = nights() > 0 ? String(nights()) : '—';
+      if (prV) prV.textContent = nights() > 0 && hospedesValidos() ? formatValorReserva() : '—';
+      updateMsgAdicional();
+      updateSidebar();
+      updateBtnContinuarPessoas();
+      atualizarUIPessoasCapacidade();
     }
-    if (inpAdultos) {
-      inpAdultos.addEventListener('input', onFormularioAlterado);
-      inpAdultos.addEventListener('change', onFormularioAlterado);
+
+    function bindStepper(menosBtn, maisBtn, input, min, getVal, setVal, getMax) {
+      if (menosBtn) {
+        menosBtn.addEventListener('click', function () {
+          setVal(Math.max(min, getVal() - 1));
+          syncPessoas();
+        });
+      }
+      if (maisBtn) {
+        maisBtn.addEventListener('click', function () {
+          var max = getMax ? getMax() : Infinity;
+          setVal(Math.min(max, getVal() + 1));
+          syncPessoas();
+        });
+      }
+      if (input) {
+        input.addEventListener('change', syncPessoas);
+        input.addEventListener('input', syncPessoas);
+      }
     }
-    if (inpCriancas) {
-      inpCriancas.addEventListener('input', onFormularioAlterado);
-      inpCriancas.addEventListener('change', onFormularioAlterado);
-    }
-    if (btnAdultosMenos) {
-      btnAdultosMenos.addEventListener('click', function () {
-        if (!inpAdultos) return;
-        inpAdultos.value = String(Math.max(1, state.adultos - 1));
-        onFormularioAlterado();
+
+    bindStepper(
+      adultosMenos,
+      adultosMais,
+      inpAdultos,
+      1,
+      function () {
+        return state.adultos;
+      },
+      function (v) {
+        if (inpAdultos) inpAdultos.value = String(v);
+      },
+      function () {
+        return maxAdultosParaCap(capacidadeQuartoId(state.quartoId), state.criancas);
+      }
+    );
+    bindStepper(
+      criancasMenos,
+      criancasMais,
+      inpCriancas,
+      0,
+      function () {
+        return state.criancas;
+      },
+      function (v) {
+        if (inpCriancas) inpCriancas.value = String(v);
+      },
+      function () {
+        return maxCriancasParaCap(capacidadeQuartoId(state.quartoId), state.adultos);
+      }
+    );
+    if (inpTotal) {
+      inpTotal.addEventListener('change', syncPessoas);
+      inpTotal.addEventListener('input', syncPessoas);
+      inpTotal.addEventListener('blur', function () {
+        syncPessoas();
       });
     }
-    if (btnAdultosMais) {
-      btnAdultosMais.addEventListener('click', function () {
-        if (!inpAdultos) return;
-        var cap = capacidadeQuartoId(state.quartoId);
-        inpAdultos.value = String(Math.min(cap, state.adultos + 1));
-        onFormularioAlterado();
+
+    if (btnMaisPessoas) {
+      btnMaisPessoas.addEventListener('click', function () {
+        setModoGrupo(true);
       });
     }
-    if (btnCriancasMenos) {
-      btnCriancasMenos.addEventListener('click', function () {
-        if (!inpCriancas) return;
-        inpCriancas.value = String(Math.max(0, state.criancas - 1));
-        onFormularioAlterado();
+    if (btnVoltarAteSeis) {
+      btnVoltarAteSeis.addEventListener('click', function () {
+        setModoGrupo(false);
       });
     }
-    if (btnCriancasMais) {
-      btnCriancasMais.addEventListener('click', function () {
-        if (!inpCriancas) return;
-        var cap2 = capacidadeQuartoId(state.quartoId);
-        inpCriancas.value = String(Math.min(Math.max(0, cap2 - state.adultos), state.criancas + 1));
-        onFormularioAlterado();
+
+    if (btnDatas) {
+      btnDatas.addEventListener('click', function () {
+        if (btnDatas.disabled) return;
+        syncPessoas();
+        showStep(2);
+      });
+    }
+
+    if (btnPessoas) {
+      btnPessoas.addEventListener('click', function () {
+        if (btnPessoas.disabled) return;
+        syncPessoas();
+        if (nights() <= 0) return;
+        if (!hospedesValidos()) return;
+        showStep(3);
+      });
+    }
+
+    if (btnContato) {
+      btnContato.addEventListener('click', function () {
+        var nome = document.getElementById('reservar-nome').value.trim();
+        var email = document.getElementById('reservar-email').value.trim();
+        var tel = document.getElementById('reservar-telefone').value.trim();
+        if (!nome || !email || !tel) {
+          alert('Preencha nome, e-mail e telefone.');
+          return;
+        }
+        if (!hasNomeESobrenome(nome)) {
+          alert('Informe nome e sobrenome.');
+          return;
+        }
+        if (!telefoneComDddValido(tel)) {
+          alert('Informe telefone com DDD válido (Brasil).');
+          return;
+        }
+        state.nome = nome;
+        state.email = email;
+        state.telefone = tel;
+        updateSidebar();
+        showStep(4);
+      });
+    }
+
+    if (voltar2) voltar2.addEventListener('click', function () { showStep(1); });
+    if (voltar3) voltar3.addEventListener('click', function () { showStep(2); });
+    if (voltar4) voltar4.addEventListener('click', function () { showStep(3); });
+
+    if (btnSucessoInicio) {
+      btnSucessoInicio.addEventListener('click', function () {
+        try {
+          sessionStorage.removeItem(CHAVE_POS_WHATS);
+        } catch (e) {}
+        fecharOverlaySucesso();
       });
     }
 
     if (btnFazerReserva) {
-      btnFazerReserva.addEventListener('click', function () {
-        if (btnFazerReserva.disabled) return;
-        fazerReserva();
+      btnFazerReserva.addEventListener('click', async function () {
+        if (!state.checkIn || !state.checkOut || nights() <= 0 || !hospedesValidos()) {
+          alert('Complete os dados da reserva antes de continuar.');
+          return;
+        }
+        if (!state.nome || !state.email || !state.telefone) {
+          alert('Preencha nome, e-mail e telefone.');
+          showStep(3);
+          return;
+        }
+        var entradaIso = toIsoDate(state.checkIn);
+        var saidaIso = toIsoDate(state.checkOut);
+        btnFazerReserva.disabled = true;
+        btnFazerReserva.textContent = 'Salvando…';
+
+        try {
+          if (window.SystemStore && window.SystemStore.listarReservas) {
+            await withTimeoutMs(window.SystemStore.listarReservas(), 8000);
+          }
+          if (
+            window.SystemStore &&
+            window.SystemStore.hasRangeConflictForQuarto &&
+            window.SystemStore.hasRangeConflictForQuarto(entradaIso, saidaIso, state.quartoId)
+          ) {
+            alert('Esse período já está reservado ou bloqueado para este quarto. Escolha outras datas.');
+            showStep(1);
+            return;
+          }
+
+          if (!window.SystemStore || !window.SystemStore.criarReserva) {
+            throw new Error('Sistema de reservas indisponível.');
+          }
+
+          var reservaCriada = await withTimeoutMs(
+            SystemStore.criarReserva({
+              nome: state.nome,
+              email: state.email,
+              telefone: state.telefone,
+              adultos: state.adultos,
+              criancas: state.criancas,
+              pessoasAlémCap: state.modoGrupo ? state.pessoasAlémCap : 0,
+              dataEntrada: entradaIso,
+              dataSaida: saidaIso,
+              plataforma: 'site',
+              metodoPagamento: 'whatsapp',
+              quartoId: state.quartoId
+            }),
+            15000
+          );
+
+          if (!reservaCriada || !reservaCriada.codigo) {
+            throw new Error('Não foi possível registrar a reserva.');
+          }
+
+          reservaCriada.quartoTitulo = quartoTituloPorId(state.quartoId);
+          var waUrl =
+            window.ReservaPrecos && window.ReservaPrecos.buildWhatsAppUrl
+              ? window.ReservaPrecos.buildWhatsAppUrl(reservaCriada)
+              : null;
+
+          if (!waUrl) {
+            throw new Error('Não foi possível abrir o WhatsApp.');
+          }
+
+          var ov = document.getElementById('reservar-sucesso');
+          if (ov) {
+            ov.hidden = false;
+            document.body.style.overflow = 'hidden';
+            var titulo = document.getElementById('reservar-sucesso-titulo');
+            if (titulo) {
+              titulo.textContent =
+                'Reserva registrada! Código #' + reservaCriada.codigo + '. Abrindo WhatsApp…';
+            }
+          }
+
+          window.setTimeout(function () {
+            try {
+              sessionStorage.setItem(CHAVE_POS_WHATS, '1');
+            } catch (e) {}
+            window.location.href = waUrl;
+          }, 1200);
+        } catch (errSave) {
+          console.error('Reserva:', errSave);
+          alert(
+            'Não foi possível registrar sua reserva. Tente novamente em instantes ou entre em contato pelo WhatsApp.'
+          );
+        } finally {
+          btnFazerReserva.disabled = false;
+          btnFazerReserva.textContent = 'Fazer reserva';
+        }
       });
     }
 
-    syncHospedesState();
-    updateBtnReserva();
+    var simples = document.getElementById('reservar-pessoas-simples');
+    var grupo = document.getElementById('reservar-pessoas-grupo');
+    if (simples) simples.hidden = state.modoGrupo;
+    if (grupo) grupo.hidden = !state.modoGrupo;
+    syncPessoas();
 
-    if (window.SystemStore && window.SystemStore.initPublico) {
-      window.SystemStore.initPublico().catch(function () {});
+    function repintarAposReservas() {
+      pintarCalendariosEsumario();
     }
-    mountTurnstileWidget();
-    pintarCalendariosEsumario();
+    if (window.SystemStore && window.SystemStore.init) {
+      window.SystemStore
+        .init()
+        .then(repintarAposReservas)
+        .catch(function (errInit) {
+          console.error('Falha ao carregar reservas:', errInit);
+          repintarAposReservas();
+        });
+    }
   }
 
   function initShowcaseQuartosReservar(onSelecionarQuarto) {

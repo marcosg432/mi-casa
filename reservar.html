@@ -5,12 +5,13 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;0,700;1,400&family=Outfit:wght@300;400;500;600&display=swap">
   <title>Reservar — Mi Casa Su Casa</title>
   <link rel="stylesheet" href="css/estilo.css">
   <script src="js/topo-ao-carregar.js" defer></script>
   <script src="js/intro-nav-mobile.js" defer></script>
 </head>
-<body class="pagina-reservar">
+<body>
   <div id="intro" class="active">
     <div class="logo"><img src="icons/logo%20boa.png" alt="Logo Mi Casa Su Casa"></div>
     <button type="button" class="intro-menu-toggle" id="intro-menu-toggle" aria-expanded="false" aria-controls="intro-nav-principal" aria-label="Abrir menu de navegação">
@@ -28,25 +29,16 @@
 
   <main class="reservar-main">
     <div class="reservar-pagina">
-      <p id="reservar-passo-indicador" class="reservar-passo-indicador">Reserva online</p>
+      <p id="reservar-passo-indicador" class="reservar-passo-indicador">Passo 1 de 4</p>
 
       <header class="reservar-cabecalho">
         <h1>Reservar estadia</h1>
-        <p>Escolha o quarto, as datas, os hóspedes e seus dados. A reserva é registrada no sistema e, em seguida, você confirma pelo WhatsApp da pousada.</p>
+        <p>Escolha datas, hóspedes e confirme. Ao final, sua reserva será registrada no painel e você será direcionado ao WhatsApp.</p>
       </header>
 
-      <aside class="reservar-info-precos" aria-label="Informações sobre valores da reserva">
-        <h2 class="reservar-info-precos-titulo">Como funciona o valor</h2>
-        <ul class="reservar-info-precos-lista">
-          <li><strong>Quanto mais dias, menor o valor por noite:</strong> 1 noite custa <strong>R$ 150</strong>. A partir de <strong>2 noites</strong>, a tarifa cai para <strong>R$ 130 por noite</strong> — ou seja, quanto mais dias você reserva, mais barato fica cada diária.</li>
-          <li><strong>Quarto Tem-Tem:</strong> o valor é cobrado <strong>por pessoa</strong>, com a mesma lógica (R$ 150 em 1 noite · R$ 130 por pessoa/noite a partir de 2 noites).</li>
-          <li><strong>Pessoas adicionais</strong> (nos demais quartos, acima de 2 hóspedes pagantes): <strong>R$ 100</strong> por pessoa/noite em estadias de <strong>1 noite</strong> · <strong>R$ 80</strong> por pessoa/noite a partir de <strong>2 noites</strong>.</li>
-          <li><strong>Estadias de 5 dias ou mais:</strong> não há cálculo automático — é necessário <strong>orçamento personalizado</strong>. Você pode enviar a solicitação normalmente; entraremos em contato pelo WhatsApp.</li>
-          <li>Crianças com até 3 anos não pagam.</li>
-        </ul>
-      </aside>
-
-      <div id="reservar-aviso-pagamento-topo" class="reservar-aviso-pagamento-topo" hidden role="status"></div>
+      <div id="reservar-aviso-pagamento-topo" class="reservar-aviso-pagamento-topo" hidden role="status">
+        <strong>Confirmação:</strong> ao clicar em <em>Fazer reserva</em>, sua solicitação será registrada e você será direcionado ao WhatsApp com os dados preenchidos.
+      </div>
 
       <div class="reservar-showcase-externo">
         <section class="quartos-showcase reservar-quarto-showcase" data-reservar-quarto-showcase aria-label="Escolha o quarto">
@@ -87,7 +79,6 @@
         <div class="reservar-conteudo-area">
           <section id="painel-etapa-datas" class="reservar-etapa" aria-labelledby="titulo-etapa-datas">
             <h2 id="titulo-etapa-datas" class="visually-hidden">Datas</h2>
-            <p class="reservar-etapa-desc reservar-etapa-desc--destaque">Ao escolher mais noites, o valor de cada diária diminui automaticamente (de R$ 150 para R$ 130/noite). Para <strong>5 dias ou mais</strong>, solicite orçamento personalizado.</p>
             <div class="reservar-calendarios-dupla">
               <div class="reservar-cal-wrap">
                 <p class="reservar-cal-legenda">Entrada</p>
@@ -100,48 +91,11 @@
                 <div id="cal-saida" class="reservar-cal-mount"></div>
               </div>
             </div>
-
-            <div class="reservar-hospedes reservar-campos--whatsapp">
-              <h3 class="reservar-campos-titulo">Hóspedes</h3>
-              <p class="reservar-etapa-desc">Crianças com até 3 anos não pagam. Respeite a capacidade máxima de cada quarto.</p>
-              <div class="reservar-hospedes-grid">
-                <div class="reservar-stepper-block">
-                  <span id="reservar-label-adultos" class="reservar-stepper-label">Adultos</span>
-                  <div class="reservar-stepper">
-                    <button type="button" id="reservar-adultos-menos" class="reservar-stepper-btn" aria-label="Menos um adulto">−</button>
-                    <input type="number" id="reservar-adultos" class="reservar-stepper-input" min="1" max="4" value="2" inputmode="numeric" aria-labelledby="reservar-label-adultos">
-                    <button type="button" id="reservar-adultos-mais" class="reservar-stepper-btn" aria-label="Mais um adulto">+</button>
-                  </div>
-                </div>
-                <div class="reservar-stepper-block">
-                  <span id="reservar-label-criancas" class="reservar-stepper-label">Crianças (até 3 anos)</span>
-                  <div class="reservar-stepper">
-                    <button type="button" id="reservar-criancas-menos" class="reservar-stepper-btn" aria-label="Menos uma criança">−</button>
-                    <input type="number" id="reservar-criancas" class="reservar-stepper-input" min="0" max="3" value="0" inputmode="numeric" aria-labelledby="reservar-label-criancas">
-                    <button type="button" id="reservar-criancas-mais" class="reservar-stepper-btn" aria-label="Mais uma criança">+</button>
-                  </div>
-                </div>
-              </div>
-              <p id="reservar-orcamento-aviso" class="reservar-orcamento-aviso" hidden role="alert"><strong>Estadia de 5 dias ou mais:</strong> entre em contato para solicitar um orçamento personalizado. Você pode enviar a solicitação — o valor final será combinado pelo WhatsApp.</p>
-            </div>
-
-            <div class="reservar-campos reservar-campos--whatsapp">
-              <h3 class="reservar-campos-titulo">Seus dados</h3>
-              <label class="reservar-label">Nome completo
-                <input type="text" id="reservar-nome" class="reservar-input" autocomplete="name" required>
-              </label>
-              <label class="reservar-label">E-mail (Gmail)
-                <input type="email" id="reservar-email" class="reservar-input" autocomplete="email" placeholder="seu@gmail.com" required>
-              </label>
-              <label class="reservar-label">Telefone / WhatsApp
-                <input type="tel" id="reservar-telefone" class="reservar-input" autocomplete="tel" inputmode="numeric" maxlength="15" placeholder="(00) 00000-0000" required>
-              </label>
-            </div>
           </section>
 
-          <section id="painel-etapa-pessoas" class="reservar-etapa" hidden aria-hidden="true">
+          <section id="painel-etapa-pessoas" class="reservar-etapa" hidden aria-labelledby="titulo-etapa-pessoas">
             <h2 id="titulo-etapa-pessoas">Hóspedes e valor</h2>
-            <p class="reservar-etapa-desc">Confira as noites e o valor estimado. A quantidade de hóspedes no quarto segue a <strong>capacidade de cada quarto</strong> (até o máximo indicado no seletor). Até 6 pessoas a diária base é <strong>R$ 150</strong> (igual para todos os quartos); acima de 6 pessoas há adicional por pessoa. Pode levar até <strong>3 pessoas a mais</strong> além dessa capacidade — use <strong>Quero adicionar até 3 pessoas a mais</strong>.</p>
+            <p class="reservar-etapa-desc">Informe adultos e crianças (até 3 anos não pagam). A capacidade varia por quarto. Reservas a partir de <strong>5 noites</strong> seguem como orçamento — exibimos a <strong>média de valor entre duas faixas</strong>. Pode levar até <strong>3 pessoas a mais</strong> além da capacidade — use <strong>Quero adicionar até 3 pessoas a mais</strong>.</p>
             <div class="reservar-resumo-linha">
               <span>Noites</span>
               <strong id="reservar-preview-noites">—</strong>
@@ -150,17 +104,27 @@
               <span>Total estimado</span>
               <strong id="reservar-preview-valor">—</strong>
             </div>
+            <p id="reservar-msg-orcamento" class="reservar-msg-orcamento" hidden role="status"></p>
             <div id="reservar-pessoas-simples" class="reservar-pessoas-simples">
               <div class="reservar-pessoas-row">
                 <div class="reservar-pessoas-row-stepper">
-                  <span id="reservar-stepper-label-cap" class="reservar-stepper-label">Quantidade de pessoas (até 2 no quarto)</span>
+                  <span class="reservar-stepper-label">Adultos</span>
                   <div class="reservar-stepper">
-                    <button type="button" id="reservar-pessoas-menos" class="reservar-stepper-btn" aria-label="Menos uma pessoa">−</button>
-                    <input type="number" id="reservar-input-pessoas" class="reservar-stepper-input" min="1" max="6" value="2" inputmode="numeric" aria-label="Número de hóspedes no quarto, conforme capacidade">
-                    <button type="button" id="reservar-pessoas-mais" class="reservar-stepper-btn" aria-label="Mais uma pessoa">+</button>
+                    <button type="button" id="reservar-adultos-menos" class="reservar-stepper-btn" aria-label="Menos um adulto">−</button>
+                    <input type="number" id="reservar-input-adultos" class="reservar-stepper-input" min="1" max="10" value="2" inputmode="numeric" aria-label="Número de adultos">
+                    <button type="button" id="reservar-adultos-mais" class="reservar-stepper-btn" aria-label="Mais um adulto">+</button>
+                  </div>
+                </div>
+                <div class="reservar-pessoas-row-stepper">
+                  <span class="reservar-stepper-label">Crianças (até 3 anos — não pagam)</span>
+                  <div class="reservar-stepper">
+                    <button type="button" id="reservar-criancas-menos" class="reservar-stepper-btn" aria-label="Menos uma criança">−</button>
+                    <input type="number" id="reservar-input-criancas" class="reservar-stepper-input" min="0" max="10" value="0" inputmode="numeric" aria-label="Número de crianças até 3 anos">
+                    <button type="button" id="reservar-criancas-mais" class="reservar-stepper-btn" aria-label="Mais uma criança">+</button>
                   </div>
                 </div>
                 <div class="reservar-pessoas-row-side">
+                  <p id="reservar-stepper-label-cap" class="reservar-pessoas-pergunta">Capacidade do quarto: —</p>
                   <p class="reservar-pessoas-pergunta">Quer levar mais pessoas além da capacidade do quarto?</p>
                   <button type="button" id="btn-quero-mais-pessoas" class="btn-reservar-texto">Quero adicionar até 3 pessoas a mais</button>
                 </div>
@@ -186,7 +150,7 @@
             </div>
           </section>
 
-          <section id="painel-etapa-contato" class="reservar-etapa" hidden aria-hidden="true">
+          <section id="painel-etapa-contato" class="reservar-etapa" hidden aria-labelledby="titulo-etapa-contato">
             <h2 id="titulo-etapa-contato">Seus dados</h2>
             <p class="reservar-etapa-desc">Nome completo, e-mail e telefone para contato.</p>
             <div class="reservar-campos">
@@ -202,31 +166,17 @@
             </div>
             <div class="reservar-acoes-etapa">
               <button type="button" id="btn-voltar-contato" class="btn-reservar-secundario">Voltar</button>
-              <button type="button" id="btn-step-contato" class="btn-reservar-primario">Continuar para pagamento</button>
+              <button type="button" id="btn-step-contato" class="btn-reservar-primario">Continuar</button>
             </div>
           </section>
 
-          <section id="painel-etapa-pagamento" class="reservar-etapa" hidden aria-hidden="true">
-            <h2 id="titulo-etapa-pagamento">Pagamento (simulação)</h2>
-            <p class="reservar-etapa-desc">Escolha o método de pagamento e confirme para finalizar o fluxo de demonstração.</p>
-            <div class="reservar-pix-caixa">
-              <label class="reservar-pix-opcao">
-                <input type="radio" name="reservar-metodo" value="pix" checked>
-                <span>PIX — apenas demonstração</span>
-              </label>
-              <label class="reservar-pix-opcao">
-                <input type="radio" name="reservar-metodo" value="cartao_credito">
-                <span>Cartão de crédito — apenas demonstração</span>
-              </label>
-              <label class="reservar-pix-opcao">
-                <input type="radio" name="reservar-metodo" value="cartao_debito">
-                <span>Cartão de débito — apenas demonstração</span>
-              </label>
-              <p class="reservar-pix-detalhe">Nenhuma cobrança será gerada. Ao clicar em <strong>Pagar</strong>, apenas a mensagem de sucesso será exibida.</p>
-            </div>
+          <section id="painel-etapa-confirmacao" class="reservar-etapa" hidden aria-labelledby="titulo-etapa-confirmacao">
+            <h2 id="titulo-etapa-confirmacao">Confirmar reserva</h2>
+            <p class="reservar-etapa-desc">Revise os dados. Ao clicar em <strong>Fazer reserva</strong>, sua solicitação será registrada e você será direcionado ao WhatsApp do proprietário com todas as informações.</p>
+            <div class="reservar-confirmacao-resumo" id="reservar-confirmacao-resumo" aria-live="polite"></div>
             <div class="reservar-acoes-etapa">
-              <button type="button" id="btn-voltar-pagamento" class="btn-reservar-secundario">Voltar</button>
-              <button type="button" id="btn-pagar" class="btn-reservar-pagar">Pagar</button>
+              <button type="button" id="btn-voltar-confirmacao" class="btn-reservar-secundario">Voltar</button>
+              <button type="button" id="btn-fazer-reserva" class="btn-reservar-pagar">Fazer reserva</button>
             </div>
           </section>
 
@@ -235,6 +185,8 @@
             <ul class="reservar-regras-balao-lista">
               <li>Possui <strong>Wi-Fi</strong> em toda a área interna da casa e área externa de lazer.</li>
               <li>Não é permitido fumar dentro da casa;</li>
+              <li>Crianças com até <strong>3 anos</strong> não pagam.</li>
+              <li>Cancelamento gratuito até <strong>1 dia antes</strong> da entrada; o sinal de reserva não é reembolsado.</li>
             </ul>
           </div>
         </div>
@@ -254,11 +206,6 @@
               <p id="reservar-sum-quarto-nome" class="reservar-painel-texto">—</p>
             </div>
 
-            <div class="reservar-painel-bloco reservar-painel-bloco--tarifa">
-              <h3 class="reservar-painel-sub">Valor por noite</h3>
-              <p id="reservar-sum-tarifa-dica" class="reservar-painel-texto reservar-painel-tarifa-dica">Escolha as datas para ver a tarifa aplicada.</p>
-            </div>
-
             <div class="reservar-painel-bloco reservar-painel-dinamico">
               <h3 class="reservar-painel-sub">Datas escolhidas</h3>
               <p class="reservar-painel-linha"><span>Entrada</span> <span id="reservar-sum-checkin">—</span></p>
@@ -272,9 +219,7 @@
             <p id="reservar-sum-resumo-contato" class="reservar-painel-contato" hidden></p>
 
             <div class="reservar-painel-acoes">
-              <div id="reservar-turnstile-wrap" class="reservar-turnstile-wrap"></div>
-              <button type="button" id="btn-fazer-reserva" class="btn-reservar-whatsapp btn-step-datas-full" disabled>Fazer Reserva</button>
-              <p id="reservar-reserva-hint" class="reservar-whatsapp-hint">Preencha as datas, hóspedes e seus dados para continuar.</p>
+              <button type="button" id="btn-step-datas" class="btn-reservar-primario btn-step-datas-full" disabled>Continuar</button>
             </div>
           </div>
         </aside>
@@ -341,16 +286,15 @@
   <div id="reservar-sucesso" class="reservar-overlay" hidden aria-live="assertive" role="dialog" aria-modal="true" aria-labelledby="reservar-sucesso-titulo">
     <div class="reservar-sucesso-card">
       <p id="reservar-sucesso-titulo" class="reservar-sucesso-msg">Sua reserva foi concluída!</p>
-      <p class="reservar-sucesso-sub">Em alguns segundos você voltará ao início do site.</p>
+      <p class="reservar-sucesso-sub">Redirecionando para o WhatsApp…</p>
+      <a href="index.html" id="reservar-sucesso-inicio" class="btn-reservar-primario reservar-sucesso-inicio">Ir para o início</a>
     </div>
   </div>
 
-  <script src="https://challenges.cloudflare.com/turnstile/v0/api.js" async defer></script>
-  <script src="js/config-contato.js" defer></script>
-  <script src="js/reserva-precos.js" defer></script>
   <script src="js/quartos-site.js" defer></script>
   <script src="js/quartos-imagens-pastas.js" defer></script>
   <script src="js/quartos-showcase-engine.js" defer></script>
+  <script src="js/reservar-precos.js" defer></script>
   <script src="js/system-store.js" defer></script>
   <script src="js/reservar.js" defer></script>
   <script>

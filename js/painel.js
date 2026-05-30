@@ -31,8 +31,21 @@
   }
 
   function valorReservaTexto(r) {
-    if (r && r.requerOrcamento) return 'Orçamento personalizado';
-    return money(r && r.valorTotal);
+    if (!r) return '—';
+    if (r.requerOrcamento) {
+      if (window.ReservaPrecos && window.ReservaPrecos.faixaOrcamentoReserva) {
+        var faixa =
+          r.valorMin != null && r.valorMax != null
+            ? { valorMin: r.valorMin, valorMax: r.valorMax }
+            : window.ReservaPrecos.faixaOrcamentoReserva(r);
+        if (faixa.valorMin > 0 && faixa.valorMax > 0) {
+          return window.ReservaPrecos.formatFaixaOrcamentoTexto(faixa);
+        }
+      }
+      return 'Orçamento personalizado';
+    }
+    if (r.valorTotal == null) return 'Orçamento personalizado';
+    return money(r.valorTotal);
   }
 
   function noitesReservaTexto(r) {

@@ -2120,6 +2120,7 @@ body.lightbox-aberto .cabecalho {
   line-height: 1.2;
   margin: 0 0 1rem;
   color: #141a17;
+  text-transform: uppercase;
 }
 
 .quartos-showcase-desc {
@@ -2295,6 +2296,7 @@ body.lightbox-aberto .cabecalho {
   line-height: 1.15;
   color: #111;
   flex-shrink: 0;
+  text-transform: uppercase;
 }
 
 .quarto-modelo-info .quarto-modelo-lead {
@@ -3868,7 +3870,7 @@ body.lightbox-aberto .cabecalho {
 
 /* ----- Sobre: grid de vantagens (2 + 1 largo) ----- */
 .sobre-vantagens.secao {
-  background: var(--cor-fundo-claro);
+  background: var(--cor-fundo-pagina);
 }
 
 .sobre-vantagens-grid {
@@ -5398,6 +5400,8 @@ body.lightbox-aberto .cabecalho {
 .reservar-pessoas-row-stepper {
   flex: 1 1 220px;
   min-width: 0;
+  display: flex;
+  flex-direction: column;
 }
 
 .reservar-pessoas-row-side {
@@ -5468,6 +5472,39 @@ body.lightbox-aberto .cabecalho {
   line-height: 1.45;
 }
 
+.reservar-msg-orcamento {
+  font-family: var(--font-body);
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: #ffe082;
+  background: rgba(0, 0, 0, 0.18);
+  border: 1px solid rgba(255, 224, 130, 0.35);
+  border-radius: 12px;
+  padding: 0.85rem 1rem;
+  margin: 0.75rem 0 0;
+  line-height: 1.45;
+}
+
+.reservar-confirmacao-resumo {
+  font-family: var(--font-body);
+  font-size: 0.92rem;
+  color: rgba(255, 255, 255, 0.92);
+  background: rgba(0, 0, 0, 0.14);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 14px;
+  padding: 1rem 1.15rem;
+  margin: 0 0 1rem;
+  line-height: 1.55;
+}
+
+.reservar-confirmacao-resumo p {
+  margin: 0 0 0.35rem;
+}
+
+.reservar-confirmacao-resumo p:last-child {
+  margin-bottom: 0;
+}
+
 .reservar-valor-adicional-wrap {
   font-family: var(--font-body);
   font-size: 0.92rem;
@@ -5499,6 +5536,8 @@ body.lightbox-aberto .cabecalho {
   text-transform: uppercase;
   color: rgba(255, 255, 255, 0.9);
   margin-bottom: 0.65rem;
+  line-height: 1.35;
+  min-height: calc(2 * 1.35em);
 }
 
 .reservar-stepper {
@@ -5525,6 +5564,15 @@ body.lightbox-aberto .cabecalho {
 
 .reservar-stepper-btn:hover {
   background: #4a7d5e;
+}
+
+.reservar-stepper-btn:disabled {
+  opacity: 0.35;
+  cursor: not-allowed;
+}
+
+.reservar-stepper-btn:disabled:hover {
+  background: #3d6b4f;
 }
 
 .reservar-stepper-input {
@@ -5648,6 +5696,13 @@ body.lightbox-aberto .cabecalho {
   font-family: var(--font-body);
   font-size: 1rem;
   color: rgba(255, 255, 255, 0.85);
+  margin: 0 0 1.25rem;
+}
+
+.reservar-sucesso-inicio {
+  display: inline-block;
+  margin-top: 0.25rem;
+  text-decoration: none;
 }
 
 @media (max-width: 1024px) {
