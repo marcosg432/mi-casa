@@ -9,12 +9,19 @@
     "open:browser": "start msedge http://localhost:3014",
     "pm2:start": "pm2 start ecosystem.config.cjs",
     "pm2:reload": "pm2 reload mi-casa",
-    "pm2:stop": "pm2 stop mi-casa"
+    "pm2:stop": "pm2 stop mi-casa",
+    "hash-admin-password": "node scripts/hash-admin-password.js"
   },
   "engines": {
     "node": ">=18"
   },
   "dependencies": {
-    "express": "^4.21.2"
+    "@supabase/supabase-js": "^2.49.1",
+    "bcryptjs": "^2.4.3",
+    "cookie-parser": "^1.4.7",
+    "dotenv": "^16.4.7",
+    "express": "^4.21.2",
+    "express-rate-limit": "^7.5.0",
+    "jsonwebtoken": "^9.0.2"
   }
 }

@@ -31,20 +31,19 @@
   box-sizing: border-box;
   margin: 0;
   padding: 0;
+  overscroll-behavior: none;
 }
 
 html {
-  /* auto: scroll nativo; smooth global “briga” com a roda/trackpad e com scrollTo no load */
   scroll-behavior: auto;
   overflow-x: hidden;
   max-width: 100%;
-  overscroll-behavior-x: none;
+  overscroll-behavior: none;
 }
 
 @media (prefers-reduced-motion: no-preference) {
-  /* Suave só em saltos por âncora / foco, não em todo o gesto de scroll */
   html:focus-within {
-    scroll-behavior: smooth;
+    scroll-behavior: auto;
   }
 }
 
@@ -56,8 +55,7 @@ body {
   line-height: 1.6;
   overflow-x: hidden;
   max-width: 100%;
-  overscroll-behavior-x: none;
-  /* Mobile: só scroll vertical na página (evita “deslizar” o site para os lados) */
+  overscroll-behavior: none;
   touch-action: pan-y pinch-zoom;
 }
 
@@ -4646,12 +4644,14 @@ body.lightbox-aberto .cabecalho {
   padding-top: 80px;
   min-height: 100vh;
   background: linear-gradient(165deg, #0f3d2e 0%, #1e4530 42%, #163528 100%);
+  overflow: visible;
 }
 
 .reservar-pagina {
   max-width: 1320px;
   margin: 0 auto;
   padding: 1.75rem 1.25rem 4rem;
+  overflow: visible;
 }
 
 .reservar-passo-indicador {
@@ -4780,11 +4780,65 @@ body.lightbox-aberto .cabecalho {
   color: #ffe8a8;
 }
 
+.reservar-info-precos {
+  background: rgba(255, 255, 255, 0.11);
+  border: 2px solid rgba(168, 213, 184, 0.45);
+  border-radius: 16px;
+  padding: 1.25rem 1.35rem 1.3rem;
+  margin-bottom: 1.5rem;
+  box-shadow: 0 10px 32px rgba(0, 0, 0, 0.18);
+}
+
+.reservar-info-precos-titulo {
+  font-family: var(--font-display);
+  font-size: 1.25rem;
+  color: #fff;
+  margin: 0 0 0.85rem;
+}
+
+.reservar-info-precos-lista {
+  margin: 0;
+  padding: 0 0 0 1.1rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.65rem;
+}
+
+.reservar-info-precos-lista li {
+  font-family: var(--font-body);
+  font-size: 0.9rem;
+  line-height: 1.55;
+  color: rgba(255, 255, 255, 0.92);
+}
+
+.reservar-info-precos-lista strong {
+  color: #a8d5b8;
+}
+
+.reservar-etapa-desc--destaque {
+  margin-bottom: 1rem;
+  padding: 0.75rem 0.95rem;
+  border-radius: 10px;
+  background: rgba(168, 213, 184, 0.12);
+  border: 1px solid rgba(168, 213, 184, 0.28);
+}
+
+.reservar-painel-bloco--tarifa {
+  background: rgba(168, 213, 184, 0.14);
+  border-color: rgba(168, 213, 184, 0.35);
+}
+
+.reservar-painel-tarifa-dica {
+  font-size: 0.84rem;
+  line-height: 1.5;
+}
+
 .reservar-layout {
   display: grid;
   grid-template-columns: 1fr minmax(300px, 400px);
   gap: 1.75rem;
   align-items: start;
+  overflow: visible;
 }
 
 .reservar-conteudo-area {
@@ -4792,6 +4846,7 @@ body.lightbox-aberto .cabecalho {
   flex-direction: column;
   gap: 1.5rem;
   min-width: 0;
+  overflow: visible;
 }
 
 .reservar-regras-balao {
@@ -5043,7 +5098,10 @@ body.lightbox-aberto .cabecalho {
 
 .reservar-painel {
   position: sticky;
-  top: 96px;
+  top: calc(80px + 24px);
+  align-self: start;
+  width: 100%;
+  z-index: 10;
 }
 
 .reservar-painel-inner {
@@ -5123,6 +5181,11 @@ body.lightbox-aberto .cabecalho {
   margin-top: 0.5rem;
 }
 
+.reservar-turnstile-wrap {
+  margin-bottom: 0.75rem;
+  min-height: 65px;
+}
+
 .btn-step-datas-full {
   width: 100%;
 }
@@ -5189,6 +5252,86 @@ body.lightbox-aberto .cabecalho {
 
 .btn-reservar-pagar:hover {
   background: #a8d5b8;
+}
+
+.btn-reservar-whatsapp {
+  font-family: var(--font-body);
+  font-size: 0.95rem;
+  font-weight: 800;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  padding: 1rem 1.25rem;
+  border: none;
+  border-radius: 12px;
+  background: #25d366;
+  color: #fff;
+  cursor: pointer;
+  box-shadow: 0 8px 28px rgba(0, 0, 0, 0.22);
+  width: 100%;
+}
+
+.btn-reservar-whatsapp:hover:not(:disabled) {
+  background: #1ebe57;
+}
+
+.btn-reservar-whatsapp:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+
+.reservar-whatsapp-aviso,
+.reservar-whatsapp-hint {
+  margin-top: 0.75rem;
+  font-size: 0.82rem;
+  line-height: 1.45;
+  color: rgba(255, 255, 255, 0.78);
+  text-align: center;
+}
+
+.reservar-whatsapp-hint:not([hidden]) {
+  display: block;
+}
+
+.reservar-campos--whatsapp {
+  margin-top: 1.5rem;
+  padding-top: 1.25rem;
+  border-top: 1px solid rgba(255, 255, 255, 0.18);
+}
+
+.reservar-campos-titulo {
+  font-family: var(--font-display);
+  font-size: 1.35rem;
+  color: #fff;
+  margin-bottom: 1rem;
+}
+
+.reservar-hospedes-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 1rem 1.25rem;
+}
+
+.reservar-stepper-block {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.reservar-orcamento-aviso {
+  margin-top: 1rem;
+  padding: 0.85rem 1rem;
+  border-radius: 10px;
+  background: rgba(255, 232, 168, 0.18);
+  border: 1px solid rgba(255, 232, 168, 0.45);
+  color: #ffe8a8;
+  font-size: 0.9rem;
+  line-height: 1.45;
+}
+
+@media (max-width: 640px) {
+  .reservar-hospedes-grid {
+    grid-template-columns: 1fr;
+  }
 }
 
 .reservar-etapa {
@@ -5499,7 +5642,9 @@ body.lightbox-aberto .cabecalho {
   }
 
   .reservar-painel {
-    position: static;
+    position: sticky;
+    top: calc(80px + 20px);
+    width: 100%;
   }
 
   .reservar-painel-inner {
@@ -5509,6 +5654,17 @@ body.lightbox-aberto .cabecalho {
   .reservar-calendarios-dupla {
     grid-template-columns: 1fr;
   }
+}
+
+/* overflow-x: hidden no site quebra position: sticky — clip só na página de reserva */
+body.pagina-reservar {
+  overflow-x: clip;
+  overscroll-behavior: none;
+}
+
+html:has(body.pagina-reservar) {
+  overflow-x: clip;
+  overscroll-behavior: none;
 }
 
 @media (max-width: 768px) {

@@ -8,7 +8,7 @@
   var FALLBACK = [
     {
       id: 'tem-tem',
-      capacidade: 2,
+      capacidade: 4,
       titulo: 'TEM-TEM',
       tipo: 'Quarto Duplo com Banheiro Compartilhado',
       desc:
@@ -54,7 +54,7 @@
     },
     {
       id: 'sabia',
-      capacidade: 5,
+      capacidade: 4,
       titulo: 'sabiá',
       tipo: 'Quarto Família (1 Cama de Casal + 3 de Solteiro)',
       desc:
@@ -77,7 +77,7 @@
     },
     {
       id: 'ararajuba',
-      capacidade: 2,
+      capacidade: 3,
       titulo: 'Ararajuba',
       tipo: 'Quarto Duplo',
       desc:

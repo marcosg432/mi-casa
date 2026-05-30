@@ -1,0 +1,47 @@
+'use strict';
+
+require('dotenv').config();
+
+function required(name) {
+  var val = process.env[name];
+  if (!val || !String(val).trim()) {
+    throw new Error('Variável de ambiente obrigatória ausente: ' + name);
+  }
+  return String(val).trim();
+}
+
+function optional(name, fallback) {
+  var val = process.env[name];
+  if (val == null || String(val).trim() === '') return fallback;
+  return String(val).trim();
+}
+
+var config = {
+  port: Number(process.env.PORT) || 3014,
+  nodeEnv: process.env.NODE_ENV || 'development',
+  supabaseUrl: optional('SUPABASE_URL', ''),
+  supabaseServiceRoleKey: optional('SUPABASE_SERVICE_ROLE_KEY', ''),
+  jwtSecret: optional('JWT_SECRET', ''),
+  adminUsername: optional('ADMIN_USERNAME', 'admin'),
+  adminPasswordHash: optional('ADMIN_PASSWORD_HASH', ''),
+  sessionCookieName: optional('SESSION_COOKIE_NAME', 'mcsc_session'),
+  sessionMaxAgeMs: Number(process.env.SESSION_MAX_AGE_MS) || 8 * 60 * 60 * 1000,
+  turnstileSiteKey: optional('TURNSTILE_SITE_KEY', ''),
+  turnstileSecretKey: optional('TURNSTILE_SECRET_KEY', ''),
+  isProduction: process.env.NODE_ENV === 'production'
+};
+
+function assertProductionConfig() {
+  required('SUPABASE_URL');
+  required('SUPABASE_SERVICE_ROLE_KEY');
+  required('JWT_SECRET');
+  required('ADMIN_PASSWORD_HASH');
+  if (config.jwtSecret.length < 32) {
+    throw new Error('JWT_SECRET deve ter pelo menos 32 caracteres.');
+  }
+  if (config.isProduction && !config.turnstileSecretKey) {
+    throw new Error('TURNSTILE_SECRET_KEY é obrigatória em produção.');
+  }
+}
+
+module.exports = { config: config, required: required, optional: optional, assertProductionConfig: assertProductionConfig };

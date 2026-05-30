@@ -23,6 +23,27 @@
     return Number(v || 0).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
   }
 
+  function statusLabelReserva(status) {
+    var s = String(status || 'pendente').toLowerCase();
+    if (s === 'confirmada' || s === 'ativa') return 'Confirmada';
+    if (s === 'cancelada') return 'Cancelada';
+    return 'Pendente';
+  }
+
+  function valorReservaTexto(r) {
+    if (r && r.requerOrcamento) return 'Orçamento personalizado';
+    return money(r && r.valorTotal);
+  }
+
+  function noitesReservaTexto(r) {
+    if (r && r.noites) return String(r.noites);
+    if (r && SystemStore.nightsBetween) {
+      var n = SystemStore.nightsBetween(r.dataEntrada, r.dataSaida);
+      return n > 0 ? String(n) : '—';
+    }
+    return '—';
+  }
+
   function fmtDate(iso) {
     var d = SystemStore.parseIsoDate(iso);
     return d ? d.toLocaleDateString('pt-BR') : '—';
@@ -49,6 +70,25 @@
   function firstNameOnly(nome) {
     var parts = String(nome || '').trim().split(/\s+/).filter(Boolean);
     return parts.length ? parts[0] : '';
+  }
+
+  /** Mesma lógica do site: pasta imagem/imagem quartos/{id}/ ou img do catálogo. */
+  function imagemPrincipalQuartoSite(q) {
+    if (!q) return '';
+    if (typeof window.quartoImagensDoCatalogo === 'function') {
+      var imgs = window.quartoImagensDoCatalogo(q);
+      if (imgs && imgs.length) return String(imgs[0]).trim();
+    }
+    return q.img ? String(q.img).trim() : '';
+  }
+
+  function imagensQuartoSite(q) {
+    if (!q) return [];
+    if (typeof window.quartoImagensDoCatalogo === 'function') {
+      return window.quartoImagensDoCatalogo(q) || [];
+    }
+    var img = q.img ? String(q.img).trim() : '';
+    return img ? [img] : [];
   }
 
   /** Nome amigável do quarto na ficha/modal (catálogo em window.QUARTOS_SITE). */
@@ -96,6 +136,88 @@
       }
       return t >= prevMonthStart.getTime() && t < currentMonthStart.getTime();
     });
+  }
+
+  function syncHeaderSearchInput(val) {
+    var el = document.getElementById('app-header-search');
+    if (el && document.activeElement !== el) el.value = val || '';
+  }
+
+  function syncFichaSearchInputs(val) {
+    ['ficha-search', 'ficha-search-mobile'].forEach(function (id) {
+      var inp = document.getElementById(id);
+      if (inp) inp.value = val || '';
+    });
+    syncHeaderSearchInput(val);
+  }
+
+  function pickFichaViewForReserva(r) {
+    var hoje = new Date();
+    var hojeIso = SystemStore.toIsoDate(new Date(hoje.getFullYear(), hoje.getMonth(), hoje.getDate()));
+    var status = (r.status || '').toLowerCase();
+    var finalizada = r.dataSaida && r.dataSaida < hojeIso;
+    if (status === 'cancelada' || finalizada) return 'historico';
+    return 'cliente';
+  }
+
+  function findQuartosByGlobalQuery(q) {
+    var term = String(q || '').trim().toLowerCase();
+    if (!term) return [];
+    return (window.QUARTOS_SITE || []).filter(function (qt) {
+      var blob = [qt.id, qt.titulo, qt.tipo, qt.desc]
+        .map(function (v) {
+          return String(v || '').toLowerCase();
+        })
+        .join(' ');
+      return blob.indexOf(term) !== -1;
+    });
+  }
+
+  function executeHeaderSearch(opts) {
+    opts = opts || {};
+    var input = document.getElementById('app-header-search');
+    if (!input) return;
+    var q = String(input.value || '').trim();
+    if (!q) {
+      input.focus();
+      return;
+    }
+
+    var reservas = SystemStore.searchReservas(SystemStore.getReservas(), q);
+    if (reservas.length) {
+      var termLower = q.toLowerCase();
+      var exact = reservas.find(function (r) {
+        return String(r.codigo || '').toLowerCase() === termLower;
+      });
+      var reserva = exact || reservas[0];
+      state.fichaQuery = q;
+      state.fichaView = pickFichaViewForReserva(reserva);
+      setActiveTab('ficha');
+      renderFicha();
+      syncFichaSearchInputs(q);
+      if (opts.openModal !== false) openModal(reserva.id);
+      return;
+    }
+
+    var quartos = findQuartosByGlobalQuery(q);
+    if (quartos.length) {
+      setActiveTab('quartos');
+      renderQuartos();
+      if (quartos.length === 1) {
+        setTimeout(function () {
+          var btn = document.querySelector('[data-quarto-edit="' + quartos[0].id + '"]');
+          var card = btn && btn.closest ? btn.closest('.sys-quarto-card') : null;
+          if (card) card.scrollIntoView({ behavior: 'auto', block: 'nearest' });
+        }, 0);
+      }
+      return;
+    }
+
+    state.fichaQuery = q;
+    setActiveTab('ficha');
+    renderFicha();
+    syncFichaSearchInputs(q);
+    if (opts.showAlert !== false) alert('Nenhum resultado para "' + q + '".');
   }
 
   function setActiveTab(tab) {
@@ -277,15 +399,44 @@
     var maxCount = counts.reduce(function (acc, n) {
       return n > acc ? n : acc;
     }, 0);
-    var axisMax = Math.max(2, maxCount);
     return {
       year: year,
       month: month,
       daysInMonth: daysInMonth,
       counts: counts,
       maxCount: maxCount,
-      axisMax: axisMax
+      axisMax: chartAxisMaxFromCounts(maxCount)
     };
+  }
+
+  function chartAxisMaxFromCounts(maxCount) {
+    var n = Math.max(0, Math.floor(Number(maxCount) || 0));
+    if (n === 0) return 1;
+    if (n <= 5) return n;
+    if (n <= 10) return 10;
+    var step = Math.ceil(n / 4);
+    return step * 4;
+  }
+
+  function chartYTicks(axisMax) {
+    axisMax = Math.max(1, Math.floor(Number(axisMax) || 1));
+    if (axisMax <= 6) {
+      var small = [];
+      for (var i = 0; i <= axisMax; i++) small.push(i);
+      return small;
+    }
+    var ticks = [0];
+    var step = Math.max(1, Math.ceil(axisMax / 4));
+    for (var v = step; v < axisMax; v += step) ticks.push(v);
+    if (ticks[ticks.length - 1] !== axisMax) ticks.push(axisMax);
+    return ticks;
+  }
+
+  function chartShowDayLabel(day, total) {
+    if (total <= 14) return true;
+    if (day === 1 || day === total) return true;
+    if (total <= 21) return day % 2 === 0;
+    return day % 5 === 0;
   }
 
   function renderGraficoReservasDia(reservas) {
@@ -295,17 +446,19 @@
     var axisMax = agg.axisMax;
 
     var width = 1080;
-    var height = 260;
-    var left = 38;
-    var right = 0;
+    var height = 288;
+    var left = 46;
+    var right = 16;
     var top = 14;
-    var bottom = 36;
+    var bottom = 34;
     var plotW = width - left - right;
     var plotH = height - top - bottom;
+    var yTicks = chartYTicks(axisMax);
 
     var gridLines = '';
-    for (var i = 0; i <= 5; i++) {
-      var gy = top + (plotH * i) / 5;
+    var yAxisTicks = '';
+    yTicks.forEach(function (tickVal) {
+      var gy = top + plotH - (tickVal / axisMax) * plotH;
       gridLines +=
         '<line x1="' +
         left +
@@ -316,21 +469,27 @@
         '" y2="' +
         gy.toFixed(2) +
         '" class="sys-chart-grid-line" />';
-    }
-
-    var yAxisTicks = '';
-    for (var yi = 0; yi <= 5; yi++) {
-      var gyy = top + (plotH * yi) / 5;
-      var tickVal = Math.round((axisMax * (5 - yi)) / 5);
       yAxisTicks +=
         '<text class="sys-chart-y-tick" x="' +
-        (left - 8).toFixed(2) +
+        (left - 10).toFixed(2) +
         '" y="' +
-        (gyy + 4).toFixed(2) +
+        (gy + 4).toFixed(2) +
         '" text-anchor="end">' +
         tickVal +
         '</text>';
-    }
+    });
+
+    var baselineY = top + plotH;
+    var axisBaseline =
+      '<line x1="' +
+      left +
+      '" y1="' +
+      baselineY.toFixed(2) +
+      '" x2="' +
+      (left + plotW) +
+      '" y2="' +
+      baselineY.toFixed(2) +
+      '" class="sys-chart-axis-line" />';
 
     var pointsArr = counts.map(function (value, idx) {
       var x = left + (idx * plotW) / Math.max(1, counts.length - 1);
@@ -380,7 +539,6 @@
     }
 
     var smoothPath = smoothLinePathCatmull(pointsArr);
-    var baselineY = top + plotH;
     var areaPath = '';
     if (smoothPath && pointsArr.length >= 2) {
       var lastPt = pointsArr[pointsArr.length - 1];
@@ -398,9 +556,20 @@
         ' Z';
     }
 
-    var labels = pointsArr
+    var xAxisLabels = pointsArr
+      .filter(function (p) {
+        return chartShowDayLabel(p.day, daysInMonth);
+      })
       .map(function (p) {
-        return '<span class="sys-chart-x-item">' + String(p.day).padStart(2, '0') + '</span>';
+        return (
+          '<text class="sys-chart-x-tick" x="' +
+          p.x.toFixed(2) +
+          '" y="' +
+          (baselineY + 22).toFixed(2) +
+          '" text-anchor="middle">' +
+          String(p.day).padStart(2, '0') +
+          '</text>'
+        );
       })
       .join('');
 
@@ -441,8 +610,10 @@
       '<stop offset="100%" stop-color="#2d6a4a" stop-opacity="0"/>' +
       '</linearGradient></defs>' +
       '<g>' +
+      axisBaseline +
       gridLines +
       yAxisTicks +
+      xAxisLabels +
       (areaPath
         ? '<path d="' + areaPath + '" class="sys-chart-area" fill="url(#reservas-chart-area-grad)" />'
         : '') +
@@ -456,21 +627,17 @@
       '" x2="' +
       left +
       '" y2="' +
-      (top + plotH) +
+      baselineY.toFixed(2) +
       '" hidden />' +
       '<circle class="sys-chart-dot" cx="' +
       left +
       '" cy="' +
-      (top + plotH) +
+      baselineY.toFixed(2) +
       '" r="4.5" hidden />' +
       hitAreas +
-      '</g></svg></div>' +
-      '<div class="sys-chart-x" style="--chart-days:' +
-      daysInMonth +
-      '">' +
-      labels +
-      '</div>' +
+      '</g></svg>' +
       '<div class="sys-chart-tooltip" hidden></div>' +
+      '</div>' +
       '</article>'
     );
   }
@@ -518,9 +685,9 @@
             var cr = card.getBoundingClientRect();
             var svgEl = wrap.querySelector('svg');
             var vb =
-              svgEl && svgEl.viewBox && svgEl.viewBox.baseVal ? svgEl.viewBox.baseVal : { width: 1080, height: 260 };
+              svgEl && svgEl.viewBox && svgEl.viewBox.baseVal ? svgEl.viewBox.baseVal : { width: 1080, height: 288 };
             var vbW = vb.width || 1080;
-            var vbH = vb.height || 260;
+            var vbH = vb.height || 288;
             var scaleX = wr.width / vbW;
             var scaleY = wr.height / vbH;
             var tipX2 = Math.max(8, Math.min(cr.width - tipW - 8, wr.left - cr.left + x * scaleX - tipW / 2));
@@ -561,7 +728,7 @@
       html += '<div class="sys-cell">' + esc(r.codigo) + '</div>';
       html += '<div class="sys-cell">' + esc(quartoTituloPorIdPainel(r.quartoId)) + '</div>';
       html += '<div class="sys-cell">' + esc((r.plataforma || 'site').toUpperCase()) + '</div>';
-      html += '<div class="sys-cell">' + esc(money(r.valorTotal)) + '</div>';
+      html += '<div class="sys-cell">' + esc(valorReservaTexto(r)) + '</div>';
       if (withOpen) {
         html += '<div><button class="sys-btn" data-open="' + esc(r.id) + '">Abrir</button></div>';
       } else {
@@ -590,6 +757,8 @@
       if (state.fichaStatus === 'todos') return true;
       var status = (r.status || '').toLowerCase();
       if (state.fichaStatus === 'cancelada') return status === 'cancelada';
+      if (state.fichaStatus === 'pendente') return status === 'pendente';
+      if (state.fichaStatus === 'confirmada') return status === 'confirmada' || status === 'ativa';
       if (state.fichaStatus === 'ativa') return status !== 'cancelada';
       return true;
     });
@@ -599,7 +768,7 @@
       ? list
           .slice(0, 60)
           .map(function (r) {
-            var statusTxt = (r.status || '').toLowerCase() === 'cancelada' ? 'Cancelada' : 'Ativa';
+            var statusTxt = statusLabelReserva(r.status);
             return (
               '<div class="sys-ficha-row">' +
               '<div class="sys-ficha-col-nome">' +
@@ -610,7 +779,7 @@
               '</div>' +
               '</div>' +
               '<div class="sys-ficha-col-valor">' +
-              esc(money(r.valorTotal)) +
+              esc(valorReservaTexto(r)) +
               '</div>' +
               '<div class="sys-ficha-col-status"><span class="sys-ficha-status-pill">' +
               esc(statusTxt) +
@@ -660,7 +829,7 @@
       ? list
           .slice(0, 60)
           .map(function (r) {
-            var statusTxt = (r.status || '').toLowerCase() === 'cancelada' ? 'Cancelada' : 'Ativa';
+            var statusTxt = statusLabelReserva(r.status);
             var stClass = statusTxt === 'Cancelada' ? 'sys-ficha-m-card__pill--off' : 'sys-ficha-m-card__pill--on';
             return (
               '<article class="sys-ficha-m-card">' +
@@ -683,7 +852,7 @@
               '<div class="sys-ficha-m-card__row">' +
               '<span class="sys-ficha-m-card__label">Total</span>' +
               '<span class="sys-ficha-m-card__valor">' +
-              esc(money(r.valorTotal)) +
+              esc(valorReservaTexto(r)) +
               '</span>' +
               '</div>' +
               '<div class="sys-ficha-m-card__foot">' +
@@ -706,9 +875,15 @@
           '<option value="todos"' +
           (state.fichaStatus === 'todos' ? ' selected' : '') +
           '>Todos</option>' +
+          '<option value="pendente"' +
+          (state.fichaStatus === 'pendente' ? ' selected' : '') +
+          '>Pendente</option>' +
+          '<option value="confirmada"' +
+          (state.fichaStatus === 'confirmada' ? ' selected' : '') +
+          '>Confirmada</option>' +
           '<option value="ativa"' +
           (state.fichaStatus === 'ativa' ? ' selected' : '') +
-          '>Ativa</option>' +
+          '>Ativas</option>' +
           '<option value="cancelada"' +
           (state.fichaStatus === 'cancelada' ? ' selected' : '') +
           '>Cancelada</option>' +
@@ -721,9 +896,15 @@
           '<option value="todos"' +
           (state.fichaStatus === 'todos' ? ' selected' : '') +
           '>Todos</option>' +
+          '<option value="pendente"' +
+          (state.fichaStatus === 'pendente' ? ' selected' : '') +
+          '>Pendente</option>' +
+          '<option value="confirmada"' +
+          (state.fichaStatus === 'confirmada' ? ' selected' : '') +
+          '>Confirmada</option>' +
           '<option value="ativa"' +
           (state.fichaStatus === 'ativa' ? ' selected' : '') +
-          '>Ativa</option>' +
+          '>Ativas</option>' +
           '<option value="cancelada"' +
           (state.fichaStatus === 'cancelada' ? ' selected' : '') +
           '>Cancelada</option>' +
@@ -919,7 +1100,7 @@
     });
   }
 
-  function wireQuartoEditorImagemUI() {
+  function wireQuartoEditorImagemUI(q) {
     revogarBlobQuartoEditor();
     var inp = document.getElementById('qua-img');
     var prev = document.getElementById('qua-img-preview');
@@ -994,9 +1175,21 @@
       fileInp.value = '';
     });
 
-    if (grid && window.GALERIA_IMAGENS_URLS && window.GALERIA_IMAGENS_URLS.length) {
-      grid.innerHTML = window.GALERIA_IMAGENS_URLS.map(function (item) {
-        var u = item.url;
+    var pickerUrls = [];
+    if (q && typeof window.quartoImagensDaPasta === 'function') {
+      window.quartoImagensDaPasta(String(q.id || '').trim()).forEach(function (u) {
+        u = String(u || '').trim();
+        if (u && pickerUrls.indexOf(u) === -1) pickerUrls.push(u);
+      });
+    }
+    if (window.GALERIA_IMAGENS_URLS && window.GALERIA_IMAGENS_URLS.length) {
+      window.GALERIA_IMAGENS_URLS.forEach(function (item) {
+        var u = String((item && item.url) || '').trim();
+        if (u && pickerUrls.indexOf(u) === -1) pickerUrls.push(u);
+      });
+    }
+    if (grid && pickerUrls.length) {
+      grid.innerHTML = pickerUrls.map(function (u) {
         return (
           '<button type="button" class="sys-galeria-thumb" data-img-path="' +
           esc(u) +
@@ -1018,6 +1211,11 @@
           syncFromInput();
         }
       });
+    }
+
+    if (q && !String(inp.value || '').trim()) {
+      var siteImg = imagemPrincipalQuartoSite(q);
+      if (siteImg) showPreviewSrc(siteImg);
     }
 
     syncFromInput();
@@ -1114,7 +1312,7 @@
       checks +
       '</div></fieldset>' +
       '<fieldset class="sys-quarto-img-fieldset"><legend>Foto principal do quarto</legend>' +
-      '<p class="sys-help">Arraste uma imagem ou clique para escolher — o URL público só é preenchido se configurar envio para nuvem no futuro; use a galeria do site ou o caminho <code>imagem/…</code>.</p>' +
+      '<p class="sys-help">A foto exibida no site vem da pasta <code>imagem/imagem quartos/{id}/</code>. Use as miniaturas abaixo ou indique o caminho <code>imagem/…</code>.</p>' +
       '<label id="qua-img-dropzone" class="sys-img-dropzone" for="qua-img-file">' +
       '<span class="sys-img-dropzone-text">Arrastar imagem aqui · ou clicar para abrir o explorador</span>' +
       '<input type="file" id="qua-img-file" class="sys-img-dropzone-file" accept="image/*" />' +
@@ -1123,10 +1321,10 @@
       '<img id="qua-img-preview" class="sys-quarto-img-preview" alt="" width="240" height="160" loading="lazy" decoding="async" hidden />' +
       '</div>' +
       '<label class="sys-label">Caminho ou URL da imagem (gravado no quarto)<br /><input class="sys-input" type="text" id="qua-img" maxlength="2000" value="' +
-      esc(q ? q.img || '' : '') +
-      '" placeholder="imagem/6.webp ou URL pública" /></label>' +
-      '<details class="sys-galeria-site-picker"><summary>Fotos já no site (mesma galeria da página Galeria)</summary>' +
-      '<p class="sys-help">Clique numa miniatura para usar esse ficheiro no quarto.</p>' +
+      esc(q ? imagemPrincipalQuartoSite(q) || q.img || '' : '') +
+      '" placeholder="imagem/imagem quartos/tem-tem/quarto_detalhe_web.webp" /></label>' +
+      '<details class="sys-galeria-site-picker"><summary>Fotos do quarto no site (pasta + galeria)</summary>' +
+      '<p class="sys-help">Clique numa miniatura para usar a mesma imagem que aparece no site.</p>' +
       '<div id="qua-galeria-grid" class="sys-galeria-mini-grid"></div></details>' +
       '</fieldset>' +
       '<label class="sys-label">Texto alternativo da imagem<br />' +
@@ -1155,7 +1353,7 @@
     var modal = document.getElementById('quarto-editor-modal');
     if (!card || !modal) return;
     card.innerHTML = buildQuartoEditorFormHTML(q);
-    wireQuartoEditorImagemUI();
+    wireQuartoEditorImagemUI(q);
     modal.removeAttribute('hidden');
   }
 
@@ -1275,15 +1473,19 @@
         var n = countReservasAtivasNoQuarto(q.id);
         var hrefSite = esc(q.verQuartoHref || 'quartos.html');
         var hrefRes = esc('reservar.html?quarto=' + encodeURIComponent(q.id));
-        var imgPath = q.img ? String(q.img).trim() : '';
+        var imgPath = imagemPrincipalQuartoSite(q);
         var media =
-          imgPath !== ''
-            ? '<figure class="sys-quarto-media"><img src="' +
+          '<figure class="sys-quarto-media' +
+          (imgPath === '' ? ' sys-quarto-media--empty' : '') +
+          '">' +
+          (imgPath !== ''
+            ? '<img src="' +
               esc(imgPath) +
               '" alt="' +
               esc(q.alt || q.titulo || 'Quarto') +
-              '" width="640" height="360" loading="lazy" decoding="async" /></figure>'
-            : '';
+              '" loading="lazy" decoding="async" />'
+            : '') +
+          '</figure>';
         return (
           '<article class="sys-card sys-quarto-card">' +
           media +
@@ -1334,7 +1536,6 @@
       .join('');
     el.innerHTML =
       '<h2 class="sys-section-title">Quartos</h2>' +
-      '<p class="sys-help" style="margin-bottom:1rem">Catálogo guardado neste navegador (e no <strong>js/quartos-site.js</strong> como base). Usado no site, na reserva e na página Quartos.</p>' +
       toolbar +
       avisoSem +
       (cards
@@ -1407,6 +1608,13 @@
   function bindEvents() {
     var mobileToggle = document.getElementById('sys-mobile-toggle');
     var logoutBtn = document.getElementById('btn-logout');
+    var headerSearchForm = document.getElementById('app-header-search-form');
+    if (headerSearchForm) {
+      headerSearchForm.addEventListener('submit', function (ev) {
+        ev.preventDefault();
+        executeHeaderSearch();
+      });
+    }
     document.querySelectorAll('.sys-nav-btn[data-tab]').forEach(function (btn) {
       btn.addEventListener('click', function () {
         setActiveTab(btn.getAttribute('data-tab'));
@@ -1433,6 +1641,7 @@
     if (logoutBtn) {
       logoutBtn.addEventListener('click', async function () {
         try {
+          await fetch('/api/auth/logout', { method: 'POST', credentials: 'include' });
           if ('serviceWorker' in navigator) {
             var regs = await navigator.serviceWorker.getRegistrations();
             regs.forEach(function (r) {
@@ -1440,7 +1649,7 @@
             });
           }
         } catch (e) {}
-        window.location.href = 'index.html';
+        window.location.href = 'login.html';
       });
     }
 
@@ -1531,6 +1740,7 @@
         var cursorPos = ev.target.selectionStart;
         var activeId = ev.target.id;
         state.fichaQuery = ev.target.value;
+        syncHeaderSearchInput(state.fichaQuery);
         if (state.tab === 'ficha') {
           renderFicha();
           var input = document.getElementById(activeId);
@@ -1551,6 +1761,21 @@
         state.calendarYear = Number(ev.target.value);
         renderCalendario();
       } else if (ev.target.classList.contains('sys-ficha-status-select')) {
+        if (ev.target.id === 'modal-reserva-status' && SystemStore.atualizarStatusReserva) {
+          var rid = ev.target.getAttribute('data-reserva-id');
+          var novoStatus = ev.target.value;
+          if (rid && novoStatus) {
+            SystemStore.atualizarStatusReserva(rid, novoStatus)
+              .then(function () {
+                renderAll();
+                openModal(rid);
+              })
+              .catch(function () {
+                alert('Não foi possível atualizar o status.');
+              });
+          }
+          return;
+        }
         state.fichaStatus = ev.target.value;
         if (state.tab === 'ficha') renderFicha();
       }
@@ -1583,25 +1808,43 @@
       return r.id === id;
     });
     if (!reserva) return;
+    var st = String(reserva.status || 'pendente').toLowerCase();
+    if (st === 'ativa') st = 'confirmada';
     var card = document.getElementById('reserva-modal-card');
     card.innerHTML =
       '<div class="sys-ficha-detalhe">' +
-      '<h2 class="sys-ficha-detalhe__title">Código ' +
+      '<h2 class="sys-ficha-detalhe__title">Reserva #' +
       esc(reserva.codigo) +
       '</h2>' +
       '<div class="sys-ficha-detalhe__grid">' +
+      field('status', statusLabelReserva(reserva.status)) +
       field('nome', reserva.nome) +
       field('quarto', quartoTituloPorIdPainel(reserva.quartoId)) +
-      field('datas', fmtDate(reserva.dataEntrada) + ' – ' + fmtDate(reserva.dataSaida)) +
+      field('entrada', fmtDate(reserva.dataEntrada)) +
+      field('saída', fmtDate(reserva.dataSaida)) +
+      field('noites', noitesReservaTexto(reserva)) +
+      field('adultos', reserva.adultos != null ? reserva.adultos : reserva.pessoas) +
+      field('crianças', reserva.criancas != null ? reserva.criancas : 0) +
       field('gmail', reserva.email) +
+      field('telefone', reserva.telefone) +
       field('valor adicional', money(reserva.valorAdicional)) +
-      field('numero', reserva.telefone) +
-      field('horario feito a reserva', fmtDateTime(reserva.criadoEm)) +
-      field('n. pessoas', reserva.pessoas) +
+      field('valor total', valorReservaTexto(reserva)) +
+      field('data da solicitação', fmtDateTime(reserva.criadoEm)) +
       field('plataforma', (reserva.plataforma || 'site').toUpperCase()) +
-      field('valor total', money(reserva.valorTotal)) +
-      field('metodo de pagamento', formatMetodoPagamento(reserva.metodoPagamento), true) +
-      '</div><div class="sys-ficha-detalhe__actions">' +
+      field('método', formatMetodoPagamento(reserva.metodoPagamento), true) +
+      '</div>' +
+      (reserva.status === 'cancelada'
+        ? ''
+        : '<label class="sys-ficha-status-wrap sys-ficha-detalhe__status-edit"><span>Alterar status</span><select id="modal-reserva-status" class="sys-ficha-status-select" data-reserva-id="' +
+          esc(reserva.id) +
+          '"><option value="pendente"' +
+          (st === 'pendente' ? ' selected' : '') +
+          '>Pendente</option><option value="confirmada"' +
+          (st === 'confirmada' ? ' selected' : '') +
+          '>Confirmada</option><option value="cancelada"' +
+          (st === 'cancelada' ? ' selected' : '') +
+          '>Cancelada</option></select></label>') +
+      '<div class="sys-ficha-detalhe__actions">' +
       (reserva.status === 'cancelada'
         ? '<button type="button" class="sys-ficha-detalhe__btn sys-ficha-detalhe__btn--muted" disabled>reserva cancelada</button>'
         : '<button type="button" class="sys-ficha-detalhe__btn sys-ficha-detalhe__btn--danger" data-cancel-reserva="' +
@@ -1627,6 +1870,7 @@
   function formatMetodoPagamento(metodo) {
     var key = String(metodo || 'pix').toLowerCase();
     var map = {
+      whatsapp: 'WhatsApp',
       pix: 'PIX (simulação)',
       cartao_credito: 'Cartão de crédito (simulação)',
       cartao_debito: 'Cartão de débito (simulação)',
@@ -1692,12 +1936,18 @@
   (async function boot() {
     enablePwaAfterAuth();
     try {
+      var me = await fetch('/api/auth/me', { credentials: 'include' });
+      if (!me.ok) {
+        window.location.href =
+          '/login.html?next=' + encodeURIComponent(window.location.pathname || '/painel.html');
+        return;
+      }
+      if (window.carregarImagensQuartosPastas) await window.carregarImagensQuartosPastas();
       if (SystemStore.hydrateQuartosSite) await SystemStore.hydrateQuartosSite();
       if (SystemStore.init) await SystemStore.init();
-      else if (SystemStore.listarReservas) await SystemStore.listarReservas();
     } catch (errBoot) {
-      console.error('Falha ao carregar reservas:', errBoot);
-      alert('Nao foi possivel carregar reservas do banco.');
+      console.error('Falha ao carregar painel:', errBoot);
+      alert('Nao foi possivel carregar dados do servidor.');
     }
     renderAll();
   })();

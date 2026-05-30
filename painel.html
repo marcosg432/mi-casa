@@ -35,7 +35,7 @@
         <button type="button" class="sys-nav-btn" data-tab="calendario">Configuração</button>
       </nav>
       <div class="sys-sidebar-footer">
-        <button type="button" class="sys-nav-btn sys-nav-btn--ghost" id="btn-logout" data-sidebar-action="voltar">Voltar ao site</button>
+        <button type="button" class="sys-nav-btn sys-nav-btn--ghost" id="btn-logout" data-sidebar-action="voltar">Terminar sessão</button>
         <a href="index.html" class="sys-voltar">← Voltar ao site</a>
       </div>
     </aside>
@@ -48,13 +48,21 @@
           <span id="sys-breadcrumb-current" class="sys-breadcrumb-current">Faturamento</span>
         </nav>
         <div class="sys-main-head-center">
-          <div class="sys-app-search-decor" role="presentation">
+          <form id="app-header-search-form" class="sys-app-search" role="search" aria-label="Buscar no painel">
             <span class="sys-app-search-icon" aria-hidden="true"></span>
-            <span class="sys-app-search-ph">Buscar reservas, quartos ou código…</span>
-          </div>
+            <input
+              id="app-header-search"
+              class="sys-app-search-input"
+              type="search"
+              name="q"
+              autocomplete="off"
+              enterkeyhint="search"
+              placeholder="Buscar reservas, quartos ou código…"
+            />
+            <button type="submit" class="sys-app-search-submit">Buscar</button>
+          </form>
         </div>
         <div class="sys-main-head-actions">
-          <span class="sys-head-icon sys-head-icon--bell" title="Notificações" aria-hidden="true"></span>
           <span class="sys-head-icon sys-head-icon--user" title="Conta" aria-hidden="true"></span>
         </div>
       </header>
@@ -75,6 +83,7 @@
     <div class="sys-modal-card sys-modal-card--quarto" id="quarto-editor-card"></div>
   </div>
   <script src="js/quartos-site.js"></script>
+  <script src="js/quartos-imagens-pastas.js"></script>
   <script src="js/system-store.js"></script>
   <script src="js/galeria-imagens-lista.js"></script>
   <script src="js/painel.js"></script>

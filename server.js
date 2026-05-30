@@ -1,15 +1,49 @@
 'use strict';
 
+require('dotenv').config();
+
 const fs = require('fs');
 const path = require('path');
 const express = require('express');
+const cookieParser = require('cookie-parser');
+const rateLimit = require('express-rate-limit');
 const { getGoogleReviews } = require('./server/google-reviews-api');
+const { config, assertProductionConfig } = require('./server/config');
+const { requireAuthPage } = require('./server/middleware/require-auth');
+const authRoutes = require('./server/routes/auth');
+const publicApiRoutes = require('./server/routes/public-api');
+const adminApiRoutes = require('./server/routes/admin-api');
+
+try {
+  assertProductionConfig();
+} catch (e) {
+  console.error('[config]', e.message);
+  if (config.isProduction) process.exit(1);
+  console.warn('[config] Modo desenvolvimento — algumas funcionalidades exigem .env completo.');
+}
 
 const app = express();
 const root = path.join(__dirname);
-const PORT = Number(process.env.PORT) || 3014;
+const PORT = config.port;
 const QUARTOS_IMG_ROOT = path.join(root, 'imagem', 'imagem quartos');
 const IMG_EXT = new Set(['.webp', '.jpg', '.jpeg', '.png', '.gif']);
+
+app.disable('x-powered-by');
+app.set('trust proxy', 1);
+app.use(cookieParser());
+app.use(express.json({ limit: '256kb' }));
+
+var globalLimiter = rateLimit({
+  windowMs: 60 * 1000,
+  max: 120,
+  standardHeaders: true,
+  legacyHeaders: false
+});
+app.use('/api/', globalLimiter);
+
+app.use('/api/auth', authRoutes);
+app.use('/api', publicApiRoutes);
+app.use('/api/admin', adminApiRoutes);
 
 function ordenarArquivosQuarto(a, b) {
   var aWeb = /(?:^|_)web\./i.test(a) || /^quarto/i.test(a);
@@ -21,7 +55,6 @@ function ordenarArquivosQuarto(a, b) {
 function listQuartosImagensPorPasta() {
   var map = {};
   if (!fs.existsSync(QUARTOS_IMG_ROOT)) return map;
-
   fs.readdirSync(QUARTOS_IMG_ROOT, { withFileTypes: true }).forEach(function (dirent) {
     if (!dirent.isDirectory()) return;
     var id = dirent.name;
@@ -32,17 +65,12 @@ function listQuartosImagensPorPasta() {
         return IMG_EXT.has(path.extname(f).toLowerCase());
       })
       .sort(ordenarArquivosQuarto);
-
     map[id] = files.map(function (f) {
       return 'imagem/imagem quartos/' + id + '/' + f;
     });
   });
-
   return map;
 }
-
-app.disable('x-powered-by');
-app.use(express.static(root, { index: 'index.html' }));
 
 app.get('/api/quartos-imagens', function (req, res) {
   try {
@@ -65,11 +93,15 @@ app.get('/api/google-reviews', async function (req, res) {
   }
 });
 
+app.get('/painel.html', requireAuthPage, function (req, res) {
+  res.sendFile(path.join(root, 'painel.html'));
+});
+
+app.use(express.static(root, { index: 'index.html' }));
+
 app.listen(PORT, '0.0.0.0', () => {
   console.log(`Mi Casa Su Casa — http://0.0.0.0:${PORT}`);
   if (!process.env.GOOGLE_PLACES_API_KEY) {
-    console.warn(
-      '[google-reviews] GOOGLE_PLACES_API_KEY não definida — usando avaliações de exemplo.'
-    );
+    console.warn('[google-reviews] GOOGLE_PLACES_API_KEY não definida — usando avaliações de exemplo.');
   }
 });

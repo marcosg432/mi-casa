@@ -34,6 +34,7 @@
         speed: prefersReduced ? 0 : 900,
         loop: true,
         allowTouchMove: true,
+        resistanceRatio: 0,
         pagination: paginationEl
           ? {
               el: paginationEl,
