@@ -1936,11 +1936,18 @@
   (async function boot() {
     enablePwaAfterAuth();
     try {
-      var me = await fetch('/api/auth/me', { credentials: 'include' });
-      if (!me.ok) {
-        window.location.href =
-          '/login.html?next=' + encodeURIComponent(window.location.pathname || '/painel.html');
-        return;
+      var publicCfg = {};
+      try {
+        var cfgRes = await fetch('/api/config/public');
+        if (cfgRes.ok) publicCfg = await cfgRes.json();
+      } catch (eCfg) {}
+      if (!publicCfg.disablePanelAuth) {
+        var me = await fetch('/api/auth/me', { credentials: 'include' });
+        if (!me.ok) {
+          window.location.href =
+            '/login.html?next=' + encodeURIComponent(window.location.pathname || '/painel.html');
+          return;
+        }
       }
       if (window.carregarImagensQuartosPastas) await window.carregarImagensQuartosPastas();
       if (SystemStore.hydrateQuartosSite) await SystemStore.hydrateQuartosSite();

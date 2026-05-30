@@ -28,16 +28,20 @@ var config = {
   sessionMaxAgeMs: Number(process.env.SESSION_MAX_AGE_MS) || 8 * 60 * 60 * 1000,
   turnstileSiteKey: optional('TURNSTILE_SITE_KEY', ''),
   turnstileSecretKey: optional('TURNSTILE_SECRET_KEY', ''),
-  isProduction: process.env.NODE_ENV === 'production'
+  isProduction: process.env.NODE_ENV === 'production',
+  disablePanelAuth:
+    process.env.DISABLE_PANEL_AUTH === '1' || process.env.DISABLE_PANEL_AUTH === 'true'
 };
 
 function assertProductionConfig() {
   required('SUPABASE_URL');
   required('SUPABASE_SERVICE_ROLE_KEY');
-  required('JWT_SECRET');
-  required('ADMIN_PASSWORD_HASH');
-  if (config.jwtSecret.length < 32) {
-    throw new Error('JWT_SECRET deve ter pelo menos 32 caracteres.');
+  if (!config.disablePanelAuth) {
+    required('JWT_SECRET');
+    required('ADMIN_PASSWORD_HASH');
+    if (config.jwtSecret.length < 32) {
+      throw new Error('JWT_SECRET deve ter pelo menos 32 caracteres.');
+    }
   }
   if (config.isProduction && !config.turnstileSecretKey) {
     throw new Error('TURNSTILE_SECRET_KEY é obrigatória em produção.');

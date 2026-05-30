@@ -1,6 +1,7 @@
 'use strict';
 
 var express = require('express');
+var { config } = require('../config');
 var { requireAuth } = require('../middleware/require-auth');
 var {
   listarReservas,
@@ -13,7 +14,9 @@ var { getSupabaseAdmin } = require('../supabase-admin');
 var { validarPayloadReserva, normalizeReservaRow } = require('../reserva-validator');
 
 var router = express.Router();
-router.use(requireAuth);
+if (!config.disablePanelAuth) {
+  router.use(requireAuth);
+}
 
 router.get('/reservas', async function (req, res) {
   try {

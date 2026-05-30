@@ -93,9 +93,13 @@ app.get('/api/google-reviews', async function (req, res) {
   }
 });
 
-app.get('/painel.html', requireAuthPage, function (req, res) {
-  res.sendFile(path.join(root, 'painel.html'));
-});
+if (config.disablePanelAuth) {
+  console.warn('[painel] Autenticação desativada (DISABLE_PANEL_AUTH) — reative antes de expor o painel.');
+} else {
+  app.get('/painel.html', requireAuthPage, function (req, res) {
+    res.sendFile(path.join(root, 'painel.html'));
+  });
+}
 
 app.use(express.static(root, { index: 'index.html' }));
 

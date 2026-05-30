@@ -25,6 +25,7 @@ var reservaLimiter = rateLimit({
 router.get('/config/public', function (req, res) {
   res.json({
     turnstileSiteKey: config.turnstileSiteKey || null,
+    disablePanelAuth: !!config.disablePanelAuth,
     apiVersion: 1
   });
 });
