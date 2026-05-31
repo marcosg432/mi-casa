@@ -101,6 +101,19 @@ if (config.disablePanelAuth) {
   });
 }
 
+function sendNoCacheFile(relativePath) {
+  return function (req, res) {
+    res.setHeader('Cache-Control', 'no-cache, no-store, must-revalidate');
+    res.setHeader('Pragma', 'no-cache');
+    res.setHeader('Expires', '0');
+    res.sendFile(path.join(root, relativePath));
+  };
+}
+
+app.get('/reservar.html', sendNoCacheFile('reservar.html'));
+app.get('/js/reservar-flow.js', sendNoCacheFile('js/reservar-flow.js'));
+app.get('/js/reservar.js', sendNoCacheFile('js/reservar.js'));
+
 app.use(express.static(root, {
   index: 'index.html',
   maxAge: '1h',
