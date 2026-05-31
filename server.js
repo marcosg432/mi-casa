@@ -103,9 +103,17 @@ if (config.disablePanelAuth) {
 
 app.use(express.static(root, {
   index: 'index.html',
-  maxAge: '7d',
+  maxAge: '1h',
   setHeaders: function (res, filePath) {
-    if (/\.(webp|png|jpe?g|gif|svg|ico|woff2?|css|js)$/i.test(filePath)) {
+    if (/\.html?$/i.test(filePath)) {
+      res.setHeader('Cache-Control', 'no-cache, must-revalidate');
+      return;
+    }
+    if (/\.(js|css)$/i.test(filePath)) {
+      res.setHeader('Cache-Control', 'public, max-age=0, must-revalidate');
+      return;
+    }
+    if (/\.(webp|png|jpe?g|gif|svg|ico|woff2?)$/i.test(filePath)) {
       res.setHeader('Cache-Control', 'public, max-age=604800');
     }
   }
