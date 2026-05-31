@@ -1135,12 +1135,9 @@
           }
 
           var preco = calcPrecoAtual();
-          var reservaCriada = await tentarRegistrarReservaPainel(entradaIso, saidaIso, preco);
-          var baseReserva =
-            reservaCriada && reservaCriada.codigo
-              ? reservaCriada
-              : { codigo: gerarCodigoReservaLocal() };
-          var reservaWhats = montarReservaParaWhatsApp(baseReserva);
+          var codigoLocal = gerarCodigoReservaLocal();
+          var reservaWhats = montarReservaParaWhatsApp({ codigo: codigoLocal });
+          tentarRegistrarReservaPainel(entradaIso, saidaIso, preco);
           if (!abrirWhatsAppComReserva(reservaWhats)) {
             alert('Não foi possível abrir o WhatsApp. Verifique sua conexão e tente novamente.');
           }

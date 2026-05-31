@@ -15,7 +15,7 @@ var { validarPayloadReserva } = require('../reserva-validator');
 var router = express.Router();
 var pkg = require('../../package.json');
 
-var SITE_BUILD = process.env.SITE_BUILD || '20260531c';
+var SITE_BUILD = process.env.SITE_BUILD || '20260601d';
 
 var reservaLimiter = rateLimit({
   windowMs: 15 * 60 * 1000,

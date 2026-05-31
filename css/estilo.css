@@ -5204,6 +5204,15 @@ body.lightbox-aberto .cabecalho {
   min-height: 65px;
 }
 
+.reservar-build-stamp {
+  margin: 0 0 0.5rem;
+  font-size: 0.65rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: rgba(255, 255, 255, 0.35);
+  text-align: right;
+}
+
 .btn-step-datas-full {
   width: 100%;
 }

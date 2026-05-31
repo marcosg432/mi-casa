@@ -3,10 +3,7 @@
 var { config } = require('../config');
 
 async function verifyTurnstile(token, remoteip) {
-  if (!config.turnstileSecretKey) {
-    if (config.isProduction) {
-      return { ok: false, error: 'Turnstile não configurado.' };
-    }
+  if (!config.turnstileSecretKey || !config.turnstileSiteKey) {
     return { ok: true, skipped: true };
   }
   if (!token) {
