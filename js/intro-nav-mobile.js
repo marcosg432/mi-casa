@@ -13,6 +13,9 @@
       btn.setAttribute('aria-expanded', open ? 'true' : 'false');
       btn.setAttribute('aria-label', open ? 'Fechar menu de navegação' : 'Abrir menu de navegação');
       document.body.classList.toggle('intro-menu-aberto-no-body', open);
+      if (!open) {
+        document.body.style.removeProperty('overflow');
+      }
       if (scrim) scrim.setAttribute('aria-hidden', open ? 'false' : 'true');
     }
 

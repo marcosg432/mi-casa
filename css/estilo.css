@@ -29,14 +29,14 @@
   box-sizing: border-box;
   margin: 0;
   padding: 0;
-  overscroll-behavior: none;
 }
 
 html {
   scroll-behavior: auto;
   overflow-x: hidden;
+  overflow-y: auto;
   max-width: 100%;
-  overscroll-behavior: none;
+  -webkit-overflow-scrolling: touch;
 }
 
 @media (prefers-reduced-motion: no-preference) {
@@ -52,8 +52,10 @@ body {
   background: var(--cor-fundo-pagina);
   line-height: 1.6;
   overflow-x: hidden;
+  overflow-y: auto;
   max-width: 100%;
-  overscroll-behavior: none;
+  min-height: 100%;
+  -webkit-overflow-scrolling: touch;
   touch-action: pan-y pinch-zoom;
 }
 
@@ -110,22 +112,12 @@ a:hover {
 #intro:not(.active) {
   padding-top: clamp(1rem, 4vh, 3rem);
   box-sizing: border-box;
+  /* Deixa a rolagem passar para o conteúdo; logo continua clicável */
+  pointer-events: none;
 }
 
-#intro .logo {
-  font-family: var(--font-display);
-  font-size: clamp(2.3rem, 6vw, 4.2rem);
-  font-weight: 600;
-  letter-spacing: 0.08em;
-  color: #fff;
-  transform: translateY(0) scale(1);
-  transform-origin: center center;
-  opacity: 1;
-  transition: transform 1.2s cubic-bezier(0.22, 1, 0.36, 1);
-}
-
-/* Tela cheia: barra de 100% + flex centraliza a arte (evita img menor que o box “grudada” à esquerda) */
 #intro:not(.active) .logo {
+  pointer-events: auto;
   width: 100%;
   max-width: 100%;
   padding-inline: 1rem;
@@ -153,6 +145,18 @@ a:hover {
   width: clamp(170px, 28vw, 360px);
   max-width: 100%;
   flex-shrink: 0;
+}
+
+#intro .logo {
+  font-family: var(--font-display);
+  font-size: clamp(2.3rem, 6vw, 4.2rem);
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  color: #fff;
+  transform: translateY(0) scale(1);
+  transform-origin: center center;
+  opacity: 1;
+  transition: transform 1.2s cubic-bezier(0.22, 1, 0.36, 1);
 }
 
 #intro .logo img {
