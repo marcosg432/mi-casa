@@ -8,6 +8,18 @@
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;0,700;1,400&family=Outfit:wght@300;400;500;600&display=swap">
   <title>Mi Casa Su Casa — Galeria</title>
   <link rel="stylesheet" href="css/estilo.css">
+  <script src="js/galeria-imagens-lista.js"></script>
+  <script>
+    (function preloadGaleriaArco() {
+      (window.GALERIA_IMAGENS_URLS || []).slice(0, 20).forEach(function (item) {
+        var link = document.createElement('link');
+        link.rel = 'preload';
+        link.as = 'image';
+        link.href = item.url;
+        document.head.appendChild(link);
+      });
+    })();
+  </script>
   <script src="js/topo-ao-carregar.js" defer></script>
   <script src="js/intro-nav-mobile.js" defer></script>
 </head>
@@ -131,7 +143,6 @@
     <p class="rodape-creditos">© Mi Casa Su Casa. Todos os direitos reservados.</p>
   </footer>
 
-  <script src="js/galeria-imagens-lista.js"></script>
   <script>
     window.addEventListener('scroll', function() {
       const intro = document.getElementById('intro');
@@ -283,6 +294,12 @@
       if (TOTAL_IMAGES < 1) return;
       var MAX_SCROLL = Math.max(3000, Math.min(9000, TOTAL_IMAGES * 100));
 
+      IMAGES.forEach(function (src) {
+        var pre = new Image();
+        pre.decoding = 'async';
+        pre.src = src;
+      });
+
       function lerp(s, e, t) { return s * (1 - t) + e * t; }
 
       var container = document.getElementById('scroll-morph-container');
@@ -299,25 +316,16 @@
       var morphValue = 0;
       var rotateValue = 0;
 
-      /* Placeholder 1×1 transparente: cartões pequenos (~100px) não precisam do ficheiro grande logo aos 20. */
-      var IMG_PLACEHOLDER =
-        'data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7';
-
       for (var i = 0; i < TOTAL_IMAGES; i++) {
         var card = document.createElement('div');
         card.className = 'scroll-morph-card';
         card.setAttribute('data-index', i);
-        var eager = i < 4;
-        var srcAttr = eager ? ' src="' + IMAGES[i] + '"' : ' src="' + IMG_PLACEHOLDER + '" data-full-src="' + IMAGES[i] + '"';
-        var fetchPr = eager ? (i === 0 ? ' fetchpriority="high"' : ' fetchpriority="low"') : ' fetchpriority="low"';
-        var loadAttr = eager ? ' loading="eager"' : ' loading="lazy"';
+        var fetchPr = i === 0 ? ' fetchpriority="high"' : '';
         card.innerHTML = '<div class="scroll-morph-card-motion">' +
           '<div class="scroll-morph-card-surface">' +
-            '<img' +
-            srcAttr +
-            ' alt="" width="200" height="280" decoding="async" sizes="120px"' +
+            '<img src="' + IMAGES[i] + '"' +
+            ' alt="" width="200" height="280" decoding="async" loading="eager" sizes="120px"' +
             fetchPr +
-            loadAttr +
             '>' +
           '</div>' +
         '</div>';
@@ -352,54 +360,6 @@
 
       var section = document.getElementById('scroll-morph-hero');
       if (!section) section = container.closest('section');
-
-      function hydrateScrollMorphImages() {
-        var imgs = wrap.querySelectorAll('img[data-full-src]');
-        var idx = 0;
-        var CHUNK = 4;
-        function loadChunk() {
-          var end = Math.min(idx + CHUNK, imgs.length);
-          for (; idx < end; idx++) {
-            var im = imgs[idx];
-            var full = im.getAttribute('data-full-src');
-            if (full) {
-              im.src = full;
-              im.removeAttribute('data-full-src');
-            }
-          }
-          if (idx < imgs.length) {
-            if (typeof requestIdleCallback === 'function') {
-              requestIdleCallback(loadChunk, { timeout: 900 });
-            } else {
-              window.setTimeout(loadChunk, 100);
-            }
-          }
-        }
-        if (imgs.length) {
-          if (typeof requestIdleCallback === 'function') {
-            requestIdleCallback(loadChunk, { timeout: 1200 });
-          } else {
-            window.setTimeout(loadChunk, 50);
-          }
-        }
-      }
-
-      if (typeof IntersectionObserver === 'function') {
-        var io = new IntersectionObserver(
-          function (entries, obs) {
-            entries.forEach(function (en) {
-              if (en.isIntersecting) {
-                obs.disconnect();
-                hydrateScrollMorphImages();
-              }
-            });
-          },
-          { root: null, rootMargin: '200px 0px', threshold: 0 }
-        );
-        io.observe(section || container);
-      } else {
-        hydrateScrollMorphImages();
-      }
 
       var rafScrollPin = null;
       function pinSectionScroll() {

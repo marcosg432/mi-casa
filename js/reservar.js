@@ -175,6 +175,28 @@
     });
   }
 
+  var BTN_FINALIZAR_WHATS = 'Finalizar no WhatsApp';
+
+  function montarReservaParaWhatsApp(reservaCriada) {
+    var calc = calcPrecoAtual();
+    return Object.assign({}, reservaCriada, {
+      nome: state.nome,
+      email: state.email,
+      telefone: state.telefone,
+      quartoId: state.quartoId,
+      quartoTitulo: quartoTituloPorId(state.quartoId),
+      dataEntrada: reservaCriada.dataEntrada || toIsoDate(state.checkIn),
+      dataSaida: reservaCriada.dataSaida || toIsoDate(state.checkOut),
+      noites: nights(),
+      adultos: state.adultos,
+      criancas: state.criancas,
+      requerOrcamento: !!calc.requerOrcamento,
+      valorTotal: calc.requerOrcamento ? calc.valorMedio : calc.valorTotal,
+      valorMin: calc.valorMin,
+      valorMax: calc.valorMax
+    });
+  }
+
   function pad(n) {
     return n < 10 ? '0' + n : String(n);
   }
@@ -1012,10 +1034,10 @@
             throw new Error('Não foi possível registrar a reserva.');
           }
 
-          reservaCriada.quartoTitulo = quartoTituloPorId(state.quartoId);
+          var reservaWhats = montarReservaParaWhatsApp(reservaCriada);
           var waUrl =
             window.ReservaPrecos && window.ReservaPrecos.buildWhatsAppUrl
-              ? window.ReservaPrecos.buildWhatsAppUrl(reservaCriada)
+              ? window.ReservaPrecos.buildWhatsAppUrl(reservaWhats)
               : null;
 
           if (!waUrl) {
@@ -1046,7 +1068,7 @@
           );
         } finally {
           btnFazerReserva.disabled = false;
-          btnFazerReserva.textContent = 'Fazer reserva';
+          btnFazerReserva.textContent = BTN_FINALIZAR_WHATS;
         }
       });
     }

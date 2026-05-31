@@ -475,13 +475,13 @@
             <div class="transfer-swiper swiper" aria-label="Fotos do serviço de van">
               <div class="swiper-wrapper">
                 <div class="swiper-slide">
-                  <div class="transfer-slide-media" data-bg="imagem/van/van-1.webp" role="img" aria-label="Van da pousada — foto 1"></div>
+                  <div class="transfer-slide-media" data-bg="imagem/van%201.png" role="img" aria-label="Van da pousada — foto 1"></div>
                 </div>
                 <div class="swiper-slide">
-                  <div class="transfer-slide-media" data-bg="imagem/van/van-2.webp" role="img" aria-label="Van da pousada — foto 2"></div>
+                  <div class="transfer-slide-media" data-bg="imagem/van%202.png" role="img" aria-label="Van da pousada — foto 2"></div>
                 </div>
                 <div class="swiper-slide">
-                  <div class="transfer-slide-media" data-bg="imagem/van/van-3.webp" role="img" aria-label="Van da pousada — foto 3"></div>
+                  <div class="transfer-slide-media" data-bg="imagem/van%203.png" role="img" aria-label="Van da pousada — foto 3"></div>
                 </div>
                 <div class="swiper-slide">
                   <div class="transfer-slide-media" data-bg="imagem/van%204.png" role="img" aria-label="Van da pousada — foto 4"></div>
@@ -951,35 +951,6 @@
       });
     })();
 
-    (function carrosselQuartosShowcase() {
-      var imagensP =
-        window.carregarImagensQuartosPastas && typeof window.carregarImagensQuartosPastas === 'function'
-          ? window.carregarImagensQuartosPastas()
-          : Promise.resolve();
-      imagensP.then(function () {
-        if (window.initQuartosShowcaseCarrossel) {
-          window.initQuartosShowcaseCarrossel();
-        }
-        var hp =
-          window.SystemStore && typeof SystemStore.hydrateQuartosSite === 'function'
-            ? SystemStore.hydrateQuartosSite()
-            : Promise.resolve();
-        return hp;
-      }).then(function () {
-        if (window.carregarImagensQuartosPastas) {
-          return window.carregarImagensQuartosPastas();
-        }
-      }).then(function () {
-        if (window.refreshQuartosShowcaseCarrossel) {
-          window.refreshQuartosShowcaseCarrossel();
-        }
-      }).catch(function (e) {
-        console.warn('Quartos:', e);
-        if (window.initQuartosShowcaseCarrossel) {
-          window.initQuartosShowcaseCarrossel();
-        }
-      });
-    })();
   </script>
   <script>
     document.addEventListener('DOMContentLoaded', function () {

@@ -200,7 +200,8 @@
     }
     var codigo = reserva.codigo || reserva.id || '—';
     var msg =
-      'Olá! Gostaria de fazer uma reserva na Mi Casa Su Casa.\n\n' +
+      'Olá! Gostaria de confirmar minha reserva na Mi Casa Su Casa.\n\n' +
+      'Código da reserva: #' + codigo + '\n\n' +
       'Nome: ' + (reserva.nome || '—') + '\n' +
       'E-mail: ' + (reserva.email || '—') + '\n' +
       'Telefone: ' + (reserva.telefone || '—') + '\n' +
@@ -210,8 +211,7 @@
       'Noites: ' + (reserva.noites != null ? reserva.noites : '—') + '\n' +
       'Adultos: ' + (reserva.adultos != null ? reserva.adultos : '—') + '\n' +
       'Crianças: ' + (reserva.criancas != null ? reserva.criancas : '0') + '\n' +
-      valorLinha + '\n' +
-      'Código da reserva: #' + codigo;
+      valorLinha;
 
     return 'https://wa.me/' + WHATSAPP_PROPRIETARIO + '?text=' + encodeURIComponent(msg);
   }

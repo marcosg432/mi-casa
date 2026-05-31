@@ -70,4 +70,45 @@
       }
     });
   };
+
+  /** Carrega imagens, monta o carrossel e refresca após hidratar o catálogo. */
+  global.bootstrapQuartosShowcaseCarrossel = function bootstrapQuartosShowcaseCarrossel() {
+    var imagensP =
+      typeof global.carregarImagensQuartosPastas === 'function'
+        ? global.carregarImagensQuartosPastas()
+        : Promise.resolve();
+    return imagensP
+      .then(function () {
+        global.initQuartosShowcaseCarrossel();
+        var hp =
+          global.SystemStore && typeof global.SystemStore.hydrateQuartosSite === 'function'
+            ? global.SystemStore.hydrateQuartosSite()
+            : Promise.resolve();
+        return hp;
+      })
+      .then(function () {
+        if (typeof global.carregarImagensQuartosPastas === 'function') {
+          return global.carregarImagensQuartosPastas();
+        }
+      })
+      .then(function () {
+        global.refreshQuartosShowcaseCarrossel();
+      })
+      .catch(function (e) {
+        console.warn('Quartos:', e);
+        global.initQuartosShowcaseCarrossel();
+      });
+  };
+
+  function agendarBootstrapQuartosShowcase() {
+    if (document.querySelector('[data-quartos-showcase]')) {
+      global.bootstrapQuartosShowcaseCarrossel();
+    }
+  }
+
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', agendarBootstrapQuartosShowcase);
+  } else {
+    agendarBootstrapQuartosShowcase();
+  }
 })(window);
