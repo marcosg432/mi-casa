@@ -22,10 +22,36 @@ Atualizar código depois de um `git pull`:
 
 ```bash
 cd /caminho/para/mi-casa
-git pull
+git pull origin main
 npm ci --omit=dev
 pm2 reload mi-casa
 ```
+
+**Script automático (recomendado):** na VPS, dentro da pasta do projeto:
+
+```bash
+bash scripts/deploy-hostinger.sh
+```
+
+O script encontra a pasta certa pelo PM2, faz pull, instala dependências e recarrega o app.
+
+### Conferir se o deploy funcionou
+
+Abra no browser (PC ou celular):
+
+```
+https://miicasasucasa.com.br/api/version
+```
+
+Deve aparecer algo como:
+
+```json
+{"siteBuild":"20260531c","packageVersion":"1.0.0","reservarScript":"reservar-flow.js","ok":true}
+```
+
+Se `siteBuild` for antigo ou der erro 404, o `git pull` não rodou na pasta certa.
+
+**No celular ainda parece antigo?** O servidor pode estar certo, mas o navegador guardou arquivos velhos (cache de 7 dias). Feche todas as abas do site, use aba anônima, ou limpe o cache. Se adicionou o site à tela inicial (PWA), remova o atalho e abra de novo pelo Chrome/Safari.
 
 ## Nginx (exemplo)
 

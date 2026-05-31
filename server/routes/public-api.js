@@ -13,6 +13,9 @@ var { getSupabaseAdmin } = require('../supabase-admin');
 var { validarPayloadReserva } = require('../reserva-validator');
 
 var router = express.Router();
+var pkg = require('../../package.json');
+
+var SITE_BUILD = process.env.SITE_BUILD || '20260531c';
 
 var reservaLimiter = rateLimit({
   windowMs: 15 * 60 * 1000,
@@ -27,6 +30,16 @@ router.get('/config/public', function (req, res) {
     turnstileSiteKey: config.turnstileSiteKey || null,
     disablePanelAuth: !!config.disablePanelAuth,
     apiVersion: 1
+  });
+});
+
+router.get('/version', function (req, res) {
+  res.setHeader('Cache-Control', 'no-store, no-cache, must-revalidate');
+  res.json({
+    siteBuild: SITE_BUILD,
+    packageVersion: pkg.version,
+    reservarScript: 'reservar-flow.js',
+    ok: true
   });
 });
 
