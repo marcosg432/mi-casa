@@ -4,8 +4,6 @@
    Paleta: verde natureza, creme, tons neutros
    ============================================ */
 
-@import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;0,700;1,400&family=Outfit:wght@300;400;500;600&display=swap');
-
 :root {
   /* Branco puro: texto em botões / contraste — não usar como fundo de página */
   --cor-fundo: #ffffff;

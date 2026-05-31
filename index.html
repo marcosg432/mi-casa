@@ -5,6 +5,8 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="preload" as="image" href="imagem/ep%2015.webp" fetchpriority="high">
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;0,700;1,400&family=Outfit:wght@300;400;500;600&display=swap">
   <link rel="manifest" href="/manifest.json">
   <meta name="theme-color" content="#0F172A">
   <meta name="apple-mobile-web-app-capable" content="yes">
@@ -16,6 +18,7 @@
   <link rel="stylesheet" href="css/google-reviews.css">
   <link rel="stylesheet" href="css/transfer-van.css">
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css">
+  <script src="js/hero-imagens.js" defer></script>
   <script src="js/topo-ao-carregar.js" defer></script>
   <script src="js/intro-splash.js" defer></script>
   <script src="js/intro-nav-mobile.js" defer></script>
@@ -41,9 +44,9 @@
     <section class="inicio-hero-recanto" aria-label="Apresentação principal — carrossel e contato">
       <section class="hero revelar-quando-visivel">
         <div class="hero-carousel">
-          <div class="hero-slide ativo" style="background-image: url('imagem/ep%2015.webp')"></div>
-          <div class="hero-slide" style="background-image: url('imagem/ep%2012.webp')"></div>
-          <div class="hero-slide" style="background-image: url('imagem/ep%2019.webp')"></div>
+          <div class="hero-slide ativo" data-bg="imagem/ep%2015.webp"></div>
+          <div class="hero-slide" data-bg="imagem/ep%2012.webp"></div>
+          <div class="hero-slide" data-bg="imagem/ep%2019.webp"></div>
         </div>
         <div class="hero-conteudo">
           <p class="hero-subtitulo">Bem-vindo a pousada</p>
@@ -236,9 +239,9 @@
     <section class="inicio-hero-recanto inicio-hero-recanto--duplicado" aria-label="Apresentação principal — carrossel e contato (mobile)">
       <section class="hero revelar-quando-visivel">
         <div class="hero-carousel">
-          <div class="hero-slide ativo" style="background-image: url('imagem/ep%2015.webp')"></div>
-          <div class="hero-slide" style="background-image: url('imagem/ep%2012.webp')"></div>
-          <div class="hero-slide" style="background-image: url('imagem/ep%2019.webp')"></div>
+          <div class="hero-slide ativo" data-bg="imagem/ep%2015.webp"></div>
+          <div class="hero-slide" data-bg="imagem/ep%2012.webp"></div>
+          <div class="hero-slide" data-bg="imagem/ep%2019.webp"></div>
         </div>
         <div class="hero-conteudo">
           <p class="hero-subtitulo">Bem-vindo a pousada</p>
@@ -472,16 +475,16 @@
             <div class="transfer-swiper swiper" aria-label="Fotos do serviço de van">
               <div class="swiper-wrapper">
                 <div class="swiper-slide">
-                  <div class="transfer-slide-media" style="background-image: url('imagem/van%201.png')" role="img" aria-label="Van da pousada — foto 1"></div>
+                  <div class="transfer-slide-media" data-bg="imagem/van/van-1.webp" role="img" aria-label="Van da pousada — foto 1"></div>
                 </div>
                 <div class="swiper-slide">
-                  <div class="transfer-slide-media" style="background-image: url('imagem/van%202.png')" role="img" aria-label="Van da pousada — foto 2"></div>
+                  <div class="transfer-slide-media" data-bg="imagem/van/van-2.webp" role="img" aria-label="Van da pousada — foto 2"></div>
                 </div>
                 <div class="swiper-slide">
-                  <div class="transfer-slide-media" style="background-image: url('imagem/van%203.png')" role="img" aria-label="Van da pousada — foto 3"></div>
+                  <div class="transfer-slide-media" data-bg="imagem/van/van-3.webp" role="img" aria-label="Van da pousada — foto 3"></div>
                 </div>
                 <div class="swiper-slide">
-                  <div class="transfer-slide-media" style="background-image: url('imagem/van%204.png')" role="img" aria-label="Van da pousada — foto 4"></div>
+                  <div class="transfer-slide-media" data-bg="imagem/van%204.png" role="img" aria-label="Van da pousada — foto 4"></div>
                 </div>
               </div>
               <div class="transfer-swiper-pagination swiper-pagination" aria-label="Indicador do carrossel — 4 fotos"></div>
@@ -662,11 +665,11 @@
   <script src="js/transfer-van.js" defer></script>
   <script src="js/google-reviews-cards.js" defer></script>
   <script src="js/google-reviews.js" defer></script>
-  <script src="js/quartos-site.js"></script>
-  <script src="js/quartos-imagens-pastas.js"></script>
-  <script src="js/system-store.js"></script>
-  <script src="js/quartos-showcase-engine.js"></script>
-  <script src="js/quartos-showcase-carrossel.js"></script>
+  <script src="js/quartos-site.js" defer></script>
+  <script src="js/quartos-imagens-pastas.js" defer></script>
+  <script src="js/system-store.js" defer></script>
+  <script src="js/quartos-showcase-engine.js" defer></script>
+  <script src="js/quartos-showcase-carrossel.js" defer></script>
   <script>
     window.addEventListener('scroll', function() {
       const intro = document.getElementById('intro');

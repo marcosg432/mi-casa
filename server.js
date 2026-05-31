@@ -101,7 +101,15 @@ if (config.disablePanelAuth) {
   });
 }
 
-app.use(express.static(root, { index: 'index.html' }));
+app.use(express.static(root, {
+  index: 'index.html',
+  maxAge: '7d',
+  setHeaders: function (res, filePath) {
+    if (/\.(webp|png|jpe?g|gif|svg|ico|woff2?|css|js)$/i.test(filePath)) {
+      res.setHeader('Cache-Control', 'public, max-age=604800');
+    }
+  }
+}));
 
 app.listen(PORT, '0.0.0.0', () => {
   console.log(`Mi Casa Su Casa — http://0.0.0.0:${PORT}`);

@@ -33,6 +33,31 @@
         }
   });
 
+  function aplicarTransferBg(el) {
+    if (!el || el.style.backgroundImage) return;
+    var bg = el.getAttribute('data-bg');
+    if (bg) el.style.backgroundImage = "url('" + bg + "')";
+  }
+
+  function carregarFotosTransfer(incluirTodas) {
+    var medias = root.querySelectorAll('.transfer-slide-media[data-bg]');
+    if (!medias.length) return;
+    aplicarTransferBg(medias[0]);
+    if (incluirTodas) {
+      for (var i = 1; i < medias.length; i++) aplicarTransferBg(medias[i]);
+      return;
+    }
+    window.setTimeout(function () {
+      for (var j = 1; j < medias.length; j++) aplicarTransferBg(medias[j]);
+    }, 2500);
+  }
+
+  swiper.on('slideChange', function () {
+    var medias = root.querySelectorAll('.transfer-slide-media[data-bg]');
+    var idx = swiper.realIndex;
+    if (medias[idx]) aplicarTransferBg(medias[idx]);
+  });
+
   var gate = root.closest('.revelar-quando-visivel');
 
   function iniciarAutoplay() {
@@ -54,12 +79,14 @@
       'secao-revelada',
       function onRev() {
         gate.removeEventListener('secao-revelada', onRev);
+        carregarFotosTransfer(false);
         iniciarAutoplay();
       },
       { once: true }
     );
     pausarAutoplay();
   } else {
+    carregarFotosTransfer(false);
     iniciarAutoplay();
   }
 
