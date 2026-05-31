@@ -5272,6 +5272,13 @@ body.lightbox-aberto .cabecalho {
   background: #a8d5b8;
 }
 
+.btn-reservar-finalizar-whats,
+#btn-fazer-reserva.btn-reservar-pagar {
+  text-transform: none;
+  letter-spacing: 0.02em;
+  font-weight: 700;
+}
+
 .btn-reservar-whatsapp {
   font-family: var(--font-body);
   font-size: 0.95rem;

@@ -249,18 +249,113 @@
     );
   }
 
+  function refreshOcupadasMapAsync() {
+    if (!window.SystemStore || !state.quartoId) {
+      state.ocupadas = {};
+      return Promise.resolve();
+    }
+    if (window.SystemStore.getOccupiedDateMapForQuarto) {
+      return window.SystemStore.getOccupiedDateMapForQuarto(state.quartoId)
+        .then(function (map) {
+          state.ocupadas = map || {};
+        })
+        .catch(function () {
+          state.ocupadas = {};
+        });
+    }
+    state.ocupadas = {};
+    return Promise.resolve();
+  }
+
   function refreshOcupadasMap() {
-    if (!window.SystemStore) {
-      state.ocupadas = {};
-      return;
+    return refreshOcupadasMapAsync();
+  }
+
+  function periodoTemConflitoLocal(entradaIso, saidaIso) {
+    if (!entradaIso || !saidaIso) return false;
+    var a = entradaIso.split('-');
+    var b = saidaIso.split('-');
+    var cur = new Date(Number(a[0]), Number(a[1]) - 1, Number(a[2]));
+    var end = new Date(Number(b[0]), Number(b[1]) - 1, Number(b[2]));
+    while (cur < end) {
+      var iso =
+        cur.getFullYear() +
+        '-' +
+        String(cur.getMonth() + 1).padStart(2, '0') +
+        '-' +
+        String(cur.getDate()).padStart(2, '0');
+      if (state.ocupadas[iso]) return true;
+      cur.setDate(cur.getDate() + 1);
     }
-    if (state.quartoId && window.SystemStore.getOccupiedDateMapForQuarto) {
-      state.ocupadas = window.SystemStore.getOccupiedDateMapForQuarto(state.quartoId) || {};
-    } else if (window.SystemStore.getOccupiedDateMap) {
-      state.ocupadas = window.SystemStore.getOccupiedDateMap() || {};
-    } else {
-      state.ocupadas = {};
+    return false;
+  }
+
+  function getTurnstileToken() {
+    var el = document.querySelector('[name="cf-turnstile-response"]');
+    return el && el.value ? String(el.value) : '';
+  }
+
+  function mountTurnstileWidget() {
+    var wrap = document.getElementById('reservar-turnstile-wrap');
+    if (!wrap || wrap.dataset.mounted === '1') return;
+    if (!window.SystemStore || !window.SystemStore.fetchPublicConfig) return;
+    window.SystemStore.fetchPublicConfig()
+      .then(function (cfg) {
+        if (!cfg || !cfg.turnstileSiteKey) return;
+        wrap.innerHTML =
+          '<div class="cf-turnstile" data-sitekey="' +
+          cfg.turnstileSiteKey +
+          '" data-theme="light"></div>';
+        wrap.dataset.mounted = '1';
+        function renderWidget() {
+          var el = wrap.querySelector('.cf-turnstile');
+          if (el && window.turnstile && window.turnstile.render) {
+            window.turnstile.render(el);
+            return true;
+          }
+          return false;
+        }
+        if (!renderWidget()) {
+          var tries = 0;
+          var timer = window.setInterval(function () {
+            tries += 1;
+            if (renderWidget() || tries > 40) window.clearInterval(timer);
+          }, 250);
+        }
+      })
+      .catch(function () {});
+  }
+
+  function gerarCodigoReservaLocal() {
+    return 'WEB-' + Date.now().toString(36).toUpperCase().slice(-8);
+  }
+
+  function abrirWhatsAppComReserva(reservaObj) {
+    var waUrl =
+      window.ReservaPrecos && window.ReservaPrecos.buildWhatsAppUrl
+        ? window.ReservaPrecos.buildWhatsAppUrl(reservaObj)
+        : null;
+    if (!waUrl) {
+      alert('Não foi possível abrir o WhatsApp.');
+      return false;
     }
+    var ov = document.getElementById('reservar-sucesso');
+    if (ov) {
+      ov.hidden = false;
+      document.body.style.overflow = 'hidden';
+      var titulo = document.getElementById('reservar-sucesso-titulo');
+      if (titulo) {
+        titulo.textContent =
+          'Reserva #' + (reservaObj.codigo || '—') + ' — abrindo WhatsApp…';
+      }
+    }
+    window.setTimeout(function () {
+      try {
+        sessionStorage.setItem(CHAVE_POS_WHATS, '1');
+      } catch (e) {}
+      window.location.href = waUrl;
+    }, 800);
+    return true;
   }
 
   function nights() {
@@ -581,19 +676,19 @@
             return;
           }
           if (picked <= state.checkIn) return;
-          if (
-            window.SystemStore &&
-            window.SystemStore.hasRangeConflictForQuarto &&
-            window.SystemStore.hasRangeConflictForQuarto(
-              toIsoDate(state.checkIn),
-              toIsoDate(picked),
-              state.quartoId
-            )
-          ) {
-            alert('Esse período contém datas já reservadas ou bloqueadas para este quarto.');
-            return;
-          }
-          state.checkOut = picked;
+          var saidaIsoPick = toIsoDate(picked);
+          refreshOcupadasMapAsync().then(function () {
+            if (periodoTemConflitoLocal(toIsoDate(state.checkIn), saidaIsoPick)) {
+              alert('Esse período contém datas já reservadas ou bloqueadas para este quarto.');
+              return;
+            }
+            state.checkOut = picked;
+            renderCalendar('cal-entrada', 'entrada');
+            renderCalendar('cal-saida', 'saida');
+            updateSidebar();
+            updateContinuarDatas();
+          });
+          return;
         }
         renderCalendar('cal-entrada', 'entrada');
         renderCalendar('cal-saida', 'saida');
@@ -631,6 +726,7 @@
     }
     if (step === 4) {
       renderConfirmacaoResumo();
+      mountTurnstileWidget();
     }
 
     if (window.innerWidth <= 768) {
@@ -696,11 +792,12 @@
     state.modoGrupo = false;
 
     function pintarCalendariosEsumario() {
-      refreshOcupadasMap();
-      renderCalendar('cal-entrada', 'entrada');
-      renderCalendar('cal-saida', 'saida');
-      updateSidebar();
-      updateContinuarDatas();
+      refreshOcupadasMapAsync().then(function () {
+        renderCalendar('cal-entrada', 'entrada');
+        renderCalendar('cal-saida', 'saida');
+        updateSidebar();
+        updateContinuarDatas();
+      });
     }
 
     function aplicarQuartoPorIndice(roomIdx) {
@@ -980,6 +1077,7 @@
     }
 
     if (btnFazerReserva) {
+      btnFazerReserva.textContent = BTN_FINALIZAR_WHATS;
       btnFazerReserva.addEventListener('click', async function () {
         if (!state.checkIn || !state.checkOut || nights() <= 0 || !hospedesValidos()) {
           alert('Complete os dados da reserva antes de continuar.');
@@ -993,79 +1091,59 @@
         var entradaIso = toIsoDate(state.checkIn);
         var saidaIso = toIsoDate(state.checkOut);
         btnFazerReserva.disabled = true;
-        btnFazerReserva.textContent = 'Salvando…';
+        btnFazerReserva.textContent = 'Abrindo WhatsApp…';
 
         try {
-          if (window.SystemStore && window.SystemStore.listarReservas) {
-            await withTimeoutMs(window.SystemStore.listarReservas(), 8000);
-          }
-          if (
-            window.SystemStore &&
-            window.SystemStore.hasRangeConflictForQuarto &&
-            window.SystemStore.hasRangeConflictForQuarto(entradaIso, saidaIso, state.quartoId)
-          ) {
+          await refreshOcupadasMapAsync();
+          if (periodoTemConflitoLocal(entradaIso, saidaIso)) {
             alert('Esse período já está reservado ou bloqueado para este quarto. Escolha outras datas.');
             showStep(1);
             return;
           }
 
-          if (!window.SystemStore || !window.SystemStore.criarReserva) {
-            throw new Error('Sistema de reservas indisponível.');
-          }
+          var preco = calcPrecoAtual();
+          var reservaCriada = null;
 
-          var reservaCriada = await withTimeoutMs(
-            SystemStore.criarReserva({
-              nome: state.nome,
-              email: state.email,
-              telefone: state.telefone,
-              adultos: state.adultos,
-              criancas: state.criancas,
-              pessoasAlémCap: state.modoGrupo ? state.pessoasAlémCap : 0,
-              dataEntrada: entradaIso,
-              dataSaida: saidaIso,
-              plataforma: 'site',
-              metodoPagamento: 'whatsapp',
-              quartoId: state.quartoId
-            }),
-            15000
-          );
-
-          if (!reservaCriada || !reservaCriada.codigo) {
-            throw new Error('Não foi possível registrar a reserva.');
-          }
-
-          var reservaWhats = montarReservaParaWhatsApp(reservaCriada);
-          var waUrl =
-            window.ReservaPrecos && window.ReservaPrecos.buildWhatsAppUrl
-              ? window.ReservaPrecos.buildWhatsAppUrl(reservaWhats)
-              : null;
-
-          if (!waUrl) {
-            throw new Error('Não foi possível abrir o WhatsApp.');
-          }
-
-          var ov = document.getElementById('reservar-sucesso');
-          if (ov) {
-            ov.hidden = false;
-            document.body.style.overflow = 'hidden';
-            var titulo = document.getElementById('reservar-sucesso-titulo');
-            if (titulo) {
-              titulo.textContent =
-                'Reserva registrada! Código #' + reservaCriada.codigo + '. Abrindo WhatsApp…';
+          if (window.SystemStore && window.SystemStore.criarReserva) {
+            try {
+              reservaCriada = await withTimeoutMs(
+                SystemStore.criarReserva({
+                  nome: state.nome,
+                  email: state.email,
+                  telefone: state.telefone,
+                  adultos: state.adultos,
+                  criancas: state.criancas,
+                  pessoasAlémCap: state.modoGrupo ? state.pessoasAlémCap : 0,
+                  dataEntrada: entradaIso,
+                  dataSaida: saidaIso,
+                  plataforma: 'site',
+                  metodoPagamento: 'whatsapp',
+                  quartoId: state.quartoId,
+                  valorDiaria: preco.valorDiaria || 0,
+                  valorAdicional: preco.valorAdicional || 0,
+                  valorTotal: preco.requerOrcamento ? 0 : preco.valorTotal,
+                  requerOrcamento: !!preco.requerOrcamento,
+                  turnstileToken: getTurnstileToken()
+                }),
+                15000
+              );
+            } catch (errApi) {
+              console.warn('Registro no painel falhou; abrindo WhatsApp mesmo assim.', errApi);
             }
           }
 
-          window.setTimeout(function () {
-            try {
-              sessionStorage.setItem(CHAVE_POS_WHATS, '1');
-            } catch (e) {}
-            window.location.href = waUrl;
-          }, 1200);
+          var baseReserva =
+            reservaCriada && reservaCriada.codigo
+              ? reservaCriada
+              : { codigo: gerarCodigoReservaLocal() };
+          var reservaWhats = montarReservaParaWhatsApp(baseReserva);
+          abrirWhatsAppComReserva(reservaWhats);
         } catch (errSave) {
           console.error('Reserva:', errSave);
-          alert(
-            'Não foi possível registrar sua reserva. Tente novamente em instantes ou entre em contato pelo WhatsApp.'
-          );
+          var fallback = montarReservaParaWhatsApp({ codigo: gerarCodigoReservaLocal() });
+          if (!abrirWhatsAppComReserva(fallback)) {
+            alert('Não foi possível abrir o WhatsApp. Tente novamente em instantes.');
+          }
         } finally {
           btnFazerReserva.disabled = false;
           btnFazerReserva.textContent = BTN_FINALIZAR_WHATS;

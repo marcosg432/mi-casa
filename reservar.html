@@ -174,9 +174,10 @@
             <h2 id="titulo-etapa-confirmacao">Confirmar reserva</h2>
             <p class="reservar-etapa-desc">Revise os dados. Ao clicar em <strong>Finalizar no WhatsApp</strong>, sua solicitação será registrada e você será direcionado ao WhatsApp do proprietário com a mensagem pronta — incluindo o código da reserva. É só enviar.</p>
             <div class="reservar-confirmacao-resumo" id="reservar-confirmacao-resumo" aria-live="polite"></div>
+            <div id="reservar-turnstile-wrap" class="reservar-turnstile-wrap"></div>
             <div class="reservar-acoes-etapa">
               <button type="button" id="btn-voltar-confirmacao" class="btn-reservar-secundario">Voltar</button>
-              <button type="button" id="btn-fazer-reserva" class="btn-reservar-pagar">Finalizar no WhatsApp</button>
+              <button type="button" id="btn-fazer-reserva" class="btn-reservar-pagar btn-reservar-finalizar-whats">Finalizar no WhatsApp</button>
             </div>
           </section>
 
@@ -291,6 +292,7 @@
     </div>
   </div>
 
+  <script src="https://challenges.cloudflare.com/turnstile/v0/api.js" async defer></script>
   <script src="js/quartos-site.js" defer></script>
   <script src="js/quartos-imagens-pastas.js" defer></script>
   <script src="js/quartos-showcase-engine.js" defer></script>
