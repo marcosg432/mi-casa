@@ -313,7 +313,12 @@
       if (!String(out.desc || '').trim()) out.desc = fb.desc;
       if (!String(out.tipo || '').trim()) out.tipo = fb.tipo;
     }
-    if (id && typeof global.quartoImagensDaPasta === 'function') {
+    if (id && global.QUARTOS_IMAGENS_PASTAS && Array.isArray(global.QUARTOS_IMAGENS_PASTAS[id])) {
+      var raw = global.QUARTOS_IMAGENS_PASTAS[id].filter(function (src) {
+        return String(src || '').trim() !== '';
+      });
+      if (raw.length) out.img = raw[0];
+    } else if (id && typeof global.quartoImagensDaPasta === 'function') {
       var daPasta = global.quartoImagensDaPasta(id);
       if (daPasta && daPasta.length) out.img = daPasta[0];
     }

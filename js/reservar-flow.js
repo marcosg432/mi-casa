@@ -1184,6 +1184,10 @@
     }
 
     function bindShowcase() {
+      if (root._reservarShowcaseCtrl && typeof root._reservarShowcaseCtrl.refresh === 'function') {
+        root._reservarShowcaseCtrl.refresh();
+        return;
+      }
       var L0 = listaQuartos();
       var roomIdx = 0;
       for (var ri = 0; ri < L0.length; ri++) {
@@ -1215,6 +1219,11 @@
     }
 
     if (typeof IntersectionObserver === 'undefined') {
+      bindShowcase();
+      return;
+    }
+    var rect = root.getBoundingClientRect();
+    if (rect.width > 0 && rect.height > 0 && rect.bottom > -200 && rect.top < window.innerHeight + 200) {
       bindShowcase();
       return;
     }

@@ -38,6 +38,9 @@
   global.quartoUrlImagem = function quartoUrlImagem(src) {
     var s = String(src || '').trim();
     if (!s || /^data:/i.test(s) || /^https?:\/\//i.test(s)) return s;
+    try {
+      s = decodeURI(s);
+    } catch (eDec) {}
     return encodeURI(s);
   };
 
