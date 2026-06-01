@@ -35,14 +35,22 @@
     ]
   };
 
+  global.quartoUrlImagem = function quartoUrlImagem(src) {
+    var s = String(src || '').trim();
+    if (!s || /^data:/i.test(s) || /^https?:\/\//i.test(s)) return s;
+    return encodeURI(s);
+  };
+
   global.quartoImagensDaPasta = function (quartoId) {
     var id = String(quartoId || '').trim();
     if (!id) return [];
     var map = global.QUARTOS_IMAGENS_PASTAS;
     if (!map || !Array.isArray(map[id])) return [];
-    return map[id].filter(function (src) {
-      return String(src || '').trim() !== '';
-    });
+    return map[id]
+      .filter(function (src) {
+        return String(src || '').trim() !== '';
+      })
+      .map(global.quartoUrlImagem);
   };
 
   /** Lista de URLs para carrossel (pasta do quarto ou imagem principal). */
@@ -54,23 +62,33 @@
       if (daPasta.length) return daPasta;
     }
     var principal = String(q.img || '').trim();
-    return principal ? [principal] : [];
+    return principal ? [global.quartoUrlImagem(principal)] : [];
   };
 
+  function mesclarMapaImagens(apiMap) {
+    var base = global.QUARTOS_IMAGENS_PASTAS || {};
+    var merged = Object.assign({}, base);
+    if (!apiMap || typeof apiMap !== 'object' || Array.isArray(apiMap)) return merged;
+    Object.keys(apiMap).forEach(function (id) {
+      if (Array.isArray(apiMap[id]) && apiMap[id].length) merged[id] = apiMap[id];
+    });
+    global.QUARTOS_IMAGENS_PASTAS = merged;
+    return merged;
+  }
+
   global.carregarImagensQuartosPastas = function () {
+    var fallback = Object.assign({}, global.QUARTOS_IMAGENS_PASTAS || {});
     return fetch('/api/quartos-imagens')
       .then(function (r) {
-        if (!r.ok) return global.QUARTOS_IMAGENS_PASTAS;
+        if (!r.ok) return fallback;
         return r.json();
       })
       .then(function (data) {
-        if (data && typeof data === 'object' && !Array.isArray(data)) {
-          global.QUARTOS_IMAGENS_PASTAS = data;
-        }
-        return global.QUARTOS_IMAGENS_PASTAS;
+        return mesclarMapaImagens(data);
       })
       .catch(function () {
-        return global.QUARTOS_IMAGENS_PASTAS;
+        global.QUARTOS_IMAGENS_PASTAS = fallback;
+        return fallback;
       });
   };
 })(window);

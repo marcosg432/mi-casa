@@ -296,13 +296,28 @@
     };
   }
 
+  function fallbackQuartoSite(id) {
+    return (global.QUARTOS_SITE_FALLBACK || []).find(function (q) {
+      return q && String(q.id || '') === String(id || '');
+    });
+  }
+
   function enriquecerQuartoComImagensPasta(q) {
-    if (!q || typeof global.quartoImagensDaPasta !== 'function') return q;
+    if (!q) return q;
     var id = q.id != null ? String(q.id).trim() : '';
-    if (!id) return q;
-    var daPasta = global.quartoImagensDaPasta(id);
-    if (!daPasta || !daPasta.length) return q;
-    return Object.assign({}, q, { img: daPasta[0] });
+    var out = Object.assign({}, q);
+    var fb = id ? fallbackQuartoSite(id) : null;
+    if (fb) {
+      if (!String(out.img || '').trim()) out.img = fb.img;
+      if (!String(out.alt || '').trim()) out.alt = fb.alt;
+      if (!String(out.desc || '').trim()) out.desc = fb.desc;
+      if (!String(out.tipo || '').trim()) out.tipo = fb.tipo;
+    }
+    if (id && typeof global.quartoImagensDaPasta === 'function') {
+      var daPasta = global.quartoImagensDaPasta(id);
+      if (daPasta && daPasta.length) out.img = daPasta[0];
+    }
+    return out;
   }
 
   function slugifyQuartoId(raw) {

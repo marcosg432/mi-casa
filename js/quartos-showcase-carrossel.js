@@ -20,7 +20,22 @@
     }
   }
 
+  function showcaseVisivel(root) {
+    if (!root || !root.isConnected) return false;
+    try {
+      var st = window.getComputedStyle(root);
+      if (st.display === 'none' || st.visibility === 'hidden' || Number(st.opacity) === 0) return false;
+    } catch (eSt) {}
+    var rect = root.getBoundingClientRect();
+    if (rect.width <= 0 || rect.height <= 0) return false;
+    return rect.bottom > -280 && rect.top < window.innerHeight + 280;
+  }
+
   function initRoot(root) {
+    if (root._quartosShowcaseCtrl && typeof root._quartosShowcaseCtrl.refresh === 'function') {
+      root._quartosShowcaseCtrl.refresh();
+      return;
+    }
     if (typeof global.mountQuartosShowcase !== 'function') return;
     var ctrl = global.mountQuartosShowcase(root, {
       getLista: function () {
@@ -92,11 +107,17 @@
         }
       })
       .then(function () {
+        document.querySelectorAll('[data-quartos-showcase]').forEach(function (root) {
+          if (showcaseVisivel(root)) initRoot(root);
+        });
         global.refreshQuartosShowcaseCarrossel();
       })
       .catch(function (e) {
         console.warn('Quartos:', e);
         global.initQuartosShowcaseCarrossel();
+        document.querySelectorAll('[data-quartos-showcase]').forEach(function (root) {
+          if (showcaseVisivel(root)) initRoot(root);
+        });
       });
   };
 

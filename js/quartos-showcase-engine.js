@@ -132,9 +132,16 @@
       }
     }
 
+    function normalizarSrcImagem(src) {
+      return typeof global.quartoUrlImagem === 'function'
+        ? global.quartoUrlImagem(src)
+        : String(src || '').trim();
+    }
+
     function definirImgNoSlide(slideEl, src, alt, eager) {
       var img = slideEl.querySelector('img');
       if (!img || !src) return;
+      src = normalizarSrcImagem(src);
       if (img.getAttribute('src') !== src) img.src = src;
       img.alt = alt;
       img.sizes = IMG_SIZES_HINT;
