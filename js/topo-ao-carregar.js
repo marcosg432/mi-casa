@@ -25,4 +25,25 @@
       if (window.scrollY <= 1) irTopo();
     });
   });
+
+  var buildLocal =
+    window.__SITE_BUILD ||
+    document.documentElement.getAttribute('data-site-build') ||
+    '';
+  if (!buildLocal || !window.fetch) return;
+
+  fetch('/api/version', { cache: 'no-store' })
+    .then(function (res) {
+      return res.ok ? res.json() : null;
+    })
+    .then(function (data) {
+      if (!data || !data.siteBuild || data.siteBuild === buildLocal) return;
+      var key = 'mcsc-build-sync';
+      if (sessionStorage.getItem(key) === data.siteBuild) return;
+      sessionStorage.setItem(key, data.siteBuild);
+      var url = new URL(window.location.href);
+      url.searchParams.set('v', data.siteBuild);
+      window.location.replace(url.toString());
+    })
+    .catch(function () {});
 })();
