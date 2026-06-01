@@ -518,7 +518,7 @@
     var x = calc.pessoasAlémCap;
     el.hidden = false;
     el.textContent =
-      'Será cobrado adicional de ' +
+      'Será cobrado um adicional por ' +
       x +
       ' ' +
       (x === 1 ? 'pessoa' : 'pessoas') +
@@ -793,7 +793,7 @@
       state.criancas +
       '</p>' +
       '<p><strong>' +
-      (calc.requerOrcamento ? 'Orçamento (de 5 dias ou mais)' : 'Valor') +
+      (calc.requerOrcamento ? 'Orçamento (de 5 noites ou mais)' : 'Valor') +
       ':</strong> ' +
       formatValorReserva() +
       '</p>' +

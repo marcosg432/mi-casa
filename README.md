@@ -1,4 +1,4 @@
-# Mi Casa Su Casa
+# Mi Casa, Su Casa
 
 Site estático com **Node + Express** para servir ficheiros na VPS (Hostinger) com **PM2**.
 

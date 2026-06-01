@@ -1,5 +1,5 @@
 /**
- * Regras de preço e capacidade — Mi Casa Su Casa
+ * Regras de preço e capacidade — Mi Casa, Su Casa
  */
 (function (global) {
   var CAPACIDADE = {
@@ -16,7 +16,7 @@
   var PESSOAS_INCLUIDAS_QUARTO = 2;
   var MAX_NOITES_ORCAMENTO = 5;
   var MSG_ORCAMENTO =
-    'Estadias de 5 dias ou mais: entre em contato para solicitar um orçamento personalizado.';
+    'Estadias de 5 noites ou mais: entre em contato para solicitar um orçamento personalizado.';
 
   function tarifaNoiteQuarto(noites) {
     return noites === 1 ? 150 : 130;

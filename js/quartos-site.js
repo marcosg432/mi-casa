@@ -16,7 +16,7 @@
       preco: 'R$ 150',
       precoLabel: 'Noite',
       img: 'imagem/imagem quartos/tem-tem/quarto_detalhe_web.webp',
-      alt: 'Quarto TEM-TEM — Mi Casa Su Casa',
+      alt: 'Quarto TEM-TEM — Mi Casa, Su Casa',
       verQuartoHref: 'quartos.html#quarto-tem-tem',
       amenities: {
         wifi: true,
@@ -32,14 +32,14 @@
     {
       id: 'soco',
       capacidade: 4,
-      titulo: 'SOCO',
+      titulo: 'SOCÓ',
       tipo: 'Quarto Família (4 Camas de Solteiro)',
       desc:
         'Quarto Família (4 Camas de Solteiro). Espaçoso, com quatro camas de solteiro, ar-condicionado, cozinha compacta privativa, vista para o jardim e banheiro compartilhado. Até 4 pessoas · 40 m².',
       preco: 'R$ 150',
       precoLabel: 'Noite',
       img: 'imagem/imagem quartos/soco/10933a8a-60dd-4808-b943-0b3ab0c21c42.webp',
-      alt: 'Quarto SOCO — Mi Casa Su Casa',
+      alt: 'Quarto SOCÓ — Mi Casa, Su Casa',
       verQuartoHref: 'quartos.html#quarto-soco',
       amenities: {
         arCondicionado: true,
@@ -58,11 +58,11 @@
       titulo: 'SABIÁ',
       tipo: 'Quarto Família (1 Cama de Casal + 3 de Solteiro)',
       desc:
-        'Quarto Família (1 Cama de Casal + 3 de Solteiro). Amplo espaço, ar-condicionado, cozinha compacta privativa e vista para o jardim. Banheiro compartilhado. Até 5 pessoas · 40 m².',
+        'Quarto Família (1 Cama de Casal + 3 de Solteiro). Amplo espaço, ar-condicionado, cozinha compacta privativa e vista para o jardim. Banheiro compartilhado. Até 4 pessoas · 40 m².',
       preco: 'R$ 150',
       precoLabel: 'Noite',
       img: 'imagem/imagem quartos/sabia/quarto_convertido.webp',
-      alt: 'Quarto SABIÁ — Mi Casa Su Casa',
+      alt: 'Quarto SABIÁ — Mi Casa, Su Casa',
       verQuartoHref: 'quartos.html#quarto-sabia',
       amenities: {
         arCondicionado: true,
@@ -85,7 +85,7 @@
       preco: 'R$ 150',
       precoLabel: 'Noite',
       img: 'imagem/imagem quartos/ararajuba/quarto_web.webp',
-      alt: 'Quarto ARARAJUBA — Mi Casa Su Casa',
+      alt: 'Quarto ARARAJUBA — Mi Casa, Su Casa',
       verQuartoHref: 'quartos.html#quarto-ararajuba',
       amenities: {
         wifi: true,

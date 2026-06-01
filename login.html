@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta name="robots" content="noindex, nofollow">
-  <title>Entrar — Painel Mi Casa Su Casa</title>
+  <title>Entrar — Painel Mi Casa, Su Casa</title>
   <link rel="stylesheet" href="css/painel.css">
   <style>
     body.login-painel {
@@ -92,11 +92,11 @@
 <body class="login-painel">
   <main class="login-card">
     <h1>Painel administrativo</h1>
-    <p>Entre com as suas credenciais para gerir reservas e quartos.</p>
+    <p>Entre com suas credenciais para gerenciar reservas e quartos.</p>
     <div id="login-error" class="login-error" role="alert"></div>
     <form id="login-form">
       <div class="login-field">
-        <label for="login-user">Utilizador</label>
+        <label for="login-user">Usuário</label>
         <input id="login-user" name="username" type="text" autocomplete="username" required />
       </div>
       <div class="login-field">
@@ -119,7 +119,7 @@
         ev.preventDefault();
         err.classList.remove('is-visible');
         btn.disabled = true;
-        btn.textContent = 'A entrar…';
+        btn.textContent = 'Entrando…';
 
         fetch('/api/auth/login', {
           method: 'POST',
@@ -134,7 +134,7 @@
             var ct = (res.headers.get('content-type') || '').toLowerCase();
             if (ct.indexOf('application/json') === -1) {
               throw new Error(
-                'Servidor indisponível. Abra http://localhost:3014/login.html e confirme que npm start está a correr.'
+                'Servidor indisponível. Abra http://localhost:3014/login.html e confirme que npm start está em execução.'
               );
             }
             return res.json().then(function (data) {

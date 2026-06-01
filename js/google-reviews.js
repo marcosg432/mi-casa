@@ -8,7 +8,7 @@
     totalAvaliacoes: null,
     urlMaps:
       'https://www.google.com/maps/search/?api=1&query=' +
-      encodeURIComponent('Pousada Mi Casa Su Casa, Benevides, PA')
+      encodeURIComponent('Pousada Mi Casa, Su Casa, Benevides, PA')
   };
 
   function escapeHtml(str) {
@@ -34,7 +34,7 @@
     var img = document.createElement('img');
     img.className = 'review-card__img';
     img.src = encodeURI(item.src);
-    img.alt = item.alt || 'Avaliação Google — Mi Casa Su Casa';
+    img.alt = item.alt || 'Avaliação Google — Mi Casa, Su Casa';
     img.width = 340;
     img.height = 220;
     img.loading = 'lazy';

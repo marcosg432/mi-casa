@@ -133,7 +133,7 @@ app.use(express.static(root, {
 }));
 
 app.listen(PORT, '0.0.0.0', () => {
-  console.log(`Mi Casa Su Casa — http://0.0.0.0:${PORT}`);
+  console.log(`Mi Casa, Su Casa — http://0.0.0.0:${PORT}`);
   if (!process.env.GOOGLE_PLACES_API_KEY) {
     console.warn('[google-reviews] GOOGLE_PLACES_API_KEY não definida — usando avaliações de exemplo.');
   }

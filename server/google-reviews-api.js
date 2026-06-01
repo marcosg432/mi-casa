@@ -2,7 +2,7 @@
 
 const PLACE_QUERY =
   process.env.GOOGLE_PLACE_QUERY ||
-  'Pousada Mi Casa Su Casa, Rua Nações Unidas 111, Benevides, PA, Brasil';
+  'Pousada Mi Casa, Su Casa, Rua Nações Unidas 111, Benevides, PA, Brasil';
 
 const CACHE_TTL_MS = Number(process.env.GOOGLE_REVIEWS_CACHE_MS) || 60 * 60 * 1000;
 
@@ -71,7 +71,7 @@ function normalizeReviews(result) {
   });
 
   return {
-    nome: result.name || 'Mi Casa Su Casa',
+    nome: result.name || 'Mi Casa, Su Casa',
     notaMedia: result.rating != null ? Number(result.rating) : null,
     totalAvaliacoes: result.user_ratings_total != null ? Number(result.user_ratings_total) : null,
     urlMaps: result.url || '',
@@ -106,7 +106,7 @@ async function fetchFromGoogle(apiKey) {
 function fallbackPayload() {
   return {
     source: 'fallback',
-    nome: 'Mi Casa Su Casa',
+    nome: 'Mi Casa, Su Casa',
     notaMedia: 5.0,
     totalAvaliacoes: null,
     urlMaps:

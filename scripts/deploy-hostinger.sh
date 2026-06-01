@@ -4,7 +4,7 @@
 
 set -e
 
-echo "=== Mi Casa Su Casa — deploy ==="
+echo "=== Mi Casa, Su Casa — deploy ==="
 
 # Descobre a pasta onde o PM2 roda o app
 APP_DIR=""

@@ -1,5 +1,5 @@
 ﻿/**
- * Regras de preço e mensagem WhatsApp — reservas Mi Casa Su Casa.
+ * Regras de preço e mensagem WhatsApp — reservas Mi Casa, Su Casa.
  */
 (function (global) {
   var CAPACIDADES = {
@@ -176,7 +176,7 @@
     var map = {
       'tem-tem': 'TEM-TEM',
       sabia: 'SABIÁ',
-      soco: 'SOCO',
+      soco: 'SOCÓ',
       ararajuba: 'ARARAJUBA'
     };
     return map[id] || String(id || '').toLocaleUpperCase('pt-BR') || '—';
@@ -191,8 +191,8 @@
           : faixaOrcamentoReserva(reserva);
       valorLinha =
         faixa.valorMin > 0 && faixa.valorMax > 0
-          ? 'Orçamento (de 5 dias ou mais): ' + formatFaixaOrcamentoTexto(faixa)
-          : 'Orçamento personalizado (de 5 dias ou mais)';
+          ? 'Orçamento (de 5 noites ou mais): ' + formatFaixaOrcamentoTexto(faixa)
+          : 'Orçamento personalizado (de 5 noites ou mais)';
     } else if (reserva.valorTotal == null) {
       valorLinha = 'Orçamento personalizado';
     } else {
@@ -200,7 +200,7 @@
     }
     var codigo = reserva.codigo || reserva.id || '—';
     var msg =
-      'Olá! Gostaria de confirmar minha reserva na Mi Casa Su Casa.\n\n' +
+      'Olá! Gostaria de confirmar minha reserva na Mi Casa, Su Casa.\n\n' +
       'Código da reserva: #' + codigo + '\n\n' +
       'Nome: ' + (reserva.nome || '—') + '\n' +
       'E-mail: ' + (reserva.email || '—') + '\n' +

@@ -705,7 +705,7 @@ body.lightbox-aberto .cabecalho {
     margin-bottom: 0.78rem;
   }
 
-  /* Mi Casa Su Casa: coluna, vídeo em destaque, texto confortável (padding vertical em bloco mais abaixo, com especificidade sobre .secao) */
+  /* Mi Casa, Su Casa: coluna, vídeo em destaque, texto confortável (padding vertical em bloco mais abaixo, com especificidade sobre .secao) */
   .inicio-visivel-apenas-mobile .secao-recanto {
     background: linear-gradient(
       180deg,
@@ -1584,7 +1584,7 @@ body.lightbox-aberto .cabecalho {
   }
 }
 
-/* ----- Seção Mi Casa Su Casa ----- */
+/* ----- Seção Mi Casa, Su Casa ----- */
 .secao-recanto {
   position: relative;
   padding: 5rem 0 6rem;

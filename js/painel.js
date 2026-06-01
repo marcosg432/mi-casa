@@ -616,7 +616,7 @@
       width +
       ' ' +
       height +
-      '" class="sys-chart-svg" role="img" aria-label="Grafico de reservas por dia">' +
+      '" class="sys-chart-svg" role="img" aria-label="Gráfico de reservas por dia">' +
       '<defs>' +
       '<linearGradient id="reservas-chart-area-grad" x1="0" y1="0" x2="0" y2="1">' +
       '<stop offset="0%" stop-color="#2d6a4a" stop-opacity="0.28"/>' +
@@ -989,7 +989,7 @@
     var el = document.getElementById('tab-historico');
     if (!el) return;
     el.innerHTML =
-      '<input id="history-search" class="sys-search" placeholder="Busca por nome, código, gmail ou número" value="' +
+      '<input id="history-search" class="sys-search" placeholder="Busca por nome, código, e-mail ou número" value="' +
       esc(state.historyQuery) +
       '" />' +
       historicoRows +
@@ -1139,11 +1139,11 @@
 
     function handleFile(file) {
       if (!file || !/^image\//.test(file.type)) {
-        alert('Escolha um ficheiro de imagem (JPG, PNG, WebP, etc.).');
+        alert('Escolha um arquivo de imagem (JPG, PNG, WebP, etc.).');
         return;
       }
       if (file.size > 8 * 1024 * 1024) {
-        alert('Imagem demasiado grande (máximo 8 MB).');
+        alert('Imagem muito grande (máximo 8 MB).');
         return;
       }
       revogarBlobQuartoEditor();
@@ -1566,9 +1566,9 @@
     html += '<p class="sys-rv-legenda">' + label + '</p>';
     html += '<div class="sys-rv-mount">';
     html += '<div class="sys-rv-nav">';
-    html += '<button type="button" class="sys-rv-nav-btn" data-cal-nav="-1" aria-label="Mes anterior">‹</button>';
+    html += '<button type="button" class="sys-rv-nav-btn" data-cal-nav="-1" aria-label="Mês anterior">‹</button>';
     html += '<div class="sys-rv-nav-title"><span class="sys-rv-year">' + y + '</span><strong class="sys-rv-month">' + months[m] + '</strong></div>';
-    html += '<button type="button" class="sys-rv-nav-btn" data-cal-nav="1" aria-label="Proximo mes">›</button>';
+    html += '<button type="button" class="sys-rv-nav-btn" data-cal-nav="1" aria-label="Próximo mês">›</button>';
     html += '</div>';
     html += '<div class="sys-rv-week">DOM SEG TER QUA QUI SEX SAB</div>';
     html += '<div class="sys-rv-grid">';
@@ -1736,7 +1736,7 @@
             renderAll();
           })
           .catch(function () {
-            alert('Nao foi possivel cancelar a reserva.');
+            alert('Não foi possível cancelar a reserva.');
           });
         return;
       }
@@ -1967,7 +1967,7 @@
       if (SystemStore.init) await SystemStore.init();
     } catch (errBoot) {
       console.error('Falha ao carregar painel:', errBoot);
-      alert('Nao foi possivel carregar dados do servidor.');
+      alert('Não foi possível carregar dados do servidor.');
     }
     renderAll();
   })();

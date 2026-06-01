@@ -1,4 +1,4 @@
--- Executar no SQL Editor do Supabase (projeto Mi Casa Su Casa).
+-- Executar no SQL Editor do Supabase (projeto Mi Casa, Su Casa).
 -- Catálogo de quartos: site + reservas + painel leem daqui via anon key.
 
 create table if not exists public.quartos_catalog (

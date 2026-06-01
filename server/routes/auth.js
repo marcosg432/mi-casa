@@ -14,7 +14,7 @@ router.post('/login', loginLimiter, express.json(), async function (req, res) {
     var password = req.body && req.body.password;
     var ok = await verifyAdminCredentials(username, password);
     if (!ok) {
-      return res.status(401).json({ error: 'Utilizador ou senha incorretos.' });
+      return res.status(401).json({ error: 'Usuário ou senha incorretos.' });
     }
     var token = signSession(config.adminUsername);
     res.cookie(config.sessionCookieName, token, cookieOptions());
