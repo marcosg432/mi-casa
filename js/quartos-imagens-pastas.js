@@ -41,7 +41,7 @@
     try {
       s = decodeURI(s);
     } catch (eDec) {}
-    return encodeURI(s);
+    return s;
   };
 
   global.quartoImagensDaPasta = function (quartoId) {

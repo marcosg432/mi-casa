@@ -142,11 +142,19 @@
       var img = slideEl.querySelector('img');
       if (!img || !src) return;
       src = normalizarSrcImagem(src);
-      if (img.getAttribute('src') !== src) img.src = src;
       img.alt = alt;
       img.sizes = IMG_SIZES_HINT;
       img.decoding = 'async';
       img.loading = eager ? 'eager' : 'lazy';
+      img.onerror = function onImgErr() {
+        img.onerror = null;
+        try {
+          img.src = encodeURI(src);
+        } catch (eEnc) {
+          img.src = src;
+        }
+      };
+      img.src = src;
     }
 
     function aplicarImgQuartoNoSlide(slideDomIdx, ri, eager) {

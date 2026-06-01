@@ -2070,6 +2070,42 @@ body.lightbox-aberto .cabecalho {
   height: 100%;
   object-fit: cover;
   display: block;
+  -webkit-backface-visibility: hidden;
+  backface-visibility: hidden;
+  transform: translateZ(0);
+}
+
+@media (max-width: 768px) {
+  .quartos-3d-wrapper {
+    perspective: none;
+  }
+
+  .quartos-3d-cena {
+    transform-style: flat;
+    perspective: none;
+    height: 252px;
+  }
+
+  .quartos-3d-slide {
+    transform-style: flat;
+  }
+
+  .quartos-3d-slide.pos-centro {
+    transform: translateX(0) scale(1) !important;
+  }
+
+  .quartos-3d-slide.pos-esquerda {
+    transform: translateX(-50%) scale(0.7) !important;
+  }
+
+  .quartos-3d-slide.pos-direita {
+    transform: translateX(50%) scale(0.7) !important;
+  }
+
+  .quartos-3d-foto {
+    transform: translateZ(0);
+    -webkit-transform: translateZ(0);
+  }
 }
 
 .quartos-3d-slide.pos-centro {
