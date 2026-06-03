@@ -4,7 +4,7 @@
     return;
   }
   var s = document.createElement('script');
-  s.src = 'js/reservar-flow.js?v=20260601h';
+  s.src = 'js/reservar-flow.js?v=20260603a';
   s.defer = true;
   s.setAttribute('data-reservar-flow', '1');
   document.head.appendChild(s);

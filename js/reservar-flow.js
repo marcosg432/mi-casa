@@ -650,16 +650,13 @@
     for (var day = 1; day <= dim; day++) {
       var d = new Date(y, m, day);
       var isPast = d < today;
-      var iso = toIsoDate(d);
-      var isBlocked = !!state.ocupadas[iso];
       var isIn = selIn && sameDay(d, selIn);
       var isOut = selOut && sameDay(d, selOut);
       var classes = 'reservar-cal-cell reservar-cal-day';
       if (isPast) classes += ' reservar-cal-past';
-      if (isBlocked) classes += ' reservar-cal-ocupado';
       if (isIn) classes += ' reservar-cal-pick-in';
       if (isOut) classes += ' reservar-cal-pick-out';
-      if (!isPast && !isBlocked) {
+      if (!isPast) {
         html += '<button type="button" class="' + classes + '" data-cal="' + field + '" data-y="' + y + '" data-m="' + m + '" data-d="' + day + '">' + day + '</button>';
       } else {
         html += '<span class="' + classes + '">' + day + '</span>';
@@ -709,18 +706,11 @@
             return;
           }
           if (picked <= state.checkIn) return;
-          var saidaIsoPick = toIsoDate(picked);
-          refreshOcupadasMapAsync().then(function () {
-            if (periodoTemConflitoLocal(toIsoDate(state.checkIn), saidaIsoPick)) {
-              alert('Esse período contém datas já reservadas ou bloqueadas para este quarto.');
-              return;
-            }
-            state.checkOut = picked;
-            renderCalendar('cal-entrada', 'entrada');
-            renderCalendar('cal-saida', 'saida');
-            updateSidebar();
-            updateContinuarDatas();
-          });
+          state.checkOut = picked;
+          renderCalendar('cal-entrada', 'entrada');
+          renderCalendar('cal-saida', 'saida');
+          updateSidebar();
+          updateContinuarDatas();
           return;
         }
         renderCalendar('cal-entrada', 'entrada');
@@ -1127,13 +1117,6 @@
         btnFazerReserva.textContent = 'Abrindo WhatsApp…';
 
         try {
-          await refreshOcupadasMapAsync();
-          if (periodoTemConflitoLocal(entradaIso, saidaIso)) {
-            alert('Esse período já está reservado ou bloqueado para este quarto. Escolha outras datas.');
-            showStep(1);
-            return;
-          }
-
           var preco = calcPrecoAtual();
           var codigoLocal = gerarCodigoReservaLocal();
           var reservaWhats = montarReservaParaWhatsApp({ codigo: codigoLocal });

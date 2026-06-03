@@ -1315,5 +1315,47 @@
       });
     });
   </script>
+  <script>
+    document.addEventListener('DOMContentLoaded', function () {
+      function hojeIso() {
+        var t = new Date();
+        var m = t.getMonth() + 1;
+        var d = t.getDate();
+        return t.getFullYear() + '-' + (m < 10 ? '0' : '') + m + '-' + (d < 10 ? '0' : '') + d;
+      }
+
+      function addDiaIso(iso, dias) {
+        var p = iso.split('-');
+        var dt = new Date(Number(p[0]), Number(p[1]) - 1, Number(p[2]));
+        dt.setDate(dt.getDate() + dias);
+        var m = dt.getMonth() + 1;
+        var d = dt.getDate();
+        return dt.getFullYear() + '-' + (m < 10 ? '0' : '') + m + '-' + (d < 10 ? '0' : '') + d;
+      }
+
+      var minHoje = hojeIso();
+      document.querySelectorAll('.form-reserva input[type="date"]').forEach(function (inp) {
+        inp.removeAttribute('max');
+        if (inp.name === 'entrada') {
+          inp.min = minHoje;
+        }
+      });
+
+      document.querySelectorAll('.form-reserva').forEach(function (form) {
+        var entrada = form.querySelector('input[name="entrada"]');
+        var saida = form.querySelector('input[name="saida"]');
+        if (!entrada || !saida) return;
+
+        function syncSaidaMin() {
+          var base = entrada.value && entrada.value >= minHoje ? entrada.value : minHoje;
+          saida.min = addDiaIso(base, 1);
+          if (saida.value && saida.value <= base) saida.value = '';
+        }
+
+        entrada.addEventListener('change', syncSaidaMin);
+        syncSaidaMin();
+      });
+    });
+  </script>
 </body>
 </html>
