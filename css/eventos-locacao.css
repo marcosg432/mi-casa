@@ -238,6 +238,15 @@
   flex-shrink: 0;
 }
 
+.eventos-card-icone iconify-icon {
+  width: var(--eventos-icone);
+  height: var(--eventos-icone);
+  font-size: var(--eventos-icone);
+  color: var(--eventos-verde);
+  display: block;
+  flex-shrink: 0;
+}
+
 .eventos-card-titulo {
   margin: 0;
   font-family: var(--font-body);
