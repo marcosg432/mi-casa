@@ -11,6 +11,11 @@
   .eventos-visivel-apenas-mobile {
     display: block;
   }
+
+  .secao-eventos {
+    --eventos-icone: 1.5rem;
+    --eventos-icone-circulo: 2.5rem;
+  }
 }
 
 .secao-eventos {
@@ -21,6 +26,8 @@
   --eventos-suave: #6b6b6b;
   --eventos-borda: rgba(27, 48, 34, 0.12);
   --eventos-card-borda: #ddd8cf;
+  --eventos-icone: 1.6rem;
+  --eventos-icone-circulo: 2.75rem;
   padding: clamp(3.5rem, 7vw, 5.5rem) 0 clamp(3rem, 6vw, 4.5rem);
   background: var(--eventos-bg);
 }
@@ -103,17 +110,18 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  width: 2.35rem;
-  height: 2.35rem;
+  width: var(--eventos-icone-circulo);
+  height: var(--eventos-icone-circulo);
   border-radius: 50%;
   background: var(--eventos-verde);
   color: #fff;
   flex-shrink: 0;
 }
 
-.eventos-beneficio-icone svg {
-  width: 1.15rem;
-  height: 1.15rem;
+.eventos-beneficio-icone svg,
+.eventos-beneficio-icone .lucide-icon {
+  width: var(--eventos-icone);
+  height: var(--eventos-icone);
   stroke-width: 2.25;
 }
 
@@ -215,22 +223,19 @@
   display: flex;
   align-items: center;
   justify-content: center;
+  width: var(--eventos-icone);
+  height: var(--eventos-icone);
   color: var(--eventos-verde);
+  flex-shrink: 0;
 }
 
 .eventos-card-icone svg,
 .eventos-card-icone .lucide-icon {
-  width: 1.6rem;
-  height: 1.6rem;
+  width: var(--eventos-icone);
+  height: var(--eventos-icone);
   color: var(--eventos-verde);
-}
-
-/* mdi:ring tem margem interna maior — compensa para igualar Lucide */
-.eventos-card-icone iconify-icon {
-  width: 2.35rem;
-  height: 2.35rem;
-  font-size: 2.35rem;
-  color: var(--eventos-verde);
+  display: block;
+  flex-shrink: 0;
 }
 
 .eventos-card-titulo {
@@ -507,9 +512,12 @@
   color: var(--eventos-verde);
 }
 
-.eventos-diferencial-icone svg {
-  width: 1.65rem;
-  height: 1.65rem;
+.eventos-diferencial-icone svg,
+.eventos-diferencial-icone .lucide-icon {
+  width: var(--eventos-icone);
+  height: var(--eventos-icone);
+  display: block;
+  flex-shrink: 0;
 }
 
 .eventos-diferencial-texto {
@@ -667,16 +675,6 @@
     padding: 0.95rem 0;
   }
 
-  .eventos-visivel-apenas-mobile .eventos-beneficio-icone {
-    width: 2.5rem;
-    height: 2.5rem;
-  }
-
-  .eventos-visivel-apenas-mobile .eventos-beneficio-icone svg {
-    width: 1.2rem;
-    height: 1.2rem;
-  }
-
   .eventos-visivel-apenas-mobile .eventos-beneficio-titulo {
     font-size: 0.9rem;
   }
@@ -725,30 +723,6 @@
     overflow: visible;
     position: relative;
     z-index: 1;
-  }
-
-  .eventos-visivel-apenas-mobile .eventos-card-icone {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    min-height: 1.55rem;
-    color: var(--eventos-verde);
-  }
-
-  .eventos-visivel-apenas-mobile .eventos-card-icone svg,
-  .eventos-visivel-apenas-mobile .eventos-card-icone .lucide-icon {
-    width: 1.55rem;
-    height: 1.55rem;
-    display: block;
-    flex-shrink: 0;
-  }
-
-  .eventos-visivel-apenas-mobile .eventos-card-icone iconify-icon {
-    width: 2.2rem;
-    height: 2.2rem;
-    font-size: 2.2rem;
-    display: block;
-    flex-shrink: 0;
   }
 
   .eventos-visivel-apenas-mobile .eventos-card-titulo {
@@ -888,11 +862,6 @@
 
   .eventos-visivel-apenas-mobile .eventos-diferencial:last-child {
     border-right: none;
-  }
-
-  .eventos-visivel-apenas-mobile .eventos-diferencial-icone svg {
-    width: 1.35rem;
-    height: 1.35rem;
   }
 
   .eventos-visivel-apenas-mobile .eventos-diferencial-texto {
