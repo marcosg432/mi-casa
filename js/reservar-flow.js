@@ -173,8 +173,7 @@
       quartoId: state.quartoId,
       noites: nights(),
       adultos: state.adultos,
-      criancas: state.criancas,
-      pessoasAlémCap: state.modoGrupo ? state.pessoasAlémCap : 0
+      criancas: state.criancas
     });
   }
 
@@ -344,7 +343,7 @@
         telefone: state.telefone,
         adultos: state.adultos,
         criancas: state.criancas,
-        pessoasAlémCap: state.modoGrupo ? state.pessoasAlémCap : 0,
+        pessoasAlémCap: 0,
         dataEntrada: entradaIso,
         dataSaida: saidaIso,
         plataforma: 'site',
@@ -494,9 +493,9 @@
   function updateMsgAdicional() {
     var el = document.getElementById('reservar-msg-adicional');
     var wrap = document.getElementById('reservar-valor-adicional-wrap');
-    var strong = document.getElementById('reservar-valor-adicional');
     var msgOrc = document.getElementById('reservar-msg-orcamento');
     var calc = calcPrecoAtual();
+    var n = nights();
 
     if (msgOrc) {
       if (calc.requerOrcamento) {
@@ -508,39 +507,25 @@
       }
     }
 
+    if (wrap) wrap.hidden = true;
+
     if (!el) return;
-    if (!calc.pessoasAlémCap || calc.pessoasAlémCap <= 0) {
-      el.textContent = '';
-      el.hidden = true;
-      if (wrap) wrap.hidden = true;
+    if (!calc.requerOrcamento && n > 0 && calc.totalPessoas > 0 && calc.tarifaPorPessoa > 0) {
+      el.hidden = false;
+      el.textContent =
+        formatMoney(calc.tarifaPorPessoa) +
+        ' por pessoa/diária × ' +
+        calc.totalPessoas +
+        ' pessoa(s) × ' +
+        n +
+        ' diária(s). O quarto reservado fica indisponível para outras reservas nesse período.';
       return;
     }
-    var x = calc.pessoasAlémCap;
-    el.hidden = false;
-    el.textContent =
-      'Será cobrado um adicional por ' +
-      x +
-      ' ' +
-      (x === 1 ? 'pessoa' : 'pessoas') +
-      ' além da capacidade do quarto.';
-    var va = valorTotalSoAdicional();
-    if (wrap && strong) {
-      if (va != null && !calc.requerOrcamento) {
-        wrap.hidden = false;
-        strong.textContent = formatMoney(va);
-      } else {
-        wrap.hidden = true;
-      }
-    }
+    el.textContent = '';
+    el.hidden = true;
   }
 
   function hospedesValidos() {
-    if (state.modoGrupo) {
-      return parsePessoasExtras(
-        document.getElementById('reservar-input-pessoas-total') &&
-          document.getElementById('reservar-input-pessoas-total').value
-      ).valid;
-    }
     var cap = capacidadeQuartoId(state.quartoId);
     return state.adultos >= 1 && state.adultos + state.criancas <= cap;
   }
@@ -777,11 +762,13 @@
       '</p>' +
       '<p><strong>Noites:</strong> ' +
       nights() +
-      ' · <strong>Adultos:</strong> ' +
+      ' · <strong>Pessoas:</strong> ' +
+      (state.adultos + state.criancas) +
+      ' (adultos: ' +
       state.adultos +
-      ' · <strong>Crianças:</strong> ' +
+      ', crianças: ' +
       state.criancas +
-      '</p>' +
+      ')</p>' +
       '<p><strong>' +
       (calc.requerOrcamento ? 'Orçamento (de 5 noites ou mais)' : 'Valor') +
       ':</strong> ' +
@@ -790,10 +777,6 @@
       '<p><strong>Contato:</strong> ' +
       [state.nome, state.email, state.telefone].filter(Boolean).join(' · ') +
       '</p>';
-    if (calc.pessoasAlémCap > 0) {
-      box.innerHTML +=
-        '<p><em>Inclui ' + calc.pessoasAlémCap + ' pessoa(s) além da capacidade do quarto.</em></p>';
-    }
   }
 
   async function init() {

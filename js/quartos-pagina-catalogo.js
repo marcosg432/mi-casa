@@ -10,6 +10,23 @@
       .replace(/"/g, '&quot;');
   }
 
+  function metaIcon(key) {
+    var map = {
+      'Ar-condicionado': 'air-vent',
+      'Wi-Fi': 'wifi',
+      'Banheiro': 'shower-head',
+      'Cozinha compacta': 'cooking-pot',
+      'Máquina de lavar': 'washing-machine',
+      'Ventilador': 'fan',
+      'Guarda-roupa': 'shirt',
+      'Camas': 'bed',
+      'Capacidade': 'users',
+      'Tamanho': 'ruler',
+      'Diária': 'banknote'
+    };
+    return map[key] || 'circle-dot';
+  }
+
   function metaLista(q) {
     var a = (q && q.amenities) || {};
     var lines = [];
@@ -129,7 +146,19 @@
         var invert = idx % 2 === 1 ? ' quarto-modelo-card--invert' : '';
         var lis = metaLista(q)
           .map(function (row) {
-            return '<li><strong>' + esc(row.k) + ':</strong> ' + esc(row.v) + '</li>';
+            return (
+              '<li class="quarto-modelo-meta-item">' +
+              '<span class="quarto-modelo-meta-icone" aria-hidden="true">' +
+              '<i data-lucide="' +
+              esc(metaIcon(row.k)) +
+              '" class="lucide-icon"></i>' +
+              '</span>' +
+              '<span class="quarto-modelo-meta-texto"><strong>' +
+              esc(row.k) +
+              ':</strong> ' +
+              esc(row.v) +
+              '</span></li>'
+            );
           })
           .join('');
         var id = esc(q.id);
@@ -161,6 +190,10 @@
       })
       .join('');
     el.innerHTML = html;
+
+    if (typeof global.refreshLucideIcons === 'function') {
+      global.refreshLucideIcons(el);
+    }
 
     if (typeof global.initQuartosCardCarrosseis === 'function') {
       global.initQuartosCardCarrosseis(el);

@@ -7,29 +7,16 @@ var CAPACIDADE = {
   ararajuba: 3
 };
 
-var QUARTOS_POR_PESSOA = {
-  'tem-tem': true
-};
-
-var PESSOAS_INCLUIDAS_QUARTO = 2;
 var MAX_NOITES_ORCAMENTO = 5;
 var MSG_ORCAMENTO =
   'Estadias de 5 noites ou mais: entre em contato para solicitar um orçamento personalizado.';
 
-function tarifaNoiteQuarto(noites) {
+function tarifaPorPessoa(noites) {
   return noites === 1 ? 150 : 130;
-}
-
-function tarifaPessoaAdicional(noites) {
-  return noites === 1 ? 100 : 80;
 }
 
 function getCapacidade(quartoId) {
   return CAPACIDADE[String(quartoId || '').toLowerCase()] || 4;
-}
-
-function isQuartoPorPessoa(quartoId) {
-  return !!QUARTOS_POR_PESSOA[String(quartoId || '').toLowerCase()];
 }
 
 function calcular(opts) {
@@ -63,24 +50,13 @@ function calcular(opts) {
     };
   }
 
-  var pagantes = adultos;
-  var tarifa = tarifaNoiteQuarto(noites);
-  var valorDiaria = tarifa;
-  var valorAdicional = 0;
-  var valorTotal = 0;
-
-  if (isQuartoPorPessoa(quartoId)) {
-    valorTotal = pagantes * tarifa * noites;
-  } else {
-    var extras = Math.max(0, pagantes - PESSOAS_INCLUIDAS_QUARTO);
-    valorAdicional = extras * tarifaPessoaAdicional(noites) * noites;
-    valorTotal = tarifa * noites + valorAdicional;
-  }
+  var tarifa = tarifaPorPessoa(noites);
+  var valorTotal = totalPessoas * tarifa * noites;
 
   return {
     noites: noites,
-    valorDiaria: valorDiaria,
-    valorAdicional: valorAdicional,
+    valorDiaria: tarifa,
+    valorAdicional: 0,
     valorTotal: valorTotal,
     requerOrcamento: false,
     erro: null
@@ -91,6 +67,7 @@ module.exports = {
   CAPACIDADE: CAPACIDADE,
   MAX_NOITES_ORCAMENTO: MAX_NOITES_ORCAMENTO,
   MSG_ORCAMENTO: MSG_ORCAMENTO,
+  tarifaPorPessoa: tarifaPorPessoa,
   getCapacidade: getCapacidade,
   calcular: calcular
 };

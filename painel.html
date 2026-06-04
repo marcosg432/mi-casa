@@ -12,6 +12,7 @@
   <link rel="apple-touch-icon" href="/icons/icon-192.png">
   <title>Painel — Mi Casa, Su Casa</title>
   <link rel="stylesheet" href="css/painel.css">
+  <link rel="stylesheet" href="css/lucide.css">
   <script src="js/topo-ao-carregar.js" defer></script>
 </head>
 <body class="painel">
@@ -29,10 +30,10 @@
       </div>
       <p class="sys-nav-group-label">Menu</p>
       <nav class="sys-sidebar-nav" aria-label="Seções do painel">
-        <button type="button" class="sys-nav-btn active" data-tab="faturamento">Faturamento</button>
-        <button type="button" class="sys-nav-btn" data-tab="ficha">Ficha de reserva</button>
-        <button type="button" class="sys-nav-btn" data-tab="quartos">Quartos</button>
-        <button type="button" class="sys-nav-btn" data-tab="calendario">Configuração</button>
+        <button type="button" class="sys-nav-btn active" data-tab="faturamento"><i data-lucide="bar-chart-3" class="lucide-icon lucide-icon--18" aria-hidden="true"></i> Faturamento</button>
+        <button type="button" class="sys-nav-btn" data-tab="ficha"><i data-lucide="clipboard-list" class="lucide-icon lucide-icon--18" aria-hidden="true"></i> Ficha de reserva</button>
+        <button type="button" class="sys-nav-btn" data-tab="quartos"><i data-lucide="bed-double" class="lucide-icon lucide-icon--18" aria-hidden="true"></i> Quartos</button>
+        <button type="button" class="sys-nav-btn" data-tab="calendario"><i data-lucide="settings" class="lucide-icon lucide-icon--18" aria-hidden="true"></i> Configuração</button>
       </nav>
       <div class="sys-sidebar-footer">
         <button type="button" class="sys-nav-btn sys-nav-btn--ghost" id="btn-logout" data-sidebar-action="voltar">Encerrar sessão</button>
@@ -82,6 +83,8 @@
     <div class="sys-modal-backdrop" data-quarto-modal-close="true"></div>
     <div class="sys-modal-card sys-modal-card--quarto" id="quarto-editor-card"></div>
   </div>
+  <script src="https://unpkg.com/lucide@0.469.0/dist/umd/lucide.min.js"></script>
+  <script src="js/lucide-init.js"></script>
   <script src="js/quartos-site.js"></script>
   <script src="js/quartos-imagens-pastas.js"></script>
   <script src="js/reservar-precos.js"></script>

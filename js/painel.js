@@ -1928,6 +1928,9 @@
     } catch (e) {
       console.error('setActiveTab', e);
     }
+    if (typeof window.refreshLucideIcons === 'function') {
+      window.refreshLucideIcons();
+    }
   }
 
   bindEvents();

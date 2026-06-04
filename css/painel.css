@@ -200,80 +200,16 @@ body.painel {
   display: none;
 }
 
-.sys-nav-btn[data-tab="faturamento"]::before {
-  width: 18px;
-  height: 18px;
-  border-radius: 0;
-  background-color: #6d8f7e;
-  -webkit-mask-image: url('../assets/icone-financeiro.svg');
-  mask-image: url('../assets/icone-financeiro.svg');
-  -webkit-mask-repeat: no-repeat;
-  mask-repeat: no-repeat;
-  -webkit-mask-position: center;
-  mask-position: center;
-  -webkit-mask-size: contain;
-  mask-size: contain;
+.sys-nav-btn[data-tab]::before {
+  display: none;
 }
 
-.sys-nav-btn[data-tab="faturamento"].active::before {
-  background-color: var(--primary);
+.sys-nav-btn .lucide-icon {
+  color: #6d8f7e;
 }
 
-.sys-nav-btn[data-tab="ficha"]::before {
-  width: 18px;
-  height: 18px;
-  border-radius: 0;
-  background-color: #6d8f7e;
-  -webkit-mask-image: url('../assets/icone-ficha.svg');
-  mask-image: url('../assets/icone-ficha.svg');
-  -webkit-mask-repeat: no-repeat;
-  mask-repeat: no-repeat;
-  -webkit-mask-position: center;
-  mask-position: center;
-  -webkit-mask-size: contain;
-  mask-size: contain;
-}
-
-.sys-nav-btn[data-tab="ficha"].active::before {
-  background-color: var(--primary);
-}
-
-.sys-nav-btn[data-tab="calendario"]::before {
-  width: 18px;
-  height: 18px;
-  border-radius: 0;
-  background-color: #6d8f7e;
-  -webkit-mask-image: url('../assets/icone-configuracao.svg');
-  mask-image: url('../assets/icone-configuracao.svg');
-  -webkit-mask-repeat: no-repeat;
-  mask-repeat: no-repeat;
-  -webkit-mask-position: center;
-  mask-position: center;
-  -webkit-mask-size: contain;
-  mask-size: contain;
-}
-
-.sys-nav-btn[data-tab="calendario"].active::before {
-  background-color: var(--primary);
-}
-
-.sys-nav-btn[data-tab="quartos"]::before {
-  width: 18px;
-  height: 18px;
-  border-radius: 0;
-  background-color: #6d8f7e;
-  -webkit-mask-image: url('../assets/icone-quarto.svg');
-  mask-image: url('../assets/icone-quarto.svg');
-  -webkit-mask-repeat: no-repeat;
-  mask-repeat: no-repeat;
-  -webkit-mask-position: center;
-  mask-position: center;
-  -webkit-mask-size: contain;
-  mask-size: contain;
-}
-
-.sys-nav-btn[data-tab="quartos"].active::before {
-  background-color: var(--primary);
+.sys-nav-btn.active .lucide-icon {
+  color: var(--primary);
 }
 
 .sys-voltar {

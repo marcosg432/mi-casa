@@ -1,0 +1,59 @@
+/* Lucide — tamanhos e alinhamento */
+.lucide-icon,
+[data-lucide] {
+  display: inline-block;
+  vertical-align: middle;
+  stroke: currentColor;
+  fill: none;
+  flex-shrink: 0;
+}
+
+.lucide-icon--18,
+[data-lucide].lucide-icon--18 {
+  width: 1.125rem;
+  height: 1.125rem;
+}
+
+.lucide-icon--22,
+[data-lucide].lucide-icon--22 {
+  width: 1.375rem;
+  height: 1.375rem;
+}
+
+.lucide-icon--48,
+[data-lucide].lucide-icon--48 {
+  width: 3rem;
+  height: 3rem;
+}
+
+.lucide-icon--64,
+[data-lucide].lucide-icon--64 {
+  width: 4rem;
+  height: 4rem;
+}
+
+.servico-icone [data-lucide],
+.servico-icone svg {
+  width: 100%;
+  height: 100%;
+  max-width: 4rem;
+  max-height: 4rem;
+}
+
+.hero-recanto-label [data-lucide] {
+  margin-right: 0.35rem;
+}
+
+.hero-recanto-btn [data-lucide] {
+  margin-right: 0.4rem;
+}
+
+.sobre-contato-link [data-lucide] {
+  width: 1.375rem;
+  height: 1.375rem;
+}
+
+.sobre-contato-icone-grosso-wrap [data-lucide] {
+  width: 3rem;
+  height: 3rem;
+}

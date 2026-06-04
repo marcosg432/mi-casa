@@ -11,7 +11,8 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;0,700;1,400&family=Outfit:wght@300;400;500;600&display=swap">
   <title>Reservar — Mi Casa, Su Casa</title>
-  <link rel="stylesheet" href="css/estilo.css?v=20260601h">
+  <link rel="stylesheet" href="css/estilo.css?v=20260604b">
+  <link rel="stylesheet" href="css/lucide.css?v=20260603b">
   <script src="js/topo-ao-carregar.js?v=20260601h" defer></script>
   <script src="js/intro-nav-mobile.js?v=20260601h" defer></script>
 </head>
@@ -34,7 +35,6 @@
   <main class="reservar-main">
     <div class="reservar-pagina">
       <p id="reservar-passo-indicador" class="reservar-passo-indicador">Passo 1 de 4</p>
-      <p class="reservar-build-stamp" id="reservar-build-stamp" aria-hidden="true">v20260601h</p>
 
       <header class="reservar-cabecalho">
         <h1>Reservar estadia</h1>
@@ -50,7 +50,7 @@
           <div class="quartos-showcase-meio">
             <div class="quartos-showcase-visual-wrap">
               <button type="button" class="quartos-showcase-nav quartos-showcase-nav--prev" aria-label="Quarto anterior">
-                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 18l-6-6 6-6"/></svg>
+                <i data-lucide="chevron-left" class="lucide-icon lucide-icon--22" aria-hidden="true"></i>
               </button>
               <div class="quartos-showcase-visual">
                 <div class="quartos-3d-wrapper">
@@ -62,7 +62,7 @@
                 </div>
               </div>
               <button type="button" class="quartos-showcase-nav quartos-showcase-nav--next" aria-label="Próximo quarto">
-                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 18l6-6-6-6"/></svg>
+                <i data-lucide="chevron-right" class="lucide-icon lucide-icon--22" aria-hidden="true"></i>
               </button>
             </div>
             <div class="quartos-showcase-copy" aria-live="polite">
@@ -100,7 +100,7 @@
 
           <section id="painel-etapa-pessoas" class="reservar-etapa" hidden aria-labelledby="titulo-etapa-pessoas">
             <h2 id="titulo-etapa-pessoas">Hóspedes e valor</h2>
-            <p class="reservar-etapa-desc">Informe adultos e crianças (até 3 anos não pagam). A capacidade varia por quarto. Reservas a partir de <strong>5 noites</strong> seguem como orçamento — exibimos a <strong>média de valor entre duas faixas</strong>. É possível incluir até <strong>3 pessoas a mais</strong> além da capacidade — use <strong>Quero adicionar até 3 pessoas a mais</strong>.</p>
+            <p class="reservar-etapa-desc">Informe adultos e acompanhantes (crianças entram na contagem de pessoas). A cobrança é <strong>por pessoa</strong>: R$ 150/pessoa em reservas de <strong>1 diária</strong> e R$ 130/pessoa/diária a partir de <strong>2 diárias</strong>. Ao reservar, o <strong>quarto inteiro</strong> fica indisponível no período. Reservas a partir de <strong>5 noites</strong> seguem como orçamento personalizado.</p>
             <div class="reservar-resumo-linha">
               <span>Noites</span>
               <strong id="reservar-preview-noites">—</strong>
@@ -121,7 +121,7 @@
                   </div>
                 </div>
                 <div class="reservar-pessoas-row-stepper">
-                  <span class="reservar-stepper-label">Crianças (até 3 anos — não pagam)</span>
+                  <span class="reservar-stepper-label">Crianças (acompanhantes)</span>
                   <div class="reservar-stepper">
                     <button type="button" id="reservar-criancas-menos" class="reservar-stepper-btn" aria-label="Menos uma criança">−</button>
                     <input type="number" id="reservar-input-criancas" class="reservar-stepper-input" min="0" max="10" value="0" inputmode="numeric" aria-label="Número de crianças até 3 anos">
@@ -130,8 +130,6 @@
                 </div>
                 <div class="reservar-pessoas-row-side">
                   <p id="reservar-stepper-label-cap" class="reservar-pessoas-pergunta">Capacidade do quarto: —</p>
-                  <p class="reservar-pessoas-pergunta">Quer levar mais pessoas além da capacidade do quarto?</p>
-                  <button type="button" id="btn-quero-mais-pessoas" class="btn-reservar-texto">Quero adicionar até 3 pessoas a mais</button>
                 </div>
               </div>
             </div>
@@ -301,9 +299,9 @@
   <script src="js/quartos-site.js?v=20260601h" defer></script>
   <script src="js/quartos-imagens-pastas.js?v=20260601h" defer></script>
   <script src="js/quartos-showcase-engine.js?v=20260601h" defer></script>
-  <script src="js/reservar-precos.js?v=20260601h" defer></script>
+  <script src="js/reservar-precos.js?v=20260604c" defer></script>
   <script src="js/system-store.js?v=20260601h" defer></script>
-  <script src="js/reservar-flow.js?v=20260603a" defer data-reservar-flow="1"></script>
+  <script src="js/reservar-flow.js?v=20260604c" defer data-reservar-flow="1"></script>
   <script>
     (function () {
       var BUILD = '20260601h';
@@ -323,5 +321,7 @@
       else intro.classList.remove('scrolled');
     });
   </script>
+  <script src="https://unpkg.com/lucide@0.469.0/dist/umd/lucide.min.js"></script>
+  <script src="js/lucide-init.js?v=20260603b"></script>
 </body>
 </html>

@@ -43,6 +43,7 @@
   display: flex;
   flex-direction: column;
   min-height: 100%;
+  gap: 0.75rem;
 }
 
 /* ---- Coluna esquerda ---- */
@@ -111,8 +112,9 @@
 }
 
 .eventos-beneficio-icone svg {
-  width: 1.05rem;
-  height: 1.05rem;
+  width: 1.15rem;
+  height: 1.15rem;
+  stroke-width: 2.25;
 }
 
 .eventos-beneficio-titulo {
@@ -180,11 +182,11 @@
 .eventos-cards {
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
-  grid-template-rows: repeat(2, minmax(0, 1fr));
-  flex: 1 1 auto;
-  gap: 0.75rem;
+  grid-template-rows: repeat(2, auto);
+  flex: 0 0 auto;
+  gap: 0.65rem;
   margin: 0 0 0.75rem;
-  min-height: clamp(18rem, 38vw, 26rem);
+  min-height: 0;
 }
 
 .eventos-card {
@@ -192,10 +194,10 @@
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  gap: 0.7rem;
-  min-height: 100%;
-  height: 100%;
-  padding: 1.35rem 1rem 1.25rem;
+  gap: 0.4rem;
+  height: auto;
+  min-height: 0;
+  padding: 0.85rem 0.65rem 0.8rem;
   border: 1px solid var(--eventos-card-borda);
   border-radius: 12px;
   background: #fff;
@@ -216,9 +218,19 @@
   color: var(--eventos-verde);
 }
 
-.eventos-card-icone svg {
-  width: 1.85rem;
-  height: 1.85rem;
+.eventos-card-icone svg,
+.eventos-card-icone .lucide-icon {
+  width: 1.6rem;
+  height: 1.6rem;
+  color: var(--eventos-verde);
+}
+
+/* mdi:ring tem margem interna maior — compensa para igualar Lucide */
+.eventos-card-icone iconify-icon {
+  width: 2.35rem;
+  height: 2.35rem;
+  font-size: 2.35rem;
+  color: var(--eventos-verde);
 }
 
 .eventos-card-titulo {
@@ -321,11 +333,18 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  width: 2.5rem;
-  height: 2.5rem;
-  border: 1.5px solid rgba(255, 255, 255, 0.85);
-  border-radius: 4px;
+  width: auto;
+  height: auto;
+  border: none;
+  border-radius: 0;
   color: #fff;
+}
+
+.eventos-banner-logo-img {
+  display: block;
+  width: 2.75rem;
+  height: auto;
+  object-fit: contain;
 }
 
 .eventos-banner-logo-icone svg {
@@ -342,6 +361,120 @@
   line-height: 1.35;
   text-transform: uppercase;
   color: rgba(255, 255, 255, 0.92);
+}
+
+/* ---- Carrossel de fotos ---- */
+.eventos-galeria {
+  flex: 1 1 auto;
+  min-height: clamp(9rem, 13vw, 12rem);
+  margin-top: auto;
+  border: 1px solid var(--eventos-card-borda);
+  border-radius: 12px;
+  overflow: hidden;
+  background: #fff;
+  box-shadow: 0 4px 18px rgba(27, 48, 34, 0.06);
+  position: relative;
+  isolation: isolate;
+}
+
+.eventos-galeria-swiper {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  min-height: clamp(9rem, 13vw, 12rem);
+  overflow: hidden;
+}
+
+.eventos-galeria-swiper:not(.swiper-initialized) .swiper-slide:not(:first-child) {
+  display: none;
+}
+
+.eventos-galeria-swiper .swiper-wrapper {
+  height: 100%;
+}
+
+.eventos-galeria-swiper .swiper-slide {
+  height: 100%;
+  min-height: clamp(9rem, 13vw, 12rem);
+}
+
+.eventos-galeria-swiper.swiper-fade .swiper-slide {
+  left: 0 !important;
+  top: 0 !important;
+}
+
+.eventos-galeria-slide {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  min-height: clamp(9rem, 13vw, 12rem);
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  cursor: zoom-in;
+  border: none;
+  padding: 0;
+}
+
+.eventos-galeria-slide::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    180deg,
+    rgba(27, 48, 34, 0.04) 0%,
+    rgba(27, 48, 34, 0.12) 100%
+  );
+  pointer-events: none;
+}
+
+.eventos-galeria-pagination {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0.65rem !important;
+  z-index: 2;
+  display: flex;
+  justify-content: center;
+  gap: 0.35rem;
+}
+
+.eventos-galeria-pagination .swiper-pagination-bullet {
+  width: 0.45rem;
+  height: 0.45rem;
+  margin: 0 !important;
+  opacity: 0.55;
+  background: #fff;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.25);
+  transition: opacity 0.25s ease, transform 0.25s ease;
+}
+
+.eventos-galeria-pagination .swiper-pagination-bullet-active {
+  opacity: 1;
+  transform: scale(1.15);
+  background: #fff;
+}
+
+.eventos-galeria-dica {
+  position: absolute;
+  left: 50%;
+  bottom: 1.85rem;
+  z-index: 2;
+  margin: 0;
+  padding: 0.3rem 0.75rem;
+  font-family: var(--font-body);
+  font-size: 0.62rem;
+  font-weight: 500;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: #fff;
+  background: rgba(27, 48, 34, 0.62);
+  border-radius: 999px;
+  transform: translateX(-50%);
+  pointer-events: none;
+  backdrop-filter: blur(4px);
+  -webkit-backdrop-filter: blur(4px);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.18);
 }
 
 /* ---- Rodapé da seção ---- */
@@ -426,9 +559,9 @@
   }
 
   .eventos-card {
-    min-height: 8.5rem;
+    min-height: 0;
     height: auto;
-    padding: 1.15rem 0.85rem;
+    padding: 0.8rem 0.65rem;
   }
 }
 
@@ -439,8 +572,8 @@
   }
 
   .eventos-card {
-    min-height: 7.75rem;
-    padding: 1rem 0.75rem;
+    min-height: 0;
+    padding: 0.75rem 0.6rem;
   }
 
   .eventos-card-titulo {
@@ -540,8 +673,8 @@
   }
 
   .eventos-visivel-apenas-mobile .eventos-beneficio-icone svg {
-    width: 1.1rem;
-    height: 1.1rem;
+    width: 1.2rem;
+    height: 1.2rem;
   }
 
   .eventos-visivel-apenas-mobile .eventos-beneficio-titulo {
@@ -569,20 +702,157 @@
     color: #5f5f5f;
   }
 
+  .eventos-visivel-apenas-mobile .eventos-dir {
+    width: 100%;
+    min-width: 0;
+  }
+
   .eventos-visivel-apenas-mobile .eventos-cards {
     grid-template-columns: repeat(2, minmax(0, 1fr));
-    grid-template-rows: repeat(3, auto);
+    grid-template-rows: none;
     gap: 0.55rem;
     min-height: 0;
     margin-bottom: 0.65rem;
+    width: 100%;
   }
 
   .eventos-visivel-apenas-mobile .eventos-card {
-    min-height: 7.25rem;
+    min-height: 7rem;
     height: auto;
-    padding: 0.95rem 0.55rem 0.85rem;
+    padding: 0.85rem 0.55rem 0.75rem;
     border-radius: 10px;
-    gap: 0.45rem;
+    gap: 0.4rem;
+    overflow: visible;
+    position: relative;
+    z-index: 1;
+  }
+
+  .eventos-visivel-apenas-mobile .eventos-card-icone {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 1.55rem;
+    color: var(--eventos-verde);
+  }
+
+  .eventos-visivel-apenas-mobile .eventos-card-icone svg,
+  .eventos-visivel-apenas-mobile .eventos-card-icone .lucide-icon {
+    width: 1.55rem;
+    height: 1.55rem;
+    display: block;
+    flex-shrink: 0;
+  }
+
+  .eventos-visivel-apenas-mobile .eventos-card-icone iconify-icon {
+    width: 2.2rem;
+    height: 2.2rem;
+    font-size: 2.2rem;
+    display: block;
+    flex-shrink: 0;
+  }
+
+  .eventos-visivel-apenas-mobile .eventos-card-titulo {
+    font-size: 0.88rem;
+    line-height: 1.25;
+    color: var(--eventos-verde);
+  }
+
+  .eventos-visivel-apenas-mobile .eventos-card-desc {
+    max-width: none;
+    font-size: 0.74rem;
+    line-height: 1.45;
+    color: var(--eventos-texto);
+    opacity: 1;
+  }
+
+  .eventos-visivel-apenas-mobile .eventos-banner {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.65rem;
+    min-height: 0;
+    padding: 1rem 0.85rem;
+    border-radius: 10px;
+    text-align: center;
+    width: 100%;
+  }
+
+  .eventos-visivel-apenas-mobile .eventos-banner-ilustra svg {
+    width: 3.35rem;
+  }
+
+  .eventos-visivel-apenas-mobile .eventos-banner-texto {
+    width: 100%;
+    min-width: 0;
+  }
+
+  .eventos-visivel-apenas-mobile .eventos-banner-titulo {
+    margin-bottom: 0.3rem;
+    font-size: 0.98rem;
+    line-height: 1.25;
+    color: #fff;
+  }
+
+  .eventos-visivel-apenas-mobile .eventos-banner-desc {
+    max-width: none;
+    font-size: 0.72rem;
+    line-height: 1.5;
+    color: rgba(255, 255, 255, 0.9);
+  }
+
+  .eventos-visivel-apenas-mobile .eventos-banner-logo {
+    width: 100%;
+    min-width: 0;
+  }
+
+  .eventos-visivel-apenas-mobile .eventos-banner-logo-icone {
+    width: auto;
+    height: auto;
+  }
+
+  .eventos-visivel-apenas-mobile .eventos-banner-logo-img {
+    width: 2.75rem;
+    height: auto;
+    border-radius: 4px;
+  }
+
+  .eventos-visivel-apenas-mobile .eventos-banner-logo-icone svg {
+    width: 1.05rem;
+    height: 1.05rem;
+  }
+
+  .eventos-visivel-apenas-mobile .eventos-banner-logo-texto {
+    font-size: 0.42rem;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: rgba(255, 255, 255, 0.92);
+  }
+
+  .eventos-visivel-apenas-mobile .eventos-galeria {
+    flex: none;
+    width: 100%;
+    height: 11.5rem;
+    min-height: 11.5rem;
+    max-height: 11.5rem;
+    margin-top: 0.65rem;
+    border-radius: 10px;
+  }
+
+  .eventos-visivel-apenas-mobile .eventos-galeria-swiper,
+  .eventos-visivel-apenas-mobile .eventos-galeria-swiper .swiper-slide {
+    height: 100%;
+    min-height: 100%;
+  }
+
+  .eventos-visivel-apenas-mobile .eventos-galeria-slide {
+    min-height: 100%;
+    height: 100%;
+  }
+
+  .eventos-visivel-apenas-mobile .eventos-galeria-dica {
+    bottom: 1.55rem;
+    font-size: 0.56rem;
+    padding: 0.28rem 0.65rem;
   }
 
   .eventos-visivel-apenas-mobile .eventos-card:hover {
@@ -593,67 +863,6 @@
 
   .eventos-visivel-apenas-mobile .eventos-cta:hover {
     transform: none;
-  }
-
-  .eventos-visivel-apenas-mobile .eventos-card-icone svg {
-    width: 1.55rem;
-    height: 1.55rem;
-  }
-
-  .eventos-visivel-apenas-mobile .eventos-card-titulo {
-    font-size: 0.82rem;
-    line-height: 1.25;
-  }
-
-  .eventos-visivel-apenas-mobile .eventos-card-desc {
-    max-width: none;
-    font-size: 0.72rem;
-    line-height: 1.4;
-    opacity: 0.78;
-  }
-
-  .eventos-visivel-apenas-mobile .eventos-banner {
-    display: grid;
-    grid-template-columns: minmax(0, 0.72fr) minmax(0, 1.45fr) minmax(0, 0.82fr);
-    gap: 0.45rem;
-    align-items: center;
-    min-height: 0;
-    padding: 0.95rem 0.65rem;
-    border-radius: 8px;
-    text-align: center;
-  }
-
-  .eventos-visivel-apenas-mobile .eventos-banner-ilustra svg {
-    width: 3.35rem;
-  }
-
-  .eventos-visivel-apenas-mobile .eventos-banner-titulo {
-    margin-bottom: 0.3rem;
-    font-size: 0.92rem;
-    line-height: 1.22;
-  }
-
-  .eventos-visivel-apenas-mobile .eventos-banner-desc {
-    max-width: none;
-    font-size: 0.58rem;
-    line-height: 1.45;
-    color: rgba(255, 255, 255, 0.88);
-  }
-
-  .eventos-visivel-apenas-mobile .eventos-banner-logo-icone {
-    width: 2.15rem;
-    height: 2.15rem;
-  }
-
-  .eventos-visivel-apenas-mobile .eventos-banner-logo-icone svg {
-    width: 1.05rem;
-    height: 1.05rem;
-  }
-
-  .eventos-visivel-apenas-mobile .eventos-banner-logo-texto {
-    font-size: 0.38rem;
-    letter-spacing: 0.1em;
-    text-transform: uppercase;
   }
 
   .eventos-visivel-apenas-mobile .eventos-diferenciais {
@@ -705,6 +914,7 @@
   }
 
   .eventos-visivel-apenas-mobile .eventos-diferencial-texto {
-    font-size: 0.44rem;
+    font-size: 0.62rem;
+    line-height: 1.45;
   }
 }

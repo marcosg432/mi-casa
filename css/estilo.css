@@ -2372,10 +2372,36 @@ body.lightbox-aberto .cabecalho {
   align-content: start;
 }
 
-.quarto-modelo-meta li {
+.quarto-modelo-meta li,
+.quarto-modelo-meta-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.45rem;
   font-size: 0.92rem;
   color: #1b1b1b;
   line-height: 1.3;
+}
+
+.quarto-modelo-meta-icone {
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 1.15rem;
+  height: 1.15rem;
+  margin-top: 0.08rem;
+  color: #2d5a3d;
+}
+
+.quarto-modelo-meta-icone .lucide-icon,
+.quarto-modelo-meta-icone svg {
+  width: 1.05rem;
+  height: 1.05rem;
+  stroke-width: 2;
+}
+
+.quarto-modelo-meta-texto {
+  min-width: 0;
 }
 
 .quarto-modelo-info a.btn.btn-reserva {
@@ -4367,6 +4393,24 @@ body.lightbox-aberto .cabecalho {
   gap: 1rem;
 }
 
+.rodape .sobre-contato-redes a.sobre-contato-rede {
+  padding-left: 0;
+}
+
+.rodape .sobre-contato-redes a.sobre-contato-rede--facebook,
+.rodape .sobre-contato-redes a.sobre-contato-rede--facebook:hover {
+  color: #fff;
+}
+
+.rodape .sobre-contato-redes a.sobre-contato-rede--whatsapp,
+.rodape .sobre-contato-redes a.sobre-contato-rede--whatsapp:hover {
+  color: #25d366;
+}
+
+.rodape .sobre-contato-redes a.sobre-contato-rede--instagram:hover {
+  opacity: 0.92;
+}
+
 .rodape .sobre-contato-redes a:hover {
   padding-left: 0;
 }
@@ -5238,15 +5282,6 @@ body.lightbox-aberto .cabecalho {
 .reservar-turnstile-wrap {
   margin-bottom: 0.75rem;
   min-height: 65px;
-}
-
-.reservar-build-stamp {
-  margin: 0 0 0.5rem;
-  font-size: 0.65rem;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
-  color: rgba(255, 255, 255, 0.35);
-  text-align: right;
 }
 
 .btn-step-datas-full {
