@@ -10,6 +10,11 @@
       .replace(/"/g, '&quot;');
   }
 
+  function formatPrecoDiariaPorPessoa(q) {
+    var preco = String((q && q.preco) || '—').trim();
+    return preco + ' diária por pessoa';
+  }
+
   function metaIcon(key) {
     var map = {
       'Ar-condicionado': 'air-vent',
@@ -50,7 +55,7 @@
     if (a.metros2) lines.push({ k: 'Tamanho', v: String(a.metros2) + ' m²' });
     lines.push({
       k: 'Diária',
-      v: (q.preco || '—') + ' / ' + String((q.precoLabel || 'noite').toLowerCase())
+      v: formatPrecoDiariaPorPessoa(q)
     });
     return lines;
   }
@@ -179,6 +184,8 @@
           esc(q.titulo) +
           '</h3><p class="quarto-modelo-lead">' +
           esc(q.tipo || '') +
+          '</p><p class="quarto-modelo-preco">' +
+          esc(formatPrecoDiariaPorPessoa(q)) +
           '</p><p>' +
           esc(textoCorpo(q)) +
           '</p><ul class="quarto-modelo-meta">' +

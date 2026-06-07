@@ -235,7 +235,7 @@
       if (desc) desc.textContent = q.desc;
       if (precoVal) precoVal.textContent = q.preco;
       var lbl = copyInner.querySelector('.quartos-showcase-preco-label');
-      if (lbl) lbl.textContent = q.precoLabel || 'Noite';
+      if (lbl) lbl.textContent = q.precoLabel || 'diária por pessoa';
       var a = copyInner.querySelector('.quartos-showcase-btn');
       if (a) {
         a.href = q.verQuartoHref || 'quartos.html#quarto-' + encodeURIComponent(String(q.id || ''));

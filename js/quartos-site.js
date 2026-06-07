@@ -14,7 +14,7 @@
       desc:
         'Quarto Duplo com Banheiro Compartilhado. Quarto duplo aconchegante, ideal para casais: cama de casal, ar-condicionado, ventilador, vista para o jardim e banheiro compartilhado. Até 2 pessoas · 20 m².',
       preco: 'R$ 150',
-      precoLabel: 'Noite',
+      precoLabel: 'diária por pessoa',
       img: 'imagem/imagem quartos/tem-tem/quarto_detalhe_web.webp',
       alt: 'Quarto TEM-TEM — Mi Casa, Su Casa',
       verQuartoHref: 'quartos.html#quarto-tem-tem',
@@ -38,7 +38,7 @@
       desc:
         'Quarto Família (4 Camas de Solteiro). Espaçoso, com quatro camas de solteiro, ventilador, cozinha compacta privativa, vista para o jardim e banheiro compartilhado. Até 4 pessoas · 40 m².',
       preco: 'R$ 150',
-      precoLabel: 'Noite',
+      precoLabel: 'diária por pessoa',
       img: 'imagem/imagem quartos/soco/10933a8a-60dd-4808-b943-0b3ab0c21c42.webp',
       alt: 'Quarto SOCÓ — Mi Casa, Su Casa',
       verQuartoHref: 'quartos.html#quarto-soco',
@@ -61,7 +61,7 @@
       desc:
         'Quarto Família (1 Cama de Casal + 3 de Solteiro). Amplo espaço, ar-condicionado, ventilador, cozinha compacta privativa e vista para o jardim. Banheiro compartilhado. Até 4 pessoas · 40 m².',
       preco: 'R$ 150',
-      precoLabel: 'Noite',
+      precoLabel: 'diária por pessoa',
       img: 'imagem/imagem quartos/sabia/quarto_convertido.webp',
       alt: 'Quarto SABIÁ — Mi Casa, Su Casa',
       verQuartoHref: 'quartos.html#quarto-sabia',
@@ -85,7 +85,7 @@
       desc:
         'Quarto Duplo. Confortável para casais ou viajantes: cama de casal, ar-condicionado, ventilador, vista para o jardim e banheiro compartilhado com chuveiro. Até 2 pessoas · 20 m².',
       preco: 'R$ 150',
-      precoLabel: 'Noite',
+      precoLabel: 'diária por pessoa',
       img: 'imagem/imagem quartos/ararajuba/quarto_web.webp',
       alt: 'Quarto ARARAJUBA — Mi Casa, Su Casa',
       verQuartoHref: 'quartos.html#quarto-ararajuba',

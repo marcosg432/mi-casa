@@ -286,7 +286,7 @@
       desc: limiteDescricaoQuarto(row.descricao || row.desc || ''),
       capacidade: Number(row.capacidade) > 0 ? Math.floor(Number(row.capacidade)) : 2,
       preco: row.preco_display || row.preco || 'R$ 0',
-      precoLabel: row.preco_label || row.precoLabel || 'Noite',
+      precoLabel: row.preco_label || row.precoLabel || 'diária por pessoa',
       img: row.imagem_principal || row.img || '',
       alt: row.imagem_alt || row.alt || row.titulo || '',
       verQuartoHref: 'quartos.html#quarto-' + id,
@@ -312,6 +312,10 @@
       if (!String(out.alt || '').trim()) out.alt = fb.alt;
       if (!String(out.desc || '').trim()) out.desc = fb.desc;
       if (!String(out.tipo || '').trim()) out.tipo = fb.tipo;
+      var lbl = String(out.precoLabel || '').trim().toLowerCase();
+      if (!lbl || lbl === 'noite' || lbl === 'noite.') {
+        out.precoLabel = fb.precoLabel || 'diária por pessoa';
+      }
     }
     if (id && global.QUARTOS_IMAGENS_PASTAS && Array.isArray(global.QUARTOS_IMAGENS_PASTAS[id])) {
       var raw = global.QUARTOS_IMAGENS_PASTAS[id].filter(function (src) {
@@ -358,7 +362,7 @@
       descricao: limiteDescricaoQuarto(payload.desc || ''),
       capacidade: Math.max(1, Math.floor(Number(payload.capacidade) || 1)),
       preco_display: String(payload.preco || 'R$ 0').trim(),
-      preco_label: String(payload.precoLabel || 'Noite').trim(),
+      preco_label: String(payload.precoLabel || 'diária por pessoa').trim(),
       imagem_principal: String(payload.img || '').trim(),
       imagem_alt: String(payload.alt || payload.titulo || '').trim(),
       ordem: payload.ordem != null ? Math.floor(Number(payload.ordem)) : 0,

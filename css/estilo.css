@@ -2347,7 +2347,20 @@ body.lightbox-aberto .cabecalho {
   flex-shrink: 0;
 }
 
-.quarto-modelo-info p {
+.quarto-modelo-info .quarto-modelo-preco {
+  margin: 0 0 0.85rem;
+  font-family: var(--font-body);
+  font-size: 1.05rem;
+  font-weight: 700;
+  color: #1b3022;
+  line-height: 1.35;
+  flex-shrink: 0;
+  display: block;
+  overflow: visible;
+  -webkit-line-clamp: unset;
+}
+
+.quarto-modelo-info p:not(.quarto-modelo-lead):not(.quarto-modelo-preco) {
   margin: 0 0 0.85rem;
   color: rgba(17, 17, 17, 0.86);
   line-height: 1.55;
