@@ -1,6 +1,7 @@
 'use strict';
 
 var { getSupabaseAdmin } = require('./supabase-admin');
+var { normalizeQuartoId, mesmoQuarto } = require('./quarto-ids');
 var {
   validarPayloadReserva,
   normalizeReservaRow,
@@ -97,6 +98,7 @@ function eachNight(startIso, endIso, cb) {
 async function getOccupiedDateMapForQuarto(quartoId) {
   var sb = getSupabaseAdmin();
   var map = {};
+  var targetQuarto = normalizeQuartoId(quartoId);
 
   var reservas = await sb
     .from('reservas')
@@ -105,9 +107,15 @@ async function getOccupiedDateMapForQuarto(quartoId) {
   if (reservas.error) throw reservas.error;
 
   (reservas.data || []).forEach(function (r) {
-    var rq = r.quarto_id != null && String(r.quarto_id).trim() !== '' ? String(r.quarto_id) : null;
-    if (quartoId) {
-      if (rq != null && rq !== String(quartoId)) return;
+    var rq = normalizeQuartoId(r.quarto_id);
+    if (targetQuarto) {
+      if (rq == null) {
+        eachNight(r.data_entrada, r.data_saida, function (d) {
+          map[d] = 'reserva';
+        });
+        return;
+      }
+      if (!mesmoQuarto(rq, targetQuarto)) return;
     }
     eachNight(r.data_entrada, r.data_saida, function (d) {
       map[d] = 'reserva';
@@ -128,7 +136,7 @@ async function getOccupiedDateMapForQuarto(quartoId) {
 async function verificarConflito(quartoId, dataEntrada, dataSaida) {
   var sb = getSupabaseAdmin();
   var res = await sb.rpc('datas_tem_conflito', {
-    p_quarto_id: quartoId || null,
+    p_quarto_id: normalizeQuartoId(quartoId),
     p_data_entrada: dataEntrada,
     p_data_saida: dataSaida
   });

@@ -1,6 +1,7 @@
 'use strict';
 
 var ReservaPrecos = require('./reserva-precos');
+var { normalizeQuartoId } = require('./quarto-ids');
 
 var ISO_DATE = /^\d{4}-\d{2}-\d{2}$/;
 var EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -67,7 +68,7 @@ function validarPayloadReserva(body) {
   var nome = sanitizeText(body.nome, 120);
   var email = sanitizeText(body.email, 160).toLowerCase();
   var telefone = sanitizeText(body.telefone, 30);
-  var quartoId = slugQuarto(body.quartoId);
+  var quartoId = normalizeQuartoId(slugQuarto(body.quartoId));
   var dataEntrada = sanitizeText(body.dataEntrada, 10);
   var dataSaida = sanitizeText(body.dataSaida, 10);
   var adultos = Math.max(0, Math.floor(Number(body.adultos) || Number(body.pessoas) || 0));

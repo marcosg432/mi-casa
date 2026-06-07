@@ -292,6 +292,7 @@
       verQuartoHref: 'quartos.html#quarto-' + id,
       href: 'reservar.html?quarto=' + encodeURIComponent(id),
       amenities: a,
+      destaques: Array.isArray(a.destaques) ? a.destaques : [],
       ordem: row.ordem != null ? Number(row.ordem) : 0
     };
   }
@@ -312,6 +313,20 @@
       if (!String(out.alt || '').trim()) out.alt = fb.alt;
       if (!String(out.desc || '').trim()) out.desc = fb.desc;
       if (!String(out.tipo || '').trim()) out.tipo = fb.tipo;
+      if ((!out.destaques || !out.destaques.length) && fb.destaques && fb.destaques.length) {
+        out.destaques = fb.destaques.slice();
+      }
+      if (fb.capacidade && (!out.capacidade || out.capacidade < fb.capacidade)) {
+        out.capacidade = fb.capacidade;
+      }
+      if (fb.amenities && fb.amenities.banheiroPrivativo) {
+        out.amenities = Object.assign({}, out.amenities || {}, {
+          banheiroPrivativo: true,
+          camasCasal: fb.amenities.camasCasal != null ? fb.amenities.camasCasal : (out.amenities || {}).camasCasal,
+          camasSolteiro: fb.amenities.camasSolteiro != null ? fb.amenities.camasSolteiro : (out.amenities || {}).camasSolteiro
+        });
+        delete out.amenities.banheiroCompartilhado;
+      }
       var lbl = String(out.precoLabel || '').trim().toLowerCase();
       if (!lbl || lbl === 'noite' || lbl === 'noite.') {
         out.precoLabel = fb.precoLabel || 'diária por pessoa';

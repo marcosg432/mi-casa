@@ -273,6 +273,11 @@
     return refreshOcupadasMapAsync();
   }
 
+  function isDayOccupied(date) {
+    if (!date) return false;
+    return !!state.ocupadas[toIsoDate(date)];
+  }
+
   function periodoTemConflitoLocal(entradaIso, saidaIso) {
     if (!entradaIso || !saidaIso) return false;
     var a = entradaIso.split('-');
@@ -334,7 +339,7 @@
 
   function tentarRegistrarReservaPainel(entradaIso, saidaIso, preco) {
     if (!window.SystemStore || !window.SystemStore.criarReserva) {
-      return Promise.resolve(null);
+      return Promise.reject(new Error('Sistema de reservas indisponível.'));
     }
     return withTimeoutMs(
       SystemStore.criarReserva({
@@ -355,11 +360,8 @@
         requerOrcamento: !!preco.requerOrcamento,
         turnstileToken: getTurnstileToken()
       }),
-      3500
-    ).catch(function (errApi) {
-      console.warn('Registro no painel falhou; abrindo WhatsApp mesmo assim.', errApi);
-      return null;
-    });
+      15000
+    );
   }
 
   function abrirWhatsAppComReserva(reservaObj) {
@@ -635,16 +637,18 @@
     for (var day = 1; day <= dim; day++) {
       var d = new Date(y, m, day);
       var isPast = d < today;
+      var isOccupied = !isPast && isDayOccupied(d);
       var isIn = selIn && sameDay(d, selIn);
       var isOut = selOut && sameDay(d, selOut);
       var classes = 'reservar-cal-cell reservar-cal-day';
       if (isPast) classes += ' reservar-cal-past';
+      if (isOccupied) classes += ' reservar-cal-ocupado';
       if (isIn) classes += ' reservar-cal-pick-in';
       if (isOut) classes += ' reservar-cal-pick-out';
-      if (!isPast) {
+      if (!isPast && !isOccupied) {
         html += '<button type="button" class="' + classes + '" data-cal="' + field + '" data-y="' + y + '" data-m="' + m + '" data-d="' + day + '">' + day + '</button>';
       } else {
-        html += '<span class="' + classes + '">' + day + '</span>';
+        html += '<span class="' + classes + '" aria-disabled="true">' + day + '</span>';
       }
     }
     html += '</div>';
@@ -679,11 +683,18 @@
         var mm = parseInt(btn.getAttribute('data-m'), 10);
         var dd = parseInt(btn.getAttribute('data-d'), 10);
         var picked = new Date(yy, mm, dd);
+        if (isDayOccupied(picked)) {
+          alert('Esta data já está reservada ou indisponível para este quarto.');
+          return;
+        }
         if (field === 'entrada') {
           state.checkIn = picked;
           state.saidaMes = new Date(yy, mm, 1);
           if (state.checkOut && state.checkOut <= state.checkIn) {
             state.checkOut = new Date(yy, mm, dd + 1);
+          }
+          if (state.checkOut && periodoTemConflitoLocal(toIsoDate(state.checkIn), toIsoDate(state.checkOut))) {
+            state.checkOut = null;
           }
         } else {
           if (!state.checkIn) {
@@ -691,6 +702,10 @@
             return;
           }
           if (picked <= state.checkIn) return;
+          if (periodoTemConflitoLocal(toIsoDate(state.checkIn), toIsoDate(picked))) {
+            alert('Parte deste período já está reservada ou indisponível para este quarto.');
+            return;
+          }
           state.checkOut = picked;
           renderCalendar('cal-entrada', 'entrada');
           renderCalendar('cal-saida', 'saida');
@@ -710,6 +725,9 @@
     var btn = document.getElementById('btn-step-datas');
     if (!btn) return;
     var ok = state.checkIn && state.checkOut && state.checkOut > state.checkIn;
+    if (ok) {
+      ok = !periodoTemConflitoLocal(toIsoDate(state.checkIn), toIsoDate(state.checkOut));
+    }
     btn.disabled = !ok;
   }
 
@@ -1101,16 +1119,27 @@
 
         try {
           var preco = calcPrecoAtual();
-          var codigoLocal = gerarCodigoReservaLocal();
-          var reservaWhats = montarReservaParaWhatsApp({ codigo: codigoLocal });
-          tentarRegistrarReservaPainel(entradaIso, saidaIso, preco);
+          var created = await tentarRegistrarReservaPainel(entradaIso, saidaIso, preco);
+          var codigoReserva =
+            created && created.codigo ? created.codigo : gerarCodigoReservaLocal();
+          var reservaWhats = montarReservaParaWhatsApp({ codigo: codigoReserva });
+          await refreshOcupadasMapAsync();
+          pintarCalendariosEsumario();
           if (!abrirWhatsAppComReserva(reservaWhats)) {
             alert('Não foi possível abrir o WhatsApp. Verifique sua conexão e tente novamente.');
           }
         } catch (errSave) {
           console.error('Reserva:', errSave);
-          var fallback = montarReservaParaWhatsApp({ codigo: gerarCodigoReservaLocal() });
-          abrirWhatsAppComReserva(fallback);
+          var msg =
+            (errSave && errSave.message) ||
+            'Não foi possível registrar a reserva. Tente novamente.';
+          if (errSave && errSave.status === 409) {
+            msg = 'Esse período acabou de ser reservado. Escolha outras datas.';
+            await refreshOcupadasMapAsync();
+            pintarCalendariosEsumario();
+            showStep(1);
+          }
+          alert(msg);
         } finally {
           btnFazerReserva.disabled = false;
           btnFazerReserva.textContent = BTN_FINALIZAR_WHATS;

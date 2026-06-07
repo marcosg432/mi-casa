@@ -870,7 +870,7 @@ body.lightbox-aberto .cabecalho {
 
 .hero-recanto-barra {
   display: flex;
-  align-items: center;
+  align-items: flex-start;
   gap: 0;
   width: 100%;
   max-width: 920px;
@@ -886,14 +886,27 @@ body.lightbox-aberto .cabecalho {
   min-width: 0;
   display: flex;
   flex-direction: column;
-  gap: 0.2rem;
-  padding: 0.35rem 1rem 0.35rem 0;
+  align-items: flex-start;
+  gap: 0.3rem;
+  padding: 0.35rem 0.5rem 0.35rem 0;
+}
+
+.hero-recanto-campo--endereco {
+  flex: 1.15;
+  padding-right: 0.25rem;
+}
+
+.hero-recanto-campo--telefone {
+  flex: 0.85;
+  padding-left: 2rem;
+  padding-right: 0.75rem;
 }
 
 .hero-recanto-label {
   display: inline-flex;
   align-items: center;
   gap: 0.35rem;
+  min-height: 1.125rem;
   font-family: var(--font-body);
   font-size: 0.7rem;
   font-weight: 600;
@@ -937,6 +950,12 @@ body.lightbox-aberto .cabecalho {
   font-weight: 600;
   color: var(--cor-texto);
   line-height: 1.25;
+  min-height: 1.25rem;
+}
+
+.hero-recanto-endereco-texto {
+  display: block;
+  min-width: 0;
 }
 
 .hero-recanto-info-link {
@@ -948,22 +967,12 @@ body.lightbox-aberto .cabecalho {
   color: var(--cor-dourado-hover);
 }
 
-.hero-recanto-endereco {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: baseline;
-  gap: 0.35rem 0.5rem;
-}
-
-.hero-recanto-endereco-curto {
-  min-width: 0;
-}
-
 .hero-recanto-ver-mais {
   flex-shrink: 0;
   display: inline-flex;
   align-items: center;
   gap: 0.2rem;
+  margin-top: 0.05rem;
   font-size: 0.82rem;
   font-weight: 600;
   letter-spacing: 0.04em;
@@ -989,12 +998,14 @@ body.lightbox-aberto .cabecalho {
   width: 1px;
   align-self: stretch;
   min-height: 44px;
-  background: rgba(0, 0, 0, 0.08);
+  margin: 0.35rem 0;
+  background: rgba(0, 0, 0, 0.12);
   flex-shrink: 0;
 }
 
 .hero-recanto-btn {
   flex-shrink: 0;
+  align-self: center;
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -1036,6 +1047,15 @@ body.lightbox-aberto .cabecalho {
 
   .hero-recanto-campo {
     padding: 0.25rem 0;
+  }
+
+  .hero-recanto-campo--telefone {
+    padding-left: 0;
+    padding-right: 0;
+  }
+
+  .hero-recanto-campo--endereco {
+    padding-right: 0;
   }
 
   .hero-recanto-divisor {
@@ -2358,6 +2378,54 @@ body.lightbox-aberto .cabecalho {
   display: block;
   overflow: visible;
   -webkit-line-clamp: unset;
+}
+
+.quarto-modelo-destaques {
+  margin: 0 0 1rem;
+  padding: 0.85rem 1rem;
+  list-style: none;
+  border-left: 3px solid #1b3022;
+  background: rgba(27, 48, 34, 0.06);
+  border-radius: 0 10px 10px 0;
+  flex-shrink: 0;
+}
+
+.quarto-modelo-destaques li {
+  position: relative;
+  padding-left: 1.1rem;
+  margin: 0 0 0.45rem;
+  font-family: var(--font-body);
+  font-size: 0.92rem;
+  line-height: 1.5;
+  color: #1b3022;
+}
+
+.quarto-modelo-destaques li:last-child {
+  margin-bottom: 0;
+}
+
+.quarto-modelo-destaques li::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 0.55em;
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: #1b3022;
+}
+
+.quartos-secao-strip--verde .quarto-modelo-destaques {
+  background: rgba(255, 255, 255, 0.12);
+  border-left-color: rgba(255, 255, 255, 0.85);
+}
+
+.quartos-secao-strip--verde .quarto-modelo-destaques li {
+  color: rgba(255, 255, 255, 0.95);
+}
+
+.quartos-secao-strip--verde .quarto-modelo-destaques li::before {
+  background: #a8d5b8;
 }
 
 .quarto-modelo-info p:not(.quarto-modelo-lead):not(.quarto-modelo-preco) {

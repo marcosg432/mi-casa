@@ -37,7 +37,9 @@
     var lines = [];
     if (a.arCondicionado) lines.push({ k: 'Ar-condicionado', v: 'sim' });
     if (a.wifi) lines.push({ k: 'Wi-Fi', v: 'gratuito' });
-    if (a.banheiroPrivativo) lines.push({ k: 'Banheiro', v: 'privativo' });
+    if (a.banheiroPrivativo) {
+      lines.push({ k: 'Banheiro', v: 'privativo (suíte) — exclusivo deste quarto' });
+    }
     if (a.banheiroCompartilhado && !a.banheiroPrivativo) lines.push({ k: 'Banheiro', v: 'compartilhado' });
     if (a.cozinhaCompacta) lines.push({ k: 'Cozinha compacta', v: 'privativa' });
     if (a.maquinaLavar) lines.push({ k: 'Máquina de lavar', v: 'sim' });
@@ -62,6 +64,27 @@
 
   function textoCorpo(q) {
     return String(q.desc || '').trim();
+  }
+
+  function destaquesQuarto(q) {
+    if (Array.isArray(q.destaques) && q.destaques.length) return q.destaques;
+    var a = (q && q.amenities) || {};
+    if (Array.isArray(a.destaques) && a.destaques.length) return a.destaques;
+    return [];
+  }
+
+  function renderQuartoDestaques(q) {
+    var items = destaquesQuarto(q);
+    if (!items.length) return '';
+    return (
+      '<ul class="quarto-modelo-destaques" aria-label="Destaques do quarto">' +
+      items
+        .map(function (txt) {
+          return '<li>' + esc(String(txt || '')) + '</li>';
+        })
+        .join('') +
+      '</ul>'
+    );
   }
 
   function quartoImagensLista(q) {
@@ -186,7 +209,9 @@
           esc(q.tipo || '') +
           '</p><p class="quarto-modelo-preco">' +
           esc(formatPrecoDiariaPorPessoa(q)) +
-          '</p><p>' +
+          '</p>' +
+          renderQuartoDestaques(q) +
+          '<p>' +
           esc(textoCorpo(q)) +
           '</p><ul class="quarto-modelo-meta">' +
           lis +

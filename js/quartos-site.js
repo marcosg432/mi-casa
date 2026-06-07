@@ -55,11 +55,17 @@
     },
     {
       id: 'sabia',
-      capacidade: 4,
+      capacidade: 5,
       titulo: 'SABIÁ',
-      tipo: 'Quarto Família (1 Cama de Casal + 3 de Solteiro)',
+      tipo: 'Quarto Família com Suíte Privativa',
       desc:
-        'Quarto Família (1 Cama de Casal + 3 de Solteiro). Amplo espaço, ar-condicionado, ventilador, cozinha compacta privativa e vista para o jardim. Banheiro compartilhado. Até 4 pessoas · 40 m².',
+        'Quarto família com suíte privativa exclusiva para os hóspedes deste quarto. Ambiente amplo, ar-condicionado, ventilador, cozinha compacta privativa e vista para o jardim. Até 5 pessoas · 40 m².',
+      destaques: [
+        'Banheiro privativo (suíte), exclusivo para os hóspedes deste quarto',
+        '1 cama de casal e 3 camas de solteiro',
+        'Capacidade máxima para 5 pessoas',
+        'As imagens exibidas correspondem a este quarto'
+      ],
       preco: 'R$ 150',
       precoLabel: 'diária por pessoa',
       img: 'imagem/imagem quartos/sabia/quarto_convertido.webp',
@@ -71,7 +77,7 @@
         cozinhaCompacta: true,
         maquinaLavar: true,
         ventilador: true,
-        banheiroCompartilhado: true,
+        banheiroPrivativo: true,
         camasCasal: 1,
         camasSolteiro: 3,
         metros2: 40

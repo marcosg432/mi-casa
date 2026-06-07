@@ -59,7 +59,7 @@ router.get('/quartos', async function (req, res) {
 router.get('/disponibilidade/:quartoId', async function (req, res) {
   try {
     var map = await getOccupiedDateMapForQuarto(req.params.quartoId);
-    res.setHeader('Cache-Control', 'private, max-age=30');
+    res.setHeader('Cache-Control', 'no-store, no-cache, must-revalidate');
     res.json(map);
   } catch (e) {
     console.error('[api/disponibilidade]', e);
