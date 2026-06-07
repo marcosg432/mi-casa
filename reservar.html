@@ -11,7 +11,7 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;0,700;1,400&family=Outfit:wght@300;400;500;600&display=swap">
   <title>Reservar — Mi Casa, Su Casa</title>
-  <link rel="stylesheet" href="css/estilo.css?v=20260604b">
+  <link rel="stylesheet" href="css/estilo.css?v=20260605b">
   <link rel="stylesheet" href="css/lucide.css?v=20260603b">
   <script src="js/topo-ao-carregar.js?v=20260601h" defer></script>
   <script src="js/intro-nav-mobile.js?v=20260601h" defer></script>
@@ -38,7 +38,7 @@
 
       <header class="reservar-cabecalho">
         <h1>Reservar estadia</h1>
-        <p>Escolha datas, hóspedes e confirme. Ao final, sua reserva será registrada no painel e você será direcionado ao WhatsApp.</p>
+        <p>Escolha datas, hóspedes e confirme. A cobrança é <strong>por pessoa</strong>: <strong>R$ 150/pessoa</strong> em estadias de <strong>1 diária</strong> e <strong>R$ 130/pessoa por diária</strong> a partir de <strong>2 diárias</strong>.</p>
       </header>
 
       <div id="reservar-aviso-pagamento-topo" class="reservar-aviso-pagamento-topo" hidden role="status">
@@ -84,6 +84,23 @@
         <div class="reservar-conteudo-area">
           <section id="painel-etapa-datas" class="reservar-etapa" aria-labelledby="titulo-etapa-datas">
             <h2 id="titulo-etapa-datas" class="visually-hidden">Datas</h2>
+            <div class="reservar-tarifa-balao" aria-labelledby="reservar-tarifa-titulo">
+              <h3 id="reservar-tarifa-titulo" class="reservar-tarifa-balao-titulo">Valores por pessoa</h3>
+              <ul class="reservar-tarifa-balao-lista">
+                <li><strong>1 diária:</strong> R$ 150 por pessoa.</li>
+                <li><strong>2 diárias ou mais:</strong> R$ 130 por pessoa, por diária.</li>
+                <li>Ao reservar, o <strong>quarto inteiro</strong> fica indisponível no período escolhido.</li>
+              </ul>
+            </div>
+            <div class="reservar-regras-balao" aria-labelledby="reservar-regras-titulo">
+              <h3 id="reservar-regras-titulo" class="reservar-regras-balao-titulo">Regras da pousada / informações</h3>
+              <ul class="reservar-regras-balao-lista">
+                <li>Possui <strong>Wi-Fi</strong> em toda a área interna da casa e área externa de lazer.</li>
+                <li>Não é permitido fumar dentro da casa.</li>
+                <li>Crianças de até <strong>3 anos</strong> não pagam.</li>
+                <li>Cancelamento gratuito até <strong>1 dia antes</strong> da entrada; o sinal de reserva não é reembolsado.</li>
+              </ul>
+            </div>
             <div class="reservar-calendarios-dupla">
               <div class="reservar-cal-wrap">
                 <p class="reservar-cal-legenda">Entrada</p>
@@ -100,7 +117,7 @@
 
           <section id="painel-etapa-pessoas" class="reservar-etapa" hidden aria-labelledby="titulo-etapa-pessoas">
             <h2 id="titulo-etapa-pessoas">Hóspedes e valor</h2>
-            <p class="reservar-etapa-desc">Informe adultos e acompanhantes (crianças entram na contagem de pessoas). A cobrança é <strong>por pessoa</strong>: R$ 150/pessoa em reservas de <strong>1 diária</strong> e R$ 130/pessoa/diária a partir de <strong>2 diárias</strong>. Ao reservar, o <strong>quarto inteiro</strong> fica indisponível no período. Reservas a partir de <strong>5 noites</strong> seguem como orçamento personalizado.</p>
+            <p class="reservar-etapa-desc">Informe adultos e acompanhantes (crianças entram na contagem). <strong>1 diária:</strong> R$ 150 por pessoa. <strong>2 diárias ou mais:</strong> R$ 130 por pessoa, por diária. O quarto inteiro fica bloqueado no período. Estadias a partir de <strong>5 noites</strong> seguem como orçamento personalizado.</p>
             <div class="reservar-resumo-linha">
               <span>Noites</span>
               <strong id="reservar-preview-noites">—</strong>
@@ -184,15 +201,6 @@
             </div>
           </section>
 
-          <div class="reservar-regras-balao" aria-labelledby="reservar-regras-titulo">
-            <h3 id="reservar-regras-titulo" class="reservar-regras-balao-titulo">Regras da pousada / informações</h3>
-            <ul class="reservar-regras-balao-lista">
-              <li>Possui <strong>Wi-Fi</strong> em toda a área interna da casa e área externa de lazer.</li>
-              <li>Não é permitido fumar dentro da casa.</li>
-              <li>Crianças de até <strong>3 anos</strong> não pagam.</li>
-              <li>Cancelamento gratuito até <strong>1 dia antes</strong> da entrada; o sinal de reserva não é reembolsado.</li>
-            </ul>
-          </div>
         </div>
 
         <aside class="reservar-painel" aria-label="Resumo da reserva">
@@ -203,6 +211,12 @@
               <h3 class="reservar-painel-sub">Horários</h3>
               <p class="reservar-painel-texto"><strong>Check-in:</strong> às 12h.</p>
               <p class="reservar-painel-texto"><strong>Check-out:</strong> até as 17h.</p>
+            </div>
+
+            <div class="reservar-painel-bloco reservar-painel-bloco--tarifa">
+              <h3 class="reservar-painel-sub">Tarifa por pessoa</h3>
+              <p class="reservar-painel-texto reservar-painel-tarifa-dica"><strong>1 diária:</strong> R$ 150/pessoa.</p>
+              <p class="reservar-painel-texto reservar-painel-tarifa-dica"><strong>2+ diárias:</strong> R$ 130/pessoa por diária.</p>
             </div>
 
             <div class="reservar-painel-bloco">

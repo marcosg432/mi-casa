@@ -4956,6 +4956,59 @@ body.lightbox-aberto .cabecalho {
   box-shadow: 0 14px 44px rgba(0, 0, 0, 0.22);
 }
 
+#painel-etapa-datas .reservar-regras-balao {
+  margin-bottom: 1.35rem;
+}
+
+.reservar-tarifa-balao {
+  width: 100%;
+  margin-bottom: 1.35rem;
+  background: rgba(168, 213, 184, 0.16);
+  border: 2px solid rgba(168, 213, 184, 0.42);
+  border-radius: 18px;
+  padding: 1.35rem 1.5rem 1.45rem;
+  box-shadow: 0 14px 44px rgba(0, 0, 0, 0.18);
+}
+
+.reservar-tarifa-balao-titulo {
+  font-family: var(--font-body);
+  font-size: 0.78rem;
+  font-weight: 800;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: rgba(255, 255, 255, 0.98);
+  margin: 0 0 1.05rem;
+}
+
+.reservar-tarifa-balao-lista {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: 0.55rem;
+}
+
+.reservar-tarifa-balao-lista li {
+  position: relative;
+  padding-left: 1rem;
+  font-family: var(--font-body);
+  font-size: 0.92rem;
+  line-height: 1.55;
+  color: rgba(255, 255, 255, 0.95);
+}
+
+.reservar-tarifa-balao-lista li::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 0.55em;
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  background: #c8ebd4;
+  box-shadow: 0 0 0 2px rgba(200, 235, 212, 0.28);
+}
+
 .reservar-regras-balao-titulo {
   font-family: var(--font-body);
   font-size: 0.78rem;
