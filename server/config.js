@@ -13,17 +13,27 @@ function required(name) {
 function optional(name, fallback) {
   var val = process.env[name];
   if (val == null || String(val).trim() === '') return fallback;
-  return String(val).trim();
+  val = String(val).trim();
+  if (
+    (val.charAt(0) === '"' && val.charAt(val.length - 1) === '"') ||
+    (val.charAt(0) === "'" && val.charAt(val.length - 1) === "'")
+  ) {
+    val = val.slice(1, -1);
+  }
+  return val;
 }
+
+var DEFAULT_ADMIN_HASH =
+  '$2a$12$MJBPfqhhw7o5DRWe6s8.c.Hq.iG5f7KxrCB4aGBflh.lbmRsKHYjm';
 
 var config = {
   port: Number(process.env.PORT) || 3014,
   nodeEnv: process.env.NODE_ENV || 'development',
   supabaseUrl: optional('SUPABASE_URL', ''),
   supabaseServiceRoleKey: optional('SUPABASE_SERVICE_ROLE_KEY', ''),
-  jwtSecret: optional('JWT_SECRET', ''),
-  adminUsername: optional('ADMIN_USERNAME', 'admin'),
-  adminPasswordHash: optional('ADMIN_PASSWORD_HASH', ''),
+  jwtSecret: optional('JWT_SECRET', 'dev-local-mi-casa-jwt-secret-2026-min32'),
+  adminUsername: optional('ADMIN_USERNAME', 'micasasucasaben@gmail.com'),
+  adminPasswordHash: optional('ADMIN_PASSWORD_HASH', DEFAULT_ADMIN_HASH),
   sessionCookieName: optional('SESSION_COOKIE_NAME', 'mcsc_session'),
   sessionMaxAgeMs: Number(process.env.SESSION_MAX_AGE_MS) || 8 * 60 * 60 * 1000,
   turnstileSiteKey: optional('TURNSTILE_SITE_KEY', ''),

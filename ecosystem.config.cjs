@@ -1,5 +1,4 @@
 /** PM2 — Hostinger VPS; app ouvindo em 0.0.0.0:3014 (nginx faz proxy para cá) */
-/** Credenciais do painel: defina ADMIN_USERNAME e ADMIN_PASSWORD_HASH no .env (não aqui). */
 module.exports = {
   apps: [
     {
@@ -11,12 +10,20 @@ module.exports = {
       watch: false,
       max_memory_restart: '200M',
       env: {
-        NODE_ENV: 'development',
-        PORT: 3014
+        NODE_ENV: 'production',
+        PORT: 3014,
+        DISABLE_PANEL_AUTH: '0',
+        ADMIN_USERNAME: 'micasasucasaben@gmail.com',
+        ADMIN_PASSWORD_HASH:
+          '$2a$12$MJBPfqhhw7o5DRWe6s8.c.Hq.iG5f7KxrCB4aGBflh.lbmRsKHYjm'
       },
       env_production: {
         NODE_ENV: 'production',
-        PORT: 3014
+        PORT: 3014,
+        DISABLE_PANEL_AUTH: '0',
+        ADMIN_USERNAME: 'micasasucasaben@gmail.com',
+        ADMIN_PASSWORD_HASH:
+          '$2a$12$MJBPfqhhw7o5DRWe6s8.c.Hq.iG5f7KxrCB4aGBflh.lbmRsKHYjm'
       }
     }
   ]

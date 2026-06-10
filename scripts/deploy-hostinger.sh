@@ -44,7 +44,7 @@ echo "--- npm ci ---"
 npm ci --omit=dev
 
 echo ""
-echo "--- pm2 restart (recarrega .env) ---"
+echo "--- pm2 restart (recarrega credenciais) ---"
 pm2 restart mi-casa --update-env
 
 echo ""
