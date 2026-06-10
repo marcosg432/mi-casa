@@ -8,7 +8,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@600;700&family=Outfit:wght@400;500;600;700&display=swap">
-  <link rel="stylesheet" href="css/painel-mesas.css?v=20260610a">
+  <link rel="stylesheet" href="css/painel-mesas.css?v=20260610c">
 </head>
 <body class="painel-mesas-body">
   <div class="pm-wrap">
@@ -21,6 +21,7 @@
     </header>
 
     <div id="pm-erro" class="pm-erro-banner" hidden role="alert"></div>
+    <div id="pm-aviso" class="pm-aviso-banner" hidden role="status"></div>
 
     <section class="pm-cards" aria-label="Resumo">
       <article class="pm-card">
@@ -31,17 +32,17 @@
       <article class="pm-card">
         <div class="pm-card-label">Mesas disponíveis</div>
         <div class="pm-card-valor" id="pm-disp-mesas">—</div>
-        <div class="pm-card-sub">disponíveis agora</div>
+        <div class="pm-card-sub">menor disponível no dia</div>
       </article>
       <article class="pm-card">
-        <div class="pm-card-label">Mesas ocupadas</div>
+        <div class="pm-card-label">Mesas reservadas</div>
         <div class="pm-card-valor" id="pm-ocupadas">—</div>
-        <div class="pm-card-sub">ocupadas / pendentes</div>
+        <div class="pm-card-sub">no dia selecionado</div>
       </article>
       <article class="pm-card">
-        <div class="pm-card-label">Reservas hoje</div>
+        <div class="pm-card-label">Reservas no dia</div>
         <div class="pm-card-valor" id="pm-reservas-hoje">—</div>
-        <div class="pm-card-sub">confirmadas no dia</div>
+        <div class="pm-card-sub">pendentes + confirmadas</div>
       </article>
     </section>
 
@@ -134,6 +135,6 @@
     <footer class="pm-footer">Mi Casa, Su Casa • Painel de Mesas</footer>
   </div>
 
-  <script src="js/painel-mesas.js?v=20260610b"></script>
+  <script src="js/painel-mesas.js?v=20260610c"></script>
 </body>
 </html>

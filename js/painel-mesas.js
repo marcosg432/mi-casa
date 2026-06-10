@@ -80,8 +80,37 @@
   function renderCards(totais) {
     $('pm-total-mesas').textContent = totais.mesas;
     $('pm-disp-mesas').textContent = totais.disponiveis;
-    $('pm-ocupadas').textContent = totais.ocupadas + totais.pendentes;
+    $('pm-ocupadas').textContent =
+      totais.mesasReservadas != null ? totais.mesasReservadas : totais.ocupadas + totais.pendentes;
     $('pm-reservas-hoje').textContent = totais.reservasHoje;
+  }
+
+  function renderAviso(data) {
+    var el = $('pm-aviso');
+    if (!el) return;
+    if (!data.aviso || !data.datasComReserva || !data.datasComReserva.length) {
+      el.hidden = true;
+      el.innerHTML = '';
+      return;
+    }
+    el.hidden = false;
+    el.innerHTML =
+      '<p>' + escapeHtml(data.aviso) + '</p>' +
+      '<div class="pm-aviso-btns">' +
+      data.datasComReserva.map(function (d) {
+        return (
+          '<button type="button" class="pm-aviso-data" data-iso="' + escapeHtml(d.iso) + '">' +
+          escapeHtml(d.br) + ' (' + d.total + ')</button>'
+        );
+      }).join('') +
+      '</div>';
+    el.querySelectorAll('.pm-aviso-data').forEach(function (btn) {
+      btn.addEventListener('click', function () {
+        var dataInput = $('pm-data');
+        if (dataInput) dataInput.value = btn.getAttribute('data-iso');
+        carregarDashboard();
+      });
+    });
   }
 
   function renderTabela(reservas) {
@@ -164,6 +193,7 @@
         renderCards(data.totais);
         renderTabela(data.reservas);
         renderMapa(data.mapa);
+        renderAviso(data);
         mostrarErro(null);
       })
       .catch(function (e) {

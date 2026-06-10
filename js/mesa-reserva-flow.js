@@ -178,6 +178,7 @@
       horariosDispCache = null;
       popularSelectHorarios(null);
     }
+    atualizarDisponibilidadeAgora();
   }
 
   function atualizarHorariosSelect() {
@@ -236,6 +237,14 @@
     }
   }
 
+  function getContextoDisponibilidade() {
+    var st = getFormState();
+    if (st.data && st.horario) {
+      return { data: st.data, horario: st.horario };
+    }
+    return { data: hojeISO(), horario: null };
+  }
+
   function renderDispAgora(disponiveis, total) {
     var el = $('mesa-disp-agora');
     if (!el) return;
@@ -261,13 +270,18 @@
     if (horario) qs.push('horario=' + encodeURIComponent(horario));
     if (qs.length) url += '?' + qs.join('&');
     return fetch(url, { cache: 'no-store' })
-      .then(function (r) { return r.json(); })
-      .then(function (info) { return normalizarDisponibilidade(info); })
+      .then(function (r) {
+        return r.json().then(function (info) {
+          if (!r.ok) return normalizarDisponibilidade(null);
+          return normalizarDisponibilidade(info);
+        });
+      })
       .catch(function () { return normalizarDisponibilidade(null); });
   }
 
   function atualizarDisponibilidadeAgora() {
-    return fetchDisponibilidade(hojeISO(), null).then(function (info) {
+    var ctx = getContextoDisponibilidade();
+    return fetchDisponibilidade(ctx.data, ctx.horario).then(function (info) {
       renderDispAgora(info.disponiveis, info.total);
       return info;
     });
@@ -325,6 +339,7 @@
 
   function finalizarReservaWhatsApp(payload) {
     abrirWhatsApp(payload);
+    onDataChange();
     atualizarDisponibilidadeAgora();
     atualizarResumo();
     mostrarErro(null);
@@ -370,13 +385,7 @@
       })
       .then(finalizarReservaWhatsApp)
       .catch(function (e) {
-        var msg = (e && e.message) || '';
-        var status = e && e.status;
-        if (!status || status >= 500 || /supabase|configurado|network|fetch/i.test(msg)) {
-          finalizarReservaWhatsApp(payload);
-          return;
-        }
-        mostrarErro(msg || 'Erro ao reservar.');
+        mostrarErro((e && e.message) || 'Erro ao reservar. Tente novamente.');
       })
       .finally(function () {
         if (btn) {
@@ -421,7 +430,12 @@
     });
 
     var horSel = $('mesa-horario');
-    if (horSel) horSel.addEventListener('change', atualizarResumo);
+    if (horSel) {
+      horSel.addEventListener('change', function () {
+        atualizarDisponibilidadeAgora();
+        atualizarResumo();
+      });
+    }
 
     var tel = $('mesa-telefone');
     if (tel) {

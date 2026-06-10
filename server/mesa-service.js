@@ -8,6 +8,25 @@ function useLocalStore() {
   return !config.supabaseUrl || !config.supabaseServiceRoleKey;
 }
 
+var forceLocalMesaStore = false;
+
+function shouldUseLocalStore() {
+  return forceLocalMesaStore || useLocalStore();
+}
+
+function maybeFallbackLocal(e) {
+  if (shouldUseLocalStore()) return false;
+  var msg = String((e && e.message) || (e && e.code) || (e && e.details) || e || '');
+  if (/does not exist|Could not find|reservas_mesa|relation.*mesas|PGRST205|42P01/i.test(msg)) {
+    forceLocalMesaStore = true;
+    console.warn(
+      '[mesas] Tabelas Supabase ausentes — usando data/mesas-local.json. Execute migrations 011 e 012.'
+    );
+    return true;
+  }
+  return false;
+}
+
 var TOTAL_MESAS = 10;
 var MAX_PESSOAS = 16;
 var HORARIOS = [];
@@ -124,35 +143,45 @@ function normalizeReservaRow(row) {
 }
 
 async function listarMesas() {
-  if (useLocalStore()) {
+  if (shouldUseLocalStore()) {
     return localStore.listarMesas();
   }
-  var sb = getSupabaseAdmin();
-  var q = await sb.from('mesas').select('*').order('id', { ascending: true });
-  if (q.error) throw q.error;
-  return (q.data || []).map(function (m) {
-    return {
-      id: m.id,
-      numero: m.numero,
-      statusManual: m.status_manual,
-      updatedAt: m.updated_at
-    };
-  });
+  try {
+    var sb = getSupabaseAdmin();
+    var q = await sb.from('mesas').select('*').order('id', { ascending: true });
+    if (q.error) throw q.error;
+    return (q.data || []).map(function (m) {
+      return {
+        id: m.id,
+        numero: m.numero,
+        statusManual: m.status_manual,
+        updatedAt: m.updated_at
+      };
+    });
+  } catch (e) {
+    if (maybeFallbackLocal(e)) return listarMesas();
+    throw e;
+  }
 }
 
 async function listarReservasMesa(filtros) {
   filtros = filtros || {};
-  if (useLocalStore()) {
+  if (shouldUseLocalStore()) {
     return localStore.listarReservasMesa(filtros).map(normalizeReservaRow);
   }
-  var sb = getSupabaseAdmin();
-  var q = sb.from('reservas_mesa').select('*').order('data', { ascending: true }).order('horario', { ascending: true });
-  if (filtros.data) q = q.eq('data', filtros.data);
-  if (filtros.status) q = q.eq('status', filtros.status);
-  if (filtros.excluirCanceladas) q = q.neq('status', 'cancelada');
-  var res = await q;
-  if (res.error) throw res.error;
-  return (res.data || []).map(normalizeReservaRow);
+  try {
+    var sb = getSupabaseAdmin();
+    var q = sb.from('reservas_mesa').select('*').order('data', { ascending: true }).order('horario', { ascending: true });
+    if (filtros.data) q = q.eq('data', filtros.data);
+    if (filtros.status) q = q.eq('status', filtros.status);
+    if (filtros.excluirCanceladas) q = q.neq('status', 'cancelada');
+    var res = await q;
+    if (res.error) throw res.error;
+    return (res.data || []).map(normalizeReservaRow);
+  } catch (e) {
+    if (maybeFallbackLocal(e)) return listarReservasMesa(filtros);
+    throw e;
+  }
 }
 
 async function contarMesasBloqueadasManualmente() {
@@ -170,19 +199,24 @@ function mesasOcupadasPorReservas(reservas) {
 }
 
 async function getReservasAtivasNoHorario(data, horario) {
-  if (useLocalStore()) {
+  if (shouldUseLocalStore()) {
     return localStore.getReservasAtivasNoHorario(data, horario).map(normalizeReservaRow);
   }
-  var sb = getSupabaseAdmin();
-  var res = await sb
-    .from('reservas_mesa')
-    .select('*')
-    .eq('data', data)
-    .in('status', ['pendente', 'confirmada']);
-  if (res.error) throw res.error;
-  return (res.data || [])
-    .map(normalizeReservaRow)
-    .filter(function (r) { return r.horario === horario; });
+  try {
+    var sb = getSupabaseAdmin();
+    var res = await sb
+      .from('reservas_mesa')
+      .select('*')
+      .eq('data', data)
+      .in('status', ['pendente', 'confirmada']);
+    if (res.error) throw res.error;
+    return (res.data || [])
+      .map(normalizeReservaRow)
+      .filter(function (r) { return r.horario === horario; });
+  } catch (e) {
+    if (maybeFallbackLocal(e)) return getReservasAtivasNoHorario(data, horario);
+    throw e;
+  }
 }
 
 async function calcularDisponibilidade(data, horario) {
@@ -241,14 +275,19 @@ function atribuirMesas(reservas, mesas) {
 
 async function getMapaMesas(data, horario, periodo) {
   var reservas;
-  if (useLocalStore()) {
+  if (shouldUseLocalStore()) {
     reservas = localStore.listarReservasMesa({ data: data, excluirCanceladas: true }).map(normalizeReservaRow);
   } else {
-    var sb = getSupabaseAdmin();
-    var q = sb.from('reservas_mesa').select('*').eq('data', data).neq('status', 'cancelada');
-    var res = await q;
-    if (res.error) throw res.error;
-    reservas = (res.data || []).map(normalizeReservaRow);
+    try {
+      var sb = getSupabaseAdmin();
+      var q = sb.from('reservas_mesa').select('*').eq('data', data).neq('status', 'cancelada');
+      var res = await q;
+      if (res.error) throw res.error;
+      reservas = (res.data || []).map(normalizeReservaRow);
+    } catch (e) {
+      if (maybeFallbackLocal(e)) return getMapaMesas(data, horario, periodo);
+      throw e;
+    }
   }
 
   if (horario) {
@@ -357,7 +396,7 @@ async function criarReservaMesa(body) {
     throw errCap;
   }
 
-  if (useLocalStore()) {
+  if (shouldUseLocalStore()) {
     var inserted = localStore.insertReserva({
       nome: d.nome,
       telefone: d.telefone,
@@ -370,23 +409,28 @@ async function criarReservaMesa(body) {
     return normalizeReservaRow(inserted);
   }
 
-  var sb = getSupabaseAdmin();
-  var insert = await sb
-    .from('reservas_mesa')
-    .insert({
-      nome: d.nome,
-      telefone: d.telefone,
-      data: d.data,
-      horario: d.horario,
-      pessoas: d.pessoas,
-      mesas_utilizadas: d.mesasUtilizadas,
-      status: d.status
-    })
-    .select('*')
-    .single();
+  try {
+    var sb = getSupabaseAdmin();
+    var insert = await sb
+      .from('reservas_mesa')
+      .insert({
+        nome: d.nome,
+        telefone: d.telefone,
+        data: d.data,
+        horario: d.horario,
+        pessoas: d.pessoas,
+        mesas_utilizadas: d.mesasUtilizadas,
+        status: d.status
+      })
+      .select('*')
+      .single();
 
-  if (insert.error) throw insert.error;
-  return normalizeReservaRow(insert.data);
+    if (insert.error) throw insert.error;
+    return normalizeReservaRow(insert.data);
+  } catch (e) {
+    if (maybeFallbackLocal(e)) return criarReservaMesa(body);
+    throw e;
+  }
 }
 
 async function criarReservaMesaAdmin(body) {
@@ -403,7 +447,7 @@ async function criarReservaMesaAdmin(body) {
 
 async function atualizarReservaMesa(id, patch) {
   patch = patch || {};
-  if (useLocalStore()) {
+  if (shouldUseLocalStore()) {
     var atualLocal = localStore.getReservaById(id);
     if (!atualLocal) {
       var err404l = new Error('Reserva não encontrada.');
@@ -528,7 +572,7 @@ async function atualizarStatusMesaManual(mesaId, statusManual) {
     errSt.status = 400;
     throw errSt;
   }
-  if (useLocalStore()) {
+  if (shouldUseLocalStore()) {
     var updLocal = localStore.updateMesa(id, st);
     if (!updLocal) {
       var err404m = new Error('Mesa inválida.');
@@ -562,7 +606,18 @@ async function getDashboardMesas(data, horario, periodo) {
   data = data || hojeISO();
   var mesas = await listarMesas();
   var reservasDia = await listarReservasMesa({ data: data, excluirCanceladas: true });
+  var reservasTodas = await listarReservasMesa({ excluirCanceladas: true });
   var bloqueadas = mesas.filter(function (m) { return m.statusManual === 'bloqueada'; }).length;
+
+  var datasComReserva = [];
+  var seen = {};
+  reservasTodas.forEach(function (r) {
+    if (r.data === data || seen[r.data]) return;
+    seen[r.data] = true;
+    var qtd = reservasTodas.filter(function (x) { return x.data === r.data; }).length;
+    datasComReserva.push({ iso: r.data, br: formatDataBR(r.data), total: qtd });
+  });
+  datasComReserva.sort(function (a, b) { return a.iso < b.iso ? -1 : 1; });
 
   var reservasFiltradas = reservasDia;
   if (horario) {
@@ -579,23 +634,39 @@ async function getDashboardMesas(data, horario, periodo) {
     });
   }
 
-  var ocupadasReservas = mesasOcupadasPorReservas(reservasFiltradas);
+  var minDisponiveis = Math.max(0, TOTAL_MESAS - bloqueadas);
+  for (var hi = 0; hi < HORARIOS.length; hi++) {
+    var slot = await calcularDisponibilidade(data, HORARIOS[hi]);
+    if (slot.disponiveis < minDisponiveis) minDisponiveis = slot.disponiveis;
+  }
+
   var confirmadas = reservasFiltradas.filter(function (r) { return r.status === 'confirmada'; }).length;
   var pendentes = reservasFiltradas.filter(function (r) { return r.status === 'pendente'; }).length;
+  var mesasReservadasNoDia = mesasOcupadasPorReservas(reservasDia);
 
   var mapa = await getMapaMesas(data, horario || null, horario ? null : periodo);
+
+  var aviso = null;
+  if (!reservasFiltradas.length && datasComReserva.length) {
+    aviso =
+      'Nenhuma reserva em ' + formatDataBR(data) + '. Há reservas em: ' +
+      datasComReserva.map(function (d) { return d.br + ' (' + d.total + ')'; }).join(', ') + '.';
+  }
 
   return {
     data: data,
     horario: horario || null,
     periodo: periodo || 'dia',
+    aviso: aviso,
+    datasComReserva: datasComReserva,
     totais: {
       mesas: TOTAL_MESAS,
-      disponiveis: Math.max(0, TOTAL_MESAS - bloqueadas - ocupadasReservas),
+      disponiveis: minDisponiveis,
       bloqueadas: bloqueadas,
+      mesasReservadas: mesasReservadasNoDia,
       ocupadas: mapa.mesas.filter(function (m) { return m.status === 'ocupada'; }).length,
       pendentes: mapa.mesas.filter(function (m) { return m.status === 'pendente'; }).length,
-      reservasHoje: reservasDia.filter(function (r) { return r.status === 'confirmada'; }).length,
+      reservasHoje: reservasDia.length,
       reservasConfirmadas: confirmadas,
       reservasPendentes: pendentes
     },
@@ -620,7 +691,7 @@ function buildWhatsAppMensagem(reserva) {
   );
 }
 
-if (useLocalStore()) {
+if (shouldUseLocalStore()) {
   console.log('[mesas] Armazenamento local (data/mesas-local.json) — configure Supabase para produção.');
 }
 
