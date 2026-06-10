@@ -109,12 +109,7 @@ async function getOccupiedDateMapForQuarto(quartoId) {
   (reservas.data || []).forEach(function (r) {
     var rq = normalizeQuartoId(r.quarto_id);
     if (targetQuarto) {
-      if (rq == null) {
-        eachNight(r.data_entrada, r.data_saida, function (d) {
-          map[d] = 'reserva';
-        });
-        return;
-      }
+      if (rq == null) return;
       if (!mesmoQuarto(rq, targetQuarto)) return;
     }
     eachNight(r.data_entrada, r.data_saida, function (d) {

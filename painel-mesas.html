@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="robots" content="noindex, nofollow">
+  <title>Painel de Mesas — Mi Casa, Su Casa</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@600;700&family=Outfit:wght@400;500;600;700&display=swap">
+  <link rel="stylesheet" href="css/painel-mesas.css?v=20260610a">
+</head>
+<body class="painel-mesas-body">
+  <div class="pm-wrap">
+    <header class="pm-top">
+      <div>
+        <h1>Olá, Sandro!</h1>
+        <p>Veja o resumo das reservas e mesas do restaurante.</p>
+      </div>
+      <button type="button" class="pm-sair" id="pm-sair">Sair</button>
+    </header>
+
+    <div id="pm-erro" class="pm-erro-banner" hidden role="alert"></div>
+
+    <section class="pm-cards" aria-label="Resumo">
+      <article class="pm-card">
+        <div class="pm-card-label">Mesas totais</div>
+        <div class="pm-card-valor" id="pm-total-mesas">10</div>
+        <div class="pm-card-sub">mesas cadastradas</div>
+      </article>
+      <article class="pm-card">
+        <div class="pm-card-label">Mesas disponíveis</div>
+        <div class="pm-card-valor" id="pm-disp-mesas">—</div>
+        <div class="pm-card-sub">disponíveis agora</div>
+      </article>
+      <article class="pm-card">
+        <div class="pm-card-label">Mesas ocupadas</div>
+        <div class="pm-card-valor" id="pm-ocupadas">—</div>
+        <div class="pm-card-sub">ocupadas / pendentes</div>
+      </article>
+      <article class="pm-card">
+        <div class="pm-card-label">Reservas hoje</div>
+        <div class="pm-card-valor" id="pm-reservas-hoje">—</div>
+        <div class="pm-card-sub">confirmadas no dia</div>
+      </article>
+    </section>
+
+    <section class="pm-nova-reserva" aria-labelledby="pm-nova-titulo">
+      <h2 id="pm-nova-titulo">Reservar mesa manualmente</h2>
+      <form id="pm-nova-form" class="pm-nova-grid">
+        <div class="pm-filtro">
+          <label for="pm-nova-nome">Nome</label>
+          <input type="text" id="pm-nova-nome" name="nome" placeholder="Nome do cliente" required>
+        </div>
+        <div class="pm-filtro">
+          <label for="pm-nova-telefone">Telefone</label>
+          <input type="tel" id="pm-nova-telefone" name="telefone" placeholder="(00) 99999-9999">
+        </div>
+        <div class="pm-filtro">
+          <label for="pm-nova-horario">Horário</label>
+          <select id="pm-nova-horario" name="horario" required></select>
+        </div>
+        <div class="pm-filtro">
+          <label for="pm-nova-pessoas">Pessoas</label>
+          <input type="number" id="pm-nova-pessoas" name="pessoas" min="1" max="16" value="2" required>
+        </div>
+        <div class="pm-filtro">
+          <label for="pm-nova-mesas">Mesas</label>
+          <input type="number" id="pm-nova-mesas" name="mesas" min="1" max="10" value="1" required>
+        </div>
+        <div class="pm-filtro pm-filtro--btn">
+          <label>&nbsp;</label>
+          <button type="submit" class="pm-btn" id="pm-nova-submit">Reservar mesa</button>
+        </div>
+      </form>
+      <p class="pm-nova-dica">A reserva usa a data do filtro acima e reduz a disponibilidade no site na hora.</p>
+    </section>
+
+    <section class="pm-filtros" aria-label="Filtros">
+      <div class="pm-filtro">
+        <label for="pm-data">Data</label>
+        <input type="date" id="pm-data" name="data">
+      </div>
+      <div class="pm-filtro">
+        <label for="pm-periodo">Período</label>
+        <select id="pm-periodo" name="periodo">
+          <option value="dia">Todo o dia</option>
+          <option value="almoco">Almoço (11h–15h)</option>
+          <option value="jantar">Jantar (18h+)</option>
+        </select>
+      </div>
+      <button type="button" class="pm-btn" id="pm-aplicar">Atualizar</button>
+    </section>
+
+    <div class="pm-grid">
+      <section class="pm-panel" aria-labelledby="pm-reservas-titulo">
+        <div class="pm-panel-head">
+          <h2 id="pm-reservas-titulo">Reservas do dia</h2>
+        </div>
+        <div class="pm-tabela-wrap">
+          <table class="pm-tabela">
+            <thead>
+              <tr>
+                <th>Horário</th>
+                <th>Nome</th>
+                <th>Pessoas</th>
+                <th>Mesas</th>
+                <th>Status</th>
+                <th>Ações</th>
+              </tr>
+            </thead>
+            <tbody id="pm-reservas-body">
+              <tr><td colspan="6" class="pm-vazio">Carregando…</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <section class="pm-panel" aria-labelledby="pm-mapa-titulo">
+        <div class="pm-panel-head">
+          <h2 id="pm-mapa-titulo">Mapa de mesas</h2>
+        </div>
+        <div class="pm-mesas-grid" id="pm-mesas-grid"></div>
+        <div class="pm-legenda">
+          <span class="l-disp">Disponível</span>
+          <span class="l-ocup">Ocupada</span>
+          <span class="l-pend">Pendente</span>
+          <span class="l-bloq">Bloqueada</span>
+        </div>
+        <p class="pm-info-box">As mesas são calculadas automaticamente de acordo com a quantidade de pessoas de cada reserva. Você pode ajustar manualmente em Ações → Mesas.</p>
+      </section>
+    </div>
+
+    <footer class="pm-footer">Mi Casa, Su Casa • Painel de Mesas</footer>
+  </div>
+
+  <script src="js/painel-mesas.js?v=20260610b"></script>
+</body>
+</html>

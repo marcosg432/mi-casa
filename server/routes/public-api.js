@@ -11,6 +11,13 @@ var {
 } = require('../reserva-service');
 var { getSupabaseAdmin } = require('../supabase-admin');
 var { validarPayloadReserva } = require('../reserva-validator');
+var {
+  getDisponibilidadePublica,
+  getHorariosDisponiveis,
+  criarReservaMesa,
+  HORARIOS,
+  hojeISO
+} = require('../mesa-service');
 
 var router = express.Router();
 var pkg = require('../../package.json');
@@ -59,7 +66,9 @@ router.get('/quartos', async function (req, res) {
 router.get('/disponibilidade/:quartoId', async function (req, res) {
   try {
     var map = await getOccupiedDateMapForQuarto(req.params.quartoId);
-    res.setHeader('Cache-Control', 'no-store, no-cache, must-revalidate');
+    res.setHeader('Cache-Control', 'no-store, no-cache, must-revalidate, proxy-revalidate');
+    res.setHeader('Pragma', 'no-cache');
+    res.setHeader('Expires', '0');
     res.json(map);
   } catch (e) {
     console.error('[api/disponibilidade]', e);
@@ -100,6 +109,44 @@ router.post('/reservas', reservaLimiter, express.json({ limit: '32kb' }), async 
     var status = e.status || 500;
     res.status(status).json({
       error: e.message || 'Não foi possível registrar a reserva.',
+      details: e.details || undefined
+    });
+  }
+});
+
+router.get('/mesas/disponibilidade', async function (req, res) {
+  try {
+    var data = req.query.data || null;
+    var horario = req.query.horario || null;
+    var info = await getDisponibilidadePublica(data, horario);
+    res.setHeader('Cache-Control', 'no-store, no-cache, must-revalidate');
+    res.json(info);
+  } catch (e) {
+    console.error('[api/mesas/disponibilidade]', e);
+    res.status(500).json({ error: 'Não foi possível carregar disponibilidade de mesas.' });
+  }
+});
+
+router.get('/mesas/horarios', async function (req, res) {
+  try {
+    var data = req.query.data || hojeISO();
+    var horarios = await getHorariosDisponiveis(data);
+    res.setHeader('Cache-Control', 'no-store, no-cache, must-revalidate');
+    res.json({ data: data, horarios: horarios, slots: HORARIOS });
+  } catch (e) {
+    console.error('[api/mesas/horarios]', e);
+    res.status(500).json({ error: 'Não foi possível carregar horários.' });
+  }
+});
+
+router.post('/mesas/reservas', reservaLimiter, express.json({ limit: '16kb' }), async function (req, res) {
+  try {
+    var created = await criarReservaMesa(req.body || {});
+    res.status(201).json(created);
+  } catch (e) {
+    console.error('[api/mesas/reservas POST]', e);
+    res.status(e.status || 500).json({
+      error: e.message || 'Não foi possível registrar a reserva de mesa.',
       details: e.details || undefined
     });
   }

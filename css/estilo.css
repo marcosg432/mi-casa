@@ -2783,6 +2783,21 @@ body.lightbox-aberto .cabecalho {
   min-width: 110px;
 }
 
+.servico-item--link {
+  text-decoration: none;
+  color: inherit;
+  transition: transform 0.25s ease;
+}
+
+.servico-item--link:hover {
+  transform: translateY(-2px);
+  color: inherit;
+}
+
+.servico-item--link .servico-nome {
+  color: var(--cor-texto);
+}
+
 .servico-icone {
   width: 64px;
   height: 64px;

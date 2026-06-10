@@ -99,6 +99,9 @@ if (config.disablePanelAuth) {
   app.get('/painel.html', requireAuthPage, function (req, res) {
     res.sendFile(path.join(root, 'painel.html'));
   });
+  app.get('/painel-mesas.html', requireAuthPage, function (req, res) {
+    res.sendFile(path.join(root, 'painel-mesas.html'));
+  });
 }
 
 function sendNoCacheFile(relativePath) {
@@ -111,7 +114,9 @@ function sendNoCacheFile(relativePath) {
 }
 
 app.get('/reservar.html', sendNoCacheFile('reservar.html'));
+app.get('/reservar-mesa.html', sendNoCacheFile('reservar-mesa.html'));
 app.get('/js/reservar-flow.js', sendNoCacheFile('js/reservar-flow.js'));
+app.get('/js/mesa-reserva-flow.js', sendNoCacheFile('js/mesa-reserva-flow.js'));
 app.get('/js/reservar.js', sendNoCacheFile('js/reservar.js'));
 
 app.use(express.static(root, {

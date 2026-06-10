@@ -20,8 +20,8 @@
 
 .secao-eventos {
   --eventos-bg: #f4f1ea;
-  --eventos-verde: #1b3022;
-  --eventos-verde-hover: #15271f;
+  --eventos-verde: var(--cor-dourado, #3d6b4f);
+  --eventos-verde-hover: var(--cor-dourado-hover, #2d5a3d);
   --eventos-texto: #2d2d2d;
   --eventos-suave: #6b6b6b;
   --eventos-borda: rgba(27, 48, 34, 0.12);

@@ -1,0 +1,394 @@
+/* Reserva de mesas — layout fiel ao mockup de referência */
+
+.secao-mesa-reserva {
+  --mesa-verde: var(--cor-dourado, #3d6b4f);
+  --mesa-verde-hover: var(--cor-dourado-hover, #2d5a3d);
+  --mesa-fundo: #f9f9f7;
+  --mesa-borda: rgba(0, 0, 0, 0.1);
+  --mesa-borda-clara: #e5e5e3;
+  --mesa-texto: #1a1a1a;
+  --mesa-texto-suave: #6b6b6b;
+  --mesa-radius: 12px;
+  padding: clamp(2.75rem, 5vw, 4rem) 0 clamp(3rem, 6vw, 4.5rem);
+  background: var(--mesa-fundo);
+}
+
+.secao-mesa-reserva .mesa-reserva-container {
+  max-width: min(1180px, 94vw);
+  margin: 0 auto;
+  padding-left: clamp(1rem, 2.5vw, 1.75rem);
+  padding-right: clamp(1rem, 2.5vw, 1.75rem);
+}
+
+/* ---- Cabeçalho ---- */
+.mesa-reserva-hero {
+  margin-bottom: clamp(1.75rem, 3vw, 2.25rem);
+  padding-bottom: clamp(1.25rem, 2.5vw, 1.75rem);
+  border-bottom: 1px solid var(--mesa-borda);
+}
+
+.mesa-reserva-rotulo {
+  margin: 0 0 0.5rem;
+  font-family: var(--font-body);
+  font-size: 0.68rem;
+  font-weight: 700;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--mesa-verde);
+}
+
+.mesa-reserva-titulo {
+  margin: 0 0 0.65rem;
+  font-family: var(--font-display);
+  font-size: clamp(2.15rem, 4.5vw, 3rem);
+  font-weight: 600;
+  line-height: 1.06;
+  color: var(--mesa-verde);
+  text-transform: none;
+}
+
+.mesa-reserva-linha {
+  width: clamp(3.25rem, 7vw, 4.5rem);
+  height: 2px;
+  margin: 0 0 0.85rem;
+  background: var(--mesa-verde);
+}
+
+.mesa-reserva-intro {
+  margin: 0;
+  max-width: 42rem;
+  font-family: var(--font-body);
+  font-size: clamp(0.9rem, 1.2vw, 0.98rem);
+  line-height: 1.6;
+  color: var(--mesa-texto-suave);
+}
+
+/* ---- Corpo: form + resumo ---- */
+.mesa-reserva-corpo {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(260px, 320px);
+  gap: clamp(1.25rem, 2.5vw, 1.75rem);
+  align-items: start;
+}
+
+.mesa-reserva-form-area {
+  min-width: 0;
+}
+
+.mesa-reserva-form-titulo {
+  display: flex;
+  align-items: center;
+  gap: 0.55rem;
+  margin: 0 0 1.15rem;
+  font-family: var(--font-display);
+  font-size: clamp(1.2rem, 2vw, 1.4rem);
+  font-weight: 600;
+  color: var(--mesa-verde);
+}
+
+.mesa-reserva-form-titulo .lucide-icon {
+  color: var(--mesa-verde);
+}
+
+/* ---- Campos ---- */
+.mesa-reserva-campos {
+  display: grid;
+  grid-template-columns: repeat(6, minmax(0, 1fr));
+  gap: 0.85rem;
+  margin-bottom: 1rem;
+}
+
+.mesa-reserva-campo {
+  grid-column: span 2;
+  display: grid;
+  gap: 0.35rem;
+}
+
+.mesa-reserva-campo--metade {
+  grid-column: span 3;
+}
+
+.mesa-reserva-campo label {
+  font-family: var(--font-body);
+  font-size: 0.65rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--mesa-texto-suave);
+}
+
+.mesa-reserva-input-wrap {
+  position: relative;
+}
+
+.mesa-reserva-input-wrap .lucide-icon {
+  position: absolute;
+  left: 0.85rem;
+  top: 50%;
+  transform: translateY(-50%);
+  color: var(--mesa-verde);
+  pointer-events: none;
+}
+
+.mesa-reserva-input-wrap select,
+.mesa-reserva-input-wrap input {
+  width: 100%;
+  border: 1px solid var(--mesa-borda-clara);
+  border-radius: var(--mesa-radius);
+  padding: 0.78rem 0.85rem 0.78rem 2.45rem;
+  font-family: var(--font-body);
+  font-size: 0.9rem;
+  color: var(--mesa-texto);
+  background: #fff;
+  appearance: none;
+  transition: border-color 0.2s ease;
+}
+
+.mesa-reserva-input-wrap select {
+  padding-right: 2.1rem;
+  background-color: #fff;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath fill='%233d6b4f' d='M1 1l5 5 5-5'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 0.85rem center;
+}
+
+.mesa-reserva-input-wrap select:focus,
+.mesa-reserva-input-wrap input:focus {
+  outline: none;
+  border-color: rgba(61, 107, 79, 0.4);
+}
+
+.mesa-reserva-input-wrap select option:disabled {
+  color: rgba(26, 26, 26, 0.45);
+}
+
+/* ---- Caixas de status ---- */
+.mesa-reserva-status-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.85rem;
+  margin: 0 0 1.15rem;
+}
+
+.mesa-reserva-status-box {
+  display: flex;
+  gap: 0.75rem;
+  align-items: flex-start;
+  padding: 0.9rem 1rem;
+  border: 1px solid var(--mesa-borda-clara);
+  border-radius: var(--mesa-radius);
+  background: #fff;
+}
+
+.mesa-reserva-status-box .lucide-icon {
+  color: var(--mesa-verde);
+  flex-shrink: 0;
+  margin-top: 0.05rem;
+}
+
+.mesa-reserva-status-box strong {
+  display: block;
+  margin-bottom: 0.15rem;
+  font-family: var(--font-body);
+  font-size: 0.6rem;
+  font-weight: 700;
+  letter-spacing: 0.07em;
+  text-transform: uppercase;
+  color: var(--mesa-verde);
+}
+
+.mesa-reserva-status-num {
+  margin: 0;
+  font-family: var(--font-body);
+  font-size: 0.95rem;
+  color: var(--mesa-texto);
+}
+
+.mesa-reserva-status-num span {
+  font-size: 1.35rem;
+  font-weight: 700;
+  color: var(--mesa-verde);
+}
+
+.mesa-reserva-status-info {
+  margin: 0;
+  font-family: var(--font-body);
+  font-size: 0.78rem;
+  line-height: 1.45;
+  color: var(--mesa-texto-suave);
+}
+
+/* ---- Botão WhatsApp ---- */
+.mesa-reserva-btn-whats {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.55rem;
+  width: 100%;
+  border: none;
+  border-radius: var(--mesa-radius);
+  padding: 0.95rem 1rem;
+  font-family: var(--font-body);
+  font-size: 0.78rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: #fff;
+  background: var(--mesa-verde);
+  cursor: pointer;
+  transition: background 0.25s ease;
+}
+
+.mesa-reserva-btn-whats:hover:not(:disabled) {
+  background: var(--mesa-verde-hover);
+}
+
+.mesa-reserva-btn-whats:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+}
+
+.mesa-reserva-btn-whats svg {
+  width: 1.15rem;
+  height: 1.15rem;
+  flex-shrink: 0;
+  opacity: 0.92;
+}
+
+.mesa-reserva-aviso {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.4rem;
+  margin: 0.85rem 0 0;
+  font-family: var(--font-body);
+  font-size: 0.74rem;
+  line-height: 1.45;
+  color: var(--mesa-texto-suave);
+}
+
+.mesa-reserva-aviso .lucide-icon {
+  flex-shrink: 0;
+  margin-top: 0.1rem;
+  color: var(--mesa-texto-suave);
+}
+
+.mesa-reserva-erro {
+  margin-top: 0.75rem;
+  padding: 0.65rem 0.8rem;
+  border-radius: 10px;
+  background: #fdecec;
+  color: #8b1e1e;
+  font-size: 0.84rem;
+}
+
+/* ---- Resumo (sidebar com borda) ---- */
+.mesa-reserva-resumo {
+  border: 1px solid var(--mesa-borda-clara);
+  border-radius: calc(var(--mesa-radius) + 2px);
+  background: #fff;
+  padding: 1.25rem 1.15rem 1.15rem;
+  position: sticky;
+  top: 1rem;
+}
+
+.mesa-reserva-resumo-titulo {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin: 0 0 1rem;
+  font-family: var(--font-display);
+  font-size: 1.15rem;
+  font-weight: 600;
+  color: var(--mesa-verde);
+}
+
+.mesa-reserva-resumo-titulo .lucide-icon {
+  color: var(--mesa-verde);
+}
+
+.mesa-reserva-resumo-lista {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.mesa-reserva-resumo-item {
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  align-items: center;
+  gap: 0.55rem 0.65rem;
+  padding: 0.72rem 0;
+  border-bottom: 1px solid var(--mesa-borda-clara);
+  font-family: var(--font-body);
+  font-size: 0.82rem;
+}
+
+.mesa-reserva-resumo-item .lucide-icon {
+  color: var(--mesa-verde);
+}
+
+.mesa-reserva-resumo-item span {
+  color: var(--mesa-texto-suave);
+  font-size: 0.72rem;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.mesa-reserva-resumo-item strong {
+  font-size: 0.88rem;
+  font-weight: 600;
+  color: var(--mesa-texto);
+}
+
+.mesa-reserva-resumo-divisor {
+  height: 1px;
+  background: var(--mesa-borda-clara);
+  margin: 0.15rem 0;
+}
+
+.mesa-reserva-resumo-item--final {
+  border-bottom: none;
+  padding-bottom: 0.35rem;
+}
+
+.mesa-reserva-resumo-placeholder {
+  margin: 0.75rem 0 0;
+  padding-top: 0.65rem;
+  border-top: 1px solid var(--mesa-borda-clara);
+  font-family: var(--font-body);
+  font-size: 0.76rem;
+  line-height: 1.5;
+  color: var(--mesa-texto-suave);
+}
+
+/* ---- Responsivo ---- */
+@media (max-width: 960px) {
+  .mesa-reserva-corpo {
+    grid-template-columns: 1fr;
+  }
+
+  .mesa-reserva-resumo {
+    position: static;
+    order: -1;
+  }
+}
+
+@media (max-width: 720px) {
+  .mesa-reserva-campos {
+    grid-template-columns: 1fr;
+  }
+
+  .mesa-reserva-campo,
+  .mesa-reserva-campo--metade {
+    grid-column: 1 / -1;
+  }
+
+  .mesa-reserva-status-row {
+    grid-template-columns: 1fr;
+  }
+
+  .mesa-reserva-resumo {
+    display: none;
+  }
+}

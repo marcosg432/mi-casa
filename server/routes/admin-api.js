@@ -12,6 +12,15 @@ var {
 } = require('../reserva-service');
 var { getSupabaseAdmin } = require('../supabase-admin');
 var { validarPayloadReserva, normalizeReservaRow } = require('../reserva-validator');
+var {
+  getDashboardMesas,
+  listarReservasMesa,
+  atualizarReservaMesa,
+  atualizarStatusMesaManual,
+  listarMesas,
+  criarReservaMesaAdmin,
+  HORARIOS
+} = require('../mesa-service');
 
 var router = express.Router();
 if (!config.disablePanelAuth) {
@@ -113,6 +122,70 @@ router.delete('/quartos/:id', async function (req, res) {
     res.json({ ok: true });
   } catch (e) {
     res.status(500).json({ error: 'Erro ao apagar quarto.' });
+  }
+});
+
+router.get('/mesas/dashboard', async function (req, res) {
+  try {
+    var data = req.query.data || null;
+    var horario = req.query.horario || null;
+    var periodo = req.query.periodo || 'dia';
+    res.json(await getDashboardMesas(data, horario || null, periodo));
+  } catch (e) {
+    console.error('[admin/mesas/dashboard]', e);
+    res.status(500).json({ error: 'Erro ao carregar painel de mesas.' });
+  }
+});
+
+router.get('/mesas/reservas', async function (req, res) {
+  try {
+    var filtros = {};
+    if (req.query.data) filtros.data = req.query.data;
+    if (req.query.status) filtros.status = req.query.status;
+    res.json(await listarReservasMesa(filtros));
+  } catch (e) {
+    console.error('[admin/mesas/reservas GET]', e);
+    res.status(500).json({ error: 'Erro ao listar reservas de mesa.' });
+  }
+});
+
+router.post('/mesas/reservas', express.json(), async function (req, res) {
+  try {
+    var created = await criarReservaMesaAdmin(req.body || {});
+    res.status(201).json(created);
+  } catch (e) {
+    console.error('[admin/mesas/reservas POST]', e);
+    res.status(e.status || 500).json({ error: e.message || 'Erro ao criar reserva de mesa.' });
+  }
+});
+
+router.patch('/mesas/reservas/:id', express.json(), async function (req, res) {
+  try {
+    var updated = await atualizarReservaMesa(req.params.id, req.body || {});
+    res.json(updated);
+  } catch (e) {
+    console.error('[admin/mesas/reservas PATCH]', e);
+    res.status(e.status || 500).json({ error: e.message || 'Erro ao atualizar reserva.' });
+  }
+});
+
+router.get('/mesas/lista', async function (req, res) {
+  try {
+    res.json(await listarMesas());
+  } catch (e) {
+    console.error('[admin/mesas/lista]', e);
+    res.status(500).json({ error: 'Erro ao listar mesas.' });
+  }
+});
+
+router.patch('/mesas/:id/status', express.json(), async function (req, res) {
+  try {
+    var statusManual = req.body && (req.body.statusManual || req.body.status);
+    var updated = await atualizarStatusMesaManual(req.params.id, statusManual);
+    res.json(updated);
+  } catch (e) {
+    console.error('[admin/mesas/status PATCH]', e);
+    res.status(e.status || 500).json({ error: e.message || 'Erro ao atualizar mesa.' });
   }
 });
 

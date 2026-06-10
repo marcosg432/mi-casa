@@ -102,7 +102,8 @@
     modoGrupo: false,
     nome: '',
     email: '',
-    telefone: ''
+    telefone: '',
+    reservaRegistrada: false
   };
 
   var SLUG_QUARTO_LEGACY = {
@@ -295,6 +296,44 @@
       cur.setDate(cur.getDate() + 1);
     }
     return false;
+  }
+
+  function marcarPeriodoOcupadoLocal(entradaIso, saidaIso) {
+    if (!entradaIso || !saidaIso) return;
+    var a = entradaIso.split('-');
+    var b = saidaIso.split('-');
+    var cur = new Date(Number(a[0]), Number(a[1]) - 1, Number(a[2]));
+    var end = new Date(Number(b[0]), Number(b[1]) - 1, Number(b[2]));
+    while (cur < end) {
+      var iso =
+        cur.getFullYear() +
+        '-' +
+        String(cur.getMonth() + 1).padStart(2, '0') +
+        '-' +
+        String(cur.getDate()).padStart(2, '0');
+      state.ocupadas[iso] = 'reserva';
+      cur.setDate(cur.getDate() + 1);
+    }
+  }
+
+  var disponibilidadePollTimer = null;
+
+  function pararPollDisponibilidade() {
+    if (disponibilidadePollTimer) {
+      window.clearInterval(disponibilidadePollTimer);
+      disponibilidadePollTimer = null;
+    }
+  }
+
+  function iniciarPollDisponibilidade(pintarFn) {
+    pararPollDisponibilidade();
+    if (!window.SystemStore || !state.quartoId) return;
+    disponibilidadePollTimer = window.setInterval(function () {
+      if (state.reservaRegistrada) return;
+      refreshOcupadasMapAsync().then(function () {
+        if (typeof pintarFn === 'function') pintarFn();
+      });
+    }, 20000);
   }
 
   function getTurnstileToken() {
@@ -824,6 +863,12 @@
       });
     }
 
+    function repintarCalendariosDisponibilidade() {
+      renderCalendar('cal-entrada', 'entrada');
+      renderCalendar('cal-saida', 'saida');
+      updateContinuarDatas();
+    }
+
     function aplicarQuartoPorIndice(roomIdx) {
       var q = QUARTOS_RESERVA[roomIdx];
       if (!q) return;
@@ -847,6 +892,7 @@
         window.history.replaceState({}, '', u.pathname + u.search + u.hash);
       } catch (eUrl) {}
       pintarCalendariosEsumario();
+      iniciarPollDisponibilidade(repintarCalendariosDisponibilidade);
       showStep(1);
       var ipAd = document.getElementById('reservar-input-adultos');
       var ipCr = document.getElementById('reservar-input-criancas');
@@ -855,6 +901,7 @@
     }
 
     pintarCalendariosEsumario();
+    iniciarPollDisponibilidade(repintarCalendariosDisponibilidade);
     showStep(1);
     var pEntrada = parseIsoDate(params.get('entrada'));
     var pSaida = parseIsoDate(params.get('saida'));
@@ -1103,6 +1150,7 @@
     if (btnFazerReserva) {
       btnFazerReserva.textContent = BTN_FINALIZAR_WHATS;
       btnFazerReserva.addEventListener('click', async function () {
+        if (state.reservaRegistrada) return;
         if (!state.checkIn || !state.checkOut || nights() <= 0 || !hospedesValidos()) {
           alert('Complete os dados da reserva antes de continuar.');
           return;
@@ -1114,19 +1162,34 @@
         }
         var entradaIso = toIsoDate(state.checkIn);
         var saidaIso = toIsoDate(state.checkOut);
+        if (periodoTemConflitoLocal(entradaIso, saidaIso)) {
+          alert('Parte deste período já está reservada ou indisponível para este quarto.');
+          await refreshOcupadasMapAsync();
+          pintarCalendariosEsumario();
+          showStep(1);
+          return;
+        }
         btnFazerReserva.disabled = true;
-        btnFazerReserva.textContent = 'Abrindo WhatsApp…';
+        btnFazerReserva.textContent = 'Registrando reserva…';
+        var reservaOk = false;
 
         try {
           var preco = calcPrecoAtual();
           var created = await tentarRegistrarReservaPainel(entradaIso, saidaIso, preco);
+          reservaOk = true;
+          state.reservaRegistrada = true;
+          pararPollDisponibilidade();
+          marcarPeriodoOcupadoLocal(entradaIso, saidaIso);
           var codigoReserva =
             created && created.codigo ? created.codigo : gerarCodigoReservaLocal();
           var reservaWhats = montarReservaParaWhatsApp({ codigo: codigoReserva });
           await refreshOcupadasMapAsync();
           pintarCalendariosEsumario();
+          btnFazerReserva.textContent = 'Abrindo WhatsApp…';
           if (!abrirWhatsAppComReserva(reservaWhats)) {
             alert('Não foi possível abrir o WhatsApp. Verifique sua conexão e tente novamente.');
+            btnFazerReserva.disabled = false;
+            btnFazerReserva.textContent = BTN_FINALIZAR_WHATS;
           }
         } catch (errSave) {
           console.error('Reserva:', errSave);
@@ -1140,9 +1203,10 @@
             showStep(1);
           }
           alert(msg);
-        } finally {
-          btnFazerReserva.disabled = false;
-          btnFazerReserva.textContent = BTN_FINALIZAR_WHATS;
+          if (!reservaOk) {
+            btnFazerReserva.disabled = false;
+            btnFazerReserva.textContent = BTN_FINALIZAR_WHATS;
+          }
         }
       });
     }
@@ -1165,6 +1229,11 @@
           repintarAposReservas();
         });
     }
+
+    document.addEventListener('visibilitychange', function () {
+      if (document.visibilityState !== 'visible' || state.reservaRegistrada) return;
+      pintarCalendariosEsumario();
+    });
   }
 
   function initShowcaseQuartosReservar(onSelecionarQuarto) {

@@ -150,7 +150,13 @@
   async function getOccupiedDateMapForQuarto(quartoId) {
     if (!quartoId) return getOccupiedDateMap();
     try {
-      return await apiFetch(API + '/disponibilidade/' + encodeURIComponent(String(quartoId)));
+      var url =
+        API +
+        '/disponibilidade/' +
+        encodeURIComponent(String(quartoId)) +
+        '?_=' +
+        Date.now();
+      return await apiFetch(url, { cache: 'no-store' });
     } catch (e) {
       console.warn('disponibilidade', e);
       return {};
