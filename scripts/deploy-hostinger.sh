@@ -44,12 +44,17 @@ echo "--- npm ci ---"
 npm ci --omit=dev
 
 echo ""
-echo "--- pm2 restart (recarrega credenciais) ---"
-pm2 restart mi-casa --update-env
+echo "--- credenciais admin (.env) ---"
+node scripts/apply-admin-env.js
 
 echo ""
-echo "--- login admin (.env) ---"
-node scripts/verify-admin-login.js 2>/dev/null || echo "Defina ADMIN_USERNAME e ADMIN_PASSWORD_HASH no .env"
+echo "--- pm2 reload (aplica ecosystem + .env) ---"
+pm2 reload ecosystem.config.cjs --update-env
+pm2 save
+
+echo ""
+echo "--- teste login ---"
+node scripts/verify-admin-login.js micasasucasaben@gmail.com 'micasa2026.'
 
 echo ""
 echo "--- versão no servidor ---"
