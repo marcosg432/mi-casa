@@ -17,10 +17,11 @@ function verifySessionToken(token) {
 }
 
 async function verifyAdminCredentials(username, password) {
-  var user = String(username || '').trim();
+  var user = String(username || '').trim().toLowerCase();
   var pass = String(password || '');
+  var expected = String(config.adminUsername || '').trim().toLowerCase();
   if (!user || !pass) return false;
-  if (user !== config.adminUsername) return false;
+  if (user !== expected) return false;
   if (!config.adminPasswordHash) return false;
   return bcrypt.compare(pass, config.adminPasswordHash);
 }

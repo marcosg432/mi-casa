@@ -44,8 +44,12 @@ echo "--- npm ci ---"
 npm ci --omit=dev
 
 echo ""
-echo "--- pm2 reload ---"
-pm2 reload mi-casa
+echo "--- pm2 restart (recarrega .env) ---"
+pm2 restart mi-casa --update-env
+
+echo ""
+echo "--- login admin (.env) ---"
+node scripts/verify-admin-login.js 2>/dev/null || echo "Defina ADMIN_USERNAME e ADMIN_PASSWORD_HASH no .env"
 
 echo ""
 echo "--- versão no servidor ---"
