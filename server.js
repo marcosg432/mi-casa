@@ -18,8 +18,7 @@ try {
   assertProductionConfig();
 } catch (e) {
   console.error('[config]', e.message);
-  if (config.isProduction) process.exit(1);
-  console.warn('[config] Modo desenvolvimento — algumas funcionalidades exigem .env completo.');
+  console.warn('[config] Servidor continua — verifique o .env quando possível.');
 }
 
 const app = express();

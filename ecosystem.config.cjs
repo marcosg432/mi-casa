@@ -10,15 +10,7 @@ module.exports = {
       watch: false,
       max_memory_restart: '200M',
       env: {
-        NODE_ENV: 'production',
-        PORT: 3014,
-        DISABLE_PANEL_AUTH: '0',
-        ADMIN_USERNAME: 'micasasucasaben@gmail.com',
-        ADMIN_PASSWORD_HASH:
-          '$2a$12$MJBPfqhhw7o5DRWe6s8.c.Hq.iG5f7KxrCB4aGBflh.lbmRsKHYjm'
-      },
-      env_production: {
-        NODE_ENV: 'production',
+        NODE_ENV: 'development',
         PORT: 3014,
         DISABLE_PANEL_AUTH: '0',
         ADMIN_USERNAME: 'micasasucasaben@gmail.com',

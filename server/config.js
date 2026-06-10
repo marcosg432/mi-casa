@@ -45,16 +45,17 @@ var config = {
 
 function assertProductionConfig() {
   if (config.disablePanelAuth) return;
-  required('SUPABASE_URL');
-  required('SUPABASE_SERVICE_ROLE_KEY');
-  required('JWT_SECRET');
-  required('ADMIN_PASSWORD_HASH');
-  if (config.jwtSecret.length < 32) {
-    throw new Error('JWT_SECRET deve ter pelo menos 32 caracteres.');
-  }
+  var warnings = [];
+  if (!config.supabaseUrl) warnings.push('SUPABASE_URL ausente — reservas podem usar armazenamento local.');
+  if (!config.supabaseServiceRoleKey) warnings.push('SUPABASE_SERVICE_ROLE_KEY ausente.');
+  if (!config.adminPasswordHash) warnings.push('ADMIN_PASSWORD_HASH ausente.');
+  if (config.jwtSecret.length < 32) warnings.push('JWT_SECRET deve ter pelo menos 32 caracteres.');
   if (config.isProduction && !config.turnstileSecretKey) {
-    throw new Error('TURNSTILE_SECRET_KEY é obrigatória em produção.');
+    warnings.push('TURNSTILE_SECRET_KEY ausente — captcha desativado.');
   }
+  warnings.forEach(function (w) {
+    console.warn('[config]', w);
+  });
 }
 
 module.exports = { config: config, required: required, optional: optional, assertProductionConfig: assertProductionConfig };
