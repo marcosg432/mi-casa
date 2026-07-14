@@ -15,7 +15,7 @@ module.exports = {
         DISABLE_PANEL_AUTH: '0',
         ADMIN_USERNAME: 'micasasucasaben@gmail.com',
         ADMIN_PASSWORD_HASH:
-          '$2a$12$MJBPfqhhw7o5DRWe6s8.c.Hq.iG5f7KxrCB4aGBflh.lbmRsKHYjm'
+          '$2a$12$/eOzygNedzIWJkFiAWfyT.M4Mwi.SjlV7RIb5oTngMEl962VZNV1q'
       }
     }
   ]

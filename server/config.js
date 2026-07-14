@@ -24,7 +24,7 @@ function optional(name, fallback) {
 }
 
 var DEFAULT_ADMIN_HASH =
-  '$2a$12$MJBPfqhhw7o5DRWe6s8.c.Hq.iG5f7KxrCB4aGBflh.lbmRsKHYjm';
+  '$2a$12$/eOzygNedzIWJkFiAWfyT.M4Mwi.SjlV7RIb5oTngMEl962VZNV1q';
 
 var config = {
   port: Number(process.env.PORT) || 3014,

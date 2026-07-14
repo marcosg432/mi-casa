@@ -13,6 +13,11 @@ const { requireAuthPage } = require('./server/middleware/require-auth');
 const authRoutes = require('./server/routes/auth');
 const publicApiRoutes = require('./server/routes/public-api');
 const adminApiRoutes = require('./server/routes/admin-api');
+const { expirarReservasPendentes } = require('./server/reserva-service');
+const {
+  blockSensitivePaths,
+  configurePublicStatic
+} = require('./server/middleware/static-security');
 
 try {
   assertProductionConfig();
@@ -118,27 +123,20 @@ app.get('/js/reservar-flow.js', sendNoCacheFile('js/reservar-flow.js'));
 app.get('/js/mesa-reserva-flow.js', sendNoCacheFile('js/mesa-reserva-flow.js'));
 app.get('/js/reservar.js', sendNoCacheFile('js/reservar.js'));
 
-app.use(express.static(root, {
-  index: 'index.html',
-  maxAge: '1h',
-  setHeaders: function (res, filePath) {
-    if (/\.html?$/i.test(filePath)) {
-      res.setHeader('Cache-Control', 'no-cache, must-revalidate');
-      return;
-    }
-    if (/\.(js|css)$/i.test(filePath)) {
-      res.setHeader('Cache-Control', 'public, max-age=0, must-revalidate');
-      return;
-    }
-    if (/\.(webp|png|jpe?g|gif|svg|ico|woff2?)$/i.test(filePath)) {
-      res.setHeader('Cache-Control', 'public, max-age=604800');
-    }
-  }
-}));
+app.use(blockSensitivePaths);
+configurePublicStatic(app, root);
 
 app.listen(PORT, '0.0.0.0', () => {
   console.log(`Mi Casa, Su Casa — http://0.0.0.0:${PORT}`);
   if (!process.env.GOOGLE_PLACES_API_KEY) {
     console.warn('[google-reviews] GOOGLE_PLACES_API_KEY não definida — usando avaliações de exemplo.');
   }
+  expirarReservasPendentes().catch(function (e) {
+    console.warn('[reservas] expirar pendentes (início):', e.message);
+  });
+  setInterval(function () {
+    expirarReservasPendentes().catch(function (e) {
+      console.warn('[reservas] expirar pendentes:', e.message);
+    });
+  }, 15 * 60 * 1000);
 });

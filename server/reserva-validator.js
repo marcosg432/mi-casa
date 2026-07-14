@@ -155,6 +155,7 @@ function normalizeReservaRow(row) {
     plataforma: (row.plataforma || 'site').toLowerCase(),
     metodoPagamento: String(row.metodo_pagamento || row.metodoPagamento || 'whatsapp').toLowerCase(),
     criadoEm: row.created_at || row.criado_em || row.criadoEm || new Date().toISOString(),
+    holdExpiresAt: row.hold_expires_at || row.holdExpiresAt || null,
     status: status,
     quartoId: row.quarto_id || row.quartoId || null,
     requerOrcamento: !!(row.requer_orcamento || row.requerOrcamento)

@@ -54,7 +54,7 @@ pm2 save
 
 echo ""
 echo "--- teste login ---"
-node scripts/verify-admin-login.js micasasucasaben@gmail.com 'micasa2026.'
+node scripts/verify-admin-login.js micasasucasaben@gmail.com
 
 echo ""
 echo "--- versão no servidor ---"

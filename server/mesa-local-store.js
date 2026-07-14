@@ -84,6 +84,18 @@ function getReservasAtivasNoHorario(data, horario) {
 
 function insertReserva(row) {
   var data = readData();
+  var tel = String(row.telefone || '').replace(/\D/g, '');
+  var dataIso = String(row.data).slice(0, 10);
+  var existente = data.reservas.find(function (r) {
+    if (r.status === 'cancelada') return false;
+    return (
+      String(r.telefone || '').replace(/\D/g, '') === tel &&
+      String(r.data).slice(0, 10) === dataIso &&
+      r.horario === row.horario
+    );
+  });
+  if (existente) return existente;
+
   var item = {
     id: crypto.randomUUID(),
     nome: row.nome,

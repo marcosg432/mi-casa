@@ -367,6 +367,41 @@ function validarPayloadReservaMesa(body) {
   };
 }
 
+async function buscarReservaMesaDuplicada(d) {
+  var tel = String(d.telefone || '').replace(/\D/g, '');
+  if (shouldUseLocalStore()) {
+    var rows = localStore.listarReservasMesa({ data: d.data, excluirCanceladas: true });
+    for (var i = 0; i < rows.length; i++) {
+      var r = rows[i];
+      if (
+        String(r.telefone || '').replace(/\D/g, '') === tel &&
+        r.horario === d.horario
+      ) {
+        return normalizeReservaRow(r);
+      }
+    }
+    return null;
+  }
+
+  var sb = getSupabaseAdmin();
+  var res = await sb
+    .from('reservas_mesa')
+    .select('*')
+    .eq('data', d.data)
+    .eq('horario', d.horario)
+    .neq('status', 'cancelada')
+    .order('created_at', { ascending: false })
+    .limit(20);
+  if (res.error) throw res.error;
+  for (var j = 0; j < (res.data || []).length; j++) {
+    var row = res.data[j];
+    if (String(row.telefone || '').replace(/\D/g, '') === tel) {
+      return normalizeReservaRow(row);
+    }
+  }
+  return null;
+}
+
 async function criarReservaMesa(body) {
   var valid = validarPayloadReservaMesa(body);
   if (!valid.ok) {
@@ -395,6 +430,9 @@ async function criarReservaMesa(body) {
     errCap.status = 409;
     throw errCap;
   }
+
+  var duplicada = await buscarReservaMesaDuplicada(d);
+  if (duplicada) return duplicada;
 
   if (shouldUseLocalStore()) {
     var inserted = localStore.insertReserva({

@@ -3,6 +3,20 @@
   var reservasCache = [];
   var bloqueiosCache = [];
   var API = '/api';
+  var HOLD_MS = 30 * 60 * 60 * 1000;
+
+  function reservaBloqueiaDatas(r) {
+    if (!r) return false;
+    var status = String(r.status || '').toLowerCase();
+    if (status === 'cancelada') return false;
+    if (status === 'confirmada' || status === 'ativa') return true;
+    if (status === 'pendente') {
+      if (r.holdExpiresAt) return new Date(r.holdExpiresAt).getTime() > Date.now();
+      if (r.criadoEm) return new Date(r.criadoEm).getTime() + HOLD_MS > Date.now();
+      return true;
+    }
+    return false;
+  }
 
   function apiFetch(url, opts) {
     opts = opts || {};
@@ -123,7 +137,7 @@
     var reservas = getReservas();
     for (var i = 0; i < reservas.length; i++) {
       var r = reservas[i];
-      if (r.status === 'cancelada') continue;
+      if (!reservaBloqueiaDatas(r)) continue;
       if (!reservaBloqueiaQuarto(r, quartoId)) continue;
       var conflict = false;
       eachNight(r.dataEntrada, r.dataSaida, function (d) {
@@ -166,7 +180,7 @@
   function getOccupiedDateMap() {
     var map = {};
     getReservas().forEach(function (r) {
-      if (r.status === 'cancelada') return;
+      if (!reservaBloqueiaDatas(r)) return;
       eachNight(r.dataEntrada, r.dataSaida, function (d) {
         map[d] = 'reserva';
       });

@@ -74,6 +74,8 @@
     'JULHO', 'AGOSTO', 'SETEMBRO', 'OUTUBRO', 'NOVEMBRO', 'DEZEMBRO'
   ];
 
+  var DIAS_SEM = ['DOM', 'SEG', 'TER', 'QUA', 'QUI', 'SEX', 'SÁB'];
+
   var QUARTOS_RESERVA =
     window.QUARTOS_SITE && Array.isArray(window.QUARTOS_SITE) && window.QUARTOS_SITE.length
       ? window.QUARTOS_SITE.slice()
@@ -103,7 +105,8 @@
     nome: '',
     email: '',
     telefone: '',
-    reservaRegistrada: false
+    reservaRegistrada: false,
+    enviandoReserva: false
   };
 
   var SLUG_QUARTO_LEGACY = {
@@ -666,7 +669,11 @@
     html += '</div>';
     var isMobile = window.innerWidth <= 768;
     if (!isMobile) {
-      html += '<div class="reservar-cal-week">DOM SEG TER QUA QUI SEX SÁB</div>';
+      html += '<div class="reservar-cal-week" aria-hidden="true">';
+      for (var w = 0; w < DIAS_SEM.length; w++) {
+        html += '<span>' + DIAS_SEM[w] + '</span>';
+      }
+      html += '</div>';
     }
     html += '<div class="reservar-cal-grid">';
 
@@ -1150,7 +1157,7 @@
     if (btnFazerReserva) {
       btnFazerReserva.textContent = BTN_FINALIZAR_WHATS;
       btnFazerReserva.addEventListener('click', async function () {
-        if (state.reservaRegistrada) return;
+        if (state.reservaRegistrada || state.enviandoReserva) return;
         if (!state.checkIn || !state.checkOut || nights() <= 0 || !hospedesValidos()) {
           alert('Complete os dados da reserva antes de continuar.');
           return;
@@ -1169,6 +1176,7 @@
           showStep(1);
           return;
         }
+        state.enviandoReserva = true;
         btnFazerReserva.disabled = true;
         btnFazerReserva.textContent = 'Registrando reserva…';
         var reservaOk = false;
@@ -1196,14 +1204,19 @@
           var msg =
             (errSave && errSave.message) ||
             'Não foi possível registrar a reserva. Tente novamente.';
-          if (errSave && errSave.status === 409) {
+          if (errSave && errSave.message === 'timeout') {
+            msg =
+              'A conexão demorou. Se o WhatsApp abriu ou você recebeu confirmação, não envie de novo — entre em contato se tiver dúvida.';
+            state.reservaRegistrada = true;
+          } else if (errSave && errSave.status === 409) {
             msg = 'Esse período acabou de ser reservado. Escolha outras datas.';
             await refreshOcupadasMapAsync();
             pintarCalendariosEsumario();
             showStep(1);
           }
           alert(msg);
-          if (!reservaOk) {
+          if (!reservaOk && !(errSave && errSave.message === 'timeout')) {
+            state.enviandoReserva = false;
             btnFazerReserva.disabled = false;
             btnFazerReserva.textContent = BTN_FINALIZAR_WHATS;
           }

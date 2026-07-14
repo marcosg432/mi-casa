@@ -27,7 +27,21 @@
     var s = String(status || 'pendente').toLowerCase();
     if (s === 'confirmada' || s === 'ativa') return 'Confirmada';
     if (s === 'cancelada') return 'Cancelada';
-    return 'Pendente';
+    return 'Aguardando confirmação';
+  }
+
+  function prazoHoldReserva(r) {
+    if (!r || String(r.status || '').toLowerCase() !== 'pendente') return '';
+    var expires = r.holdExpiresAt ? new Date(r.holdExpiresAt) : null;
+    if (!expires && r.criadoEm) {
+      expires = new Date(new Date(r.criadoEm).getTime() + 30 * 60 * 60 * 1000);
+    }
+    if (!expires || isNaN(expires.getTime())) return 'Prazo: 30 horas após o pedido';
+    var diff = expires.getTime() - Date.now();
+    if (diff <= 0) return 'Prazo expirado — datas serão reabertas';
+    var h = Math.floor(diff / 3600000);
+    var m = Math.floor((diff % 3600000) / 60000);
+    return 'Confirme em até ' + h + 'h ' + m + 'min (senão as datas reabrem)';
   }
 
   function valorReservaTexto(r) {
@@ -1570,7 +1584,11 @@
     html += '<div class="sys-rv-nav-title"><span class="sys-rv-year">' + y + '</span><strong class="sys-rv-month">' + months[m] + '</strong></div>';
     html += '<button type="button" class="sys-rv-nav-btn" data-cal-nav="1" aria-label="Próximo mês">›</button>';
     html += '</div>';
-    html += '<div class="sys-rv-week">DOM SEG TER QUA QUI SEX SAB</div>';
+    html += '<div class="sys-rv-week" aria-hidden="true">';
+    ['DOM', 'SEG', 'TER', 'QUA', 'QUI', 'SEX', 'SAB'].forEach(function (dia) {
+      html += '<span>' + dia + '</span>';
+    });
+    html += '</div>';
     html += '<div class="sys-rv-grid">';
     for (var i = 0; i < firstDow; i++) html += '<span class="sys-rv-cell sys-rv-empty"></span>';
     for (var d = 1; d <= dim; d++) {
@@ -1726,6 +1744,19 @@
         tryDeleteQuarto(elDelQuarto.getAttribute('data-quarto-delete'));
         return;
       }
+      var confirmId = ev.target.getAttribute('data-confirm-reserva');
+      if (confirmId) {
+        if (!SystemStore.atualizarStatusReserva) return;
+        SystemStore.atualizarStatusReserva(confirmId, 'confirmada')
+          .then(function () {
+            closeModal();
+            renderAll();
+          })
+          .catch(function () {
+            alert('Não foi possível confirmar a reserva.');
+          });
+        return;
+      }
       var cancelId = ev.target.getAttribute('data-cancel-reserva');
       if (cancelId) {
         var ok = window.confirm('Deseja realmente cancelar esta reserva?');
@@ -1824,11 +1855,15 @@
     var st = String(reserva.status || 'pendente').toLowerCase();
     if (st === 'ativa') st = 'confirmada';
     var card = document.getElementById('reserva-modal-card');
+    var holdInfo = st === 'pendente' ? prazoHoldReserva(reserva) : '';
     card.innerHTML =
       '<div class="sys-ficha-detalhe">' +
       '<h2 class="sys-ficha-detalhe__title">Reserva #' +
       esc(reserva.codigo) +
       '</h2>' +
+      (holdInfo
+        ? '<p class="sys-ficha-detalhe__hold">' + esc(holdInfo) + '</p>'
+        : '') +
       '<div class="sys-ficha-detalhe__grid">' +
       field('status', statusLabelReserva(reserva.status)) +
       field('nome', reserva.nome) +
@@ -1852,12 +1887,17 @@
           esc(reserva.id) +
           '"><option value="pendente"' +
           (st === 'pendente' ? ' selected' : '') +
-          '>Pendente</option><option value="confirmada"' +
+          '>Pendente (aguardando)</option><option value="confirmada"' +
           (st === 'confirmada' ? ' selected' : '') +
           '>Confirmada</option><option value="cancelada"' +
           (st === 'cancelada' ? ' selected' : '') +
           '>Cancelada</option></select></label>') +
       '<div class="sys-ficha-detalhe__actions">' +
+      (st === 'pendente'
+        ? '<button type="button" class="sys-ficha-detalhe__btn sys-ficha-detalhe__btn--confirm" data-confirm-reserva="' +
+          esc(reserva.id) +
+          '">Confirmar reserva</button>'
+        : '') +
       (reserva.status === 'cancelada'
         ? '<button type="button" class="sys-ficha-detalhe__btn sys-ficha-detalhe__btn--muted" disabled>reserva cancelada</button>'
         : '<button type="button" class="sys-ficha-detalhe__btn sys-ficha-detalhe__btn--danger" data-cancel-reserva="' +

@@ -11,7 +11,7 @@ var path = require('path');
 
 var ENV_PATH = path.join(__dirname, '..', '.env');
 var USER = 'micasasucasaben@gmail.com';
-var HASH = '$2a$12$MJBPfqhhw7o5DRWe6s8.c.Hq.iG5f7KxrCB4aGBflh.lbmRsKHYjm';
+var HASH = '$2a$12$/eOzygNedzIWJkFiAWfyT.M4Mwi.SjlV7RIb5oTngMEl962VZNV1q';
 
 var lines = [];
 if (fs.existsSync(ENV_PATH)) {

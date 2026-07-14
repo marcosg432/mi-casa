@@ -4,11 +4,12 @@ var express = require('express');
 var { config } = require('../config');
 var { signSession, verifyAdminCredentials, cookieOptions, clearSessionCookie } = require('../auth');
 var { requireAuth } = require('../middleware/require-auth');
-var { loginLimiter } = require('../middleware/login-rate-limit');
+// Limite de login desativado temporariamente — reativar: loginLimiter em POST /login
+// var { loginLimiter } = require('../middleware/login-rate-limit');
 
 var router = express.Router();
 
-router.post('/login', loginLimiter, express.json(), async function (req, res) {
+router.post('/login', express.json(), async function (req, res) {
   try {
     var username = req.body && req.body.username;
     var password = req.body && req.body.password;

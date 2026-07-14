@@ -1,0 +1,36 @@
+# Apache / Hostinger (se servir ficheiros directamente — produção usa nginx + Node)
+Options -Indexes
+
+<IfModule mod_authz_core.c>
+  <DirectoryMatch "^\.|\/\.">
+    Require all denied
+  </DirectoryMatch>
+
+  <FilesMatch "(?i)^(\.env|\.env\.example|\.gitignore|package\.json|package-lock\.json|ecosystem\.config\.cjs|server\.js)$">
+    Require all denied
+  </FilesMatch>
+
+  <FilesMatch "(?i)\.(md|sql|cjs|mjs|sh|example|config|lock|env)$">
+    Require all denied
+  </FilesMatch>
+</IfModule>
+
+<IfModule !mod_authz_core.c>
+  <DirectoryMatch "^\.|\/\.">
+    Order allow,deny
+    Deny from all
+  </DirectoryMatch>
+
+  <FilesMatch "(?i)^(\.env|\.env\.example|\.gitignore|package\.json|package-lock\.json|ecosystem\.config\.cjs|server\.js)$">
+    Order allow,deny
+    Deny from all
+  </FilesMatch>
+
+  <FilesMatch "(?i)\.(md|sql|cjs|mjs|sh|example|config|lock|env)$">
+    Order allow,deny
+    Deny from all
+  </FilesMatch>
+</IfModule>
+
+RedirectMatch 403 (?i)/\.git
+RedirectMatch 403 (?i)^/(server|supabase|scripts|deploy|lib|node_modules|data)(/|$)

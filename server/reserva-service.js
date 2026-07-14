@@ -2,6 +2,7 @@
 
 var { getSupabaseAdmin } = require('./supabase-admin');
 var { normalizeQuartoId, mesmoQuarto } = require('./quarto-ids');
+var { reservaBloqueiaDatas } = require('./reserva-hold');
 var {
   validarPayloadReserva,
   normalizeReservaRow,
@@ -10,14 +11,50 @@ var {
   toIsoDate
 } = require('./reserva-validator');
 
+async function expirarReservasPendentes() {
+  var sb = getSupabaseAdmin();
+  var res = await sb.rpc('expirar_reservas_pendentes');
+  if (res.error) {
+    if (String(res.error.message || '').indexOf('expirar_reservas_pendentes') !== -1) {
+      return 0;
+    }
+    throw res.error;
+  }
+  return Number(res.data) || 0;
+}
+
 async function listarReservas() {
+  await expirarReservasPendentes();
   var sb = getSupabaseAdmin();
   var res = await sb.from('reservas').select('*').order('created_at', { ascending: false });
   if (res.error) throw res.error;
   return (res.data || []).map(normalizeReservaRow);
 }
 
+async function buscarReservaDuplicada(data) {
+  var sb = getSupabaseAdmin();
+  var quarto = normalizeQuartoId(data.quartoId);
+  var res = await sb
+    .from('reservas')
+    .select('*')
+    .eq('email', data.email)
+    .eq('data_entrada', data.dataEntrada)
+    .eq('data_saida', data.dataSaida)
+    .neq('status', 'cancelada')
+    .order('created_at', { ascending: false })
+    .limit(20);
+  if (res.error) throw res.error;
+  for (var i = 0; i < (res.data || []).length; i++) {
+    var row = res.data[i];
+    if (!mesmoQuarto(normalizeQuartoId(row.quarto_id), quarto)) continue;
+    var normalized = normalizeReservaRow(row);
+    if (reservaBloqueiaDatas(normalized)) return normalized;
+  }
+  return null;
+}
+
 async function criarReservaValidada(payload) {
+  await expirarReservasPendentes();
   var valid = validarPayloadReserva(payload);
   if (!valid.ok) {
     var err = new Error(valid.errors.join(' '));
@@ -26,6 +63,10 @@ async function criarReservaValidada(payload) {
     throw err;
   }
   var data = valid.data;
+
+  var duplicada = await buscarReservaDuplicada(data);
+  if (duplicada) return duplicada;
+
   var sb = getSupabaseAdmin();
 
   var existing = await sb.from('reservas').select('codigo');
@@ -73,14 +114,17 @@ async function criarReservaValidada(payload) {
 }
 
 async function atualizarStatusReserva(id, status) {
+  await expirarReservasPendentes();
   var next = String(status || '').toLowerCase();
   if (next !== 'pendente' && next !== 'confirmada' && next !== 'cancelada') {
     var bad = new Error('Status inválido.');
     bad.status = 400;
     throw bad;
   }
+  var patch = { status: next };
+  if (next === 'confirmada') patch.hold_expires_at = null;
   var sb = getSupabaseAdmin();
-  var res = await sb.from('reservas').update({ status: next }).eq('id', id).select('*').single();
+  var res = await sb.from('reservas').update(patch).eq('id', id).select('*').single();
   if (res.error) throw res.error;
   return normalizeReservaRow(res.data);
 }
@@ -96,17 +140,19 @@ function eachNight(startIso, endIso, cb) {
 }
 
 async function getOccupiedDateMapForQuarto(quartoId) {
+  await expirarReservasPendentes();
   var sb = getSupabaseAdmin();
   var map = {};
   var targetQuarto = normalizeQuartoId(quartoId);
 
   var reservas = await sb
     .from('reservas')
-    .select('data_entrada, data_saida, status, quarto_id')
+    .select('data_entrada, data_saida, status, quarto_id, hold_expires_at, created_at')
     .neq('status', 'cancelada');
   if (reservas.error) throw reservas.error;
 
   (reservas.data || []).forEach(function (r) {
+    if (!reservaBloqueiaDatas(r)) return;
     var rq = normalizeQuartoId(r.quarto_id);
     if (targetQuarto) {
       if (rq == null) return;
@@ -129,6 +175,7 @@ async function getOccupiedDateMapForQuarto(quartoId) {
 }
 
 async function verificarConflito(quartoId, dataEntrada, dataSaida) {
+  await expirarReservasPendentes();
   var sb = getSupabaseAdmin();
   var res = await sb.rpc('datas_tem_conflito', {
     p_quarto_id: normalizeQuartoId(quartoId),
@@ -198,6 +245,7 @@ async function removeBloqueio(id) {
 }
 
 module.exports = {
+  expirarReservasPendentes: expirarReservasPendentes,
   listarReservas: listarReservas,
   criarReservaValidada: criarReservaValidada,
   atualizarStatusReserva: atualizarStatusReserva,

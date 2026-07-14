@@ -63,8 +63,7 @@
       destaques: [
         'Banheiro privativo (suíte), exclusivo para os hóspedes deste quarto',
         '1 cama de casal e 3 camas de solteiro',
-        'Capacidade máxima para 5 pessoas',
-        'As imagens exibidas correspondem a este quarto'
+        'Capacidade máxima para 5 pessoas'
       ],
       preco: 'R$ 150',
       precoLabel: 'diária por pessoa',

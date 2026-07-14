@@ -2229,24 +2229,16 @@ body.lightbox-aberto .cabecalho {
 
 .quarto-modelo-card {
   display: grid;
-  grid-template-columns: minmax(300px, 1.15fr) minmax(340px, 1fr);
+  grid-template-columns: 1fr;
   align-items: stretch;
-  height: 420px;
-  min-height: 420px;
-  max-height: 420px;
+  height: auto;
+  min-height: 0;
+  max-height: none;
   background: #e8e6e3;
   border: 1px solid rgba(0, 0, 0, 0.07);
   border-radius: 18px;
   overflow: hidden;
   box-shadow: 0 12px 36px rgba(0, 0, 0, 0.08);
-}
-
-.quarto-modelo-card--invert .quarto-modelo-media {
-  order: 2;
-}
-
-.quarto-modelo-card--invert .quarto-modelo-info {
-  order: 1;
 }
 
 .quarto-modelo-media {
@@ -2342,8 +2334,8 @@ body.lightbox-aberto .cabecalho {
   flex-direction: column;
   justify-content: flex-start;
   min-height: 0;
-  height: 100%;
-  overflow: hidden;
+  height: auto;
+  overflow: visible;
   box-sizing: border-box;
 }
 
@@ -2415,18 +2407,6 @@ body.lightbox-aberto .cabecalho {
   background: #1b3022;
 }
 
-.quartos-secao-strip--verde .quarto-modelo-destaques {
-  background: rgba(255, 255, 255, 0.12);
-  border-left-color: rgba(255, 255, 255, 0.85);
-}
-
-.quartos-secao-strip--verde .quarto-modelo-destaques li {
-  color: rgba(255, 255, 255, 0.95);
-}
-
-.quartos-secao-strip--verde .quarto-modelo-destaques li::before {
-  background: #a8d5b8;
-}
 
 .quarto-modelo-info p:not(.quarto-modelo-lead):not(.quarto-modelo-preco) {
   margin: 0 0 0.85rem;
@@ -2434,10 +2414,6 @@ body.lightbox-aberto .cabecalho {
   line-height: 1.55;
   font-size: 0.95rem;
   flex-shrink: 0;
-  display: -webkit-box;
-  -webkit-line-clamp: 3;
-  -webkit-box-orient: vertical;
-  overflow: hidden;
 }
 
 .quarto-modelo-meta {
@@ -2447,9 +2423,9 @@ body.lightbox-aberto .cabecalho {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: 0.5rem 1rem;
-  flex: 1 1 auto;
+  flex: 0 0 auto;
   min-height: 0;
-  overflow-y: auto;
+  overflow: visible;
   align-content: start;
 }
 
