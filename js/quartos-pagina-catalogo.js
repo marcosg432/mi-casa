@@ -37,10 +37,17 @@
     var lines = [];
     if (a.arCondicionado) lines.push({ k: 'Ar-condicionado', v: 'sim' });
     if (a.wifi) lines.push({ k: 'Wi-Fi', v: 'gratuito' });
-    if (a.banheiroPrivativo) {
-      lines.push({ k: 'Banheiro', v: 'privativo (suíte) — exclusivo deste quarto' });
+    var idQuarto = String((q && q.id) || '').trim();
+    var banheiroPriv =
+      !!a.banheiroPrivativo || idQuarto === 'ararajuba' || idQuarto === 'sabia';
+    if (banheiroPriv) {
+      var banheiroTxt = /su[ií]te/i.test(String((q && q.tipo) || ''))
+        ? 'privativo (suíte) — exclusivo deste quarto'
+        : 'privativo';
+      lines.push({ k: 'Banheiro', v: banheiroTxt });
+    } else if (a.banheiroCompartilhado) {
+      lines.push({ k: 'Banheiro', v: 'compartilhado' });
     }
-    if (a.banheiroCompartilhado && !a.banheiroPrivativo) lines.push({ k: 'Banheiro', v: 'compartilhado' });
     if (a.cozinhaCompacta) lines.push({ k: 'Cozinha compacta', v: 'privativa' });
     if (a.maquinaLavar) lines.push({ k: 'Máquina de lavar', v: 'sim' });
     if (a.ventilador) lines.push({ k: 'Ventilador', v: 'sim' });
@@ -66,33 +73,6 @@
     return String(q.desc || '').trim();
   }
 
-  function destaquesQuarto(q) {
-    var items = [];
-    if (Array.isArray(q.destaques) && q.destaques.length) {
-      items = q.destaques;
-    } else {
-      var a = (q && q.amenities) || {};
-      if (Array.isArray(a.destaques) && a.destaques.length) items = a.destaques;
-    }
-    return items.filter(function (txt) {
-      return !/imagens?\s+exibidas/i.test(String(txt || ''));
-    });
-  }
-
-  function renderQuartoDestaques(q) {
-    var items = destaquesQuarto(q);
-    if (!items.length) return '';
-    return (
-      '<ul class="quarto-modelo-destaques" aria-label="Destaques do quarto">' +
-      items
-        .map(function (txt) {
-          return '<li>' + esc(String(txt || '')) + '</li>';
-        })
-        .join('') +
-      '</ul>'
-    );
-  }
-
   function quartoImagensLista(q) {
     var id = String((q && q.id) || '').trim();
     if (id && typeof global.quartoImagensDaPasta === 'function') {
@@ -114,6 +94,58 @@
 
   global.quartoImagensLista = quartoImagensLista;
 
+  function renderQuartoMedia(q) {
+    var imgs = quartoImagensLista(q);
+    var altBase = String(q.alt || q.titulo || 'Quarto').trim();
+
+    if (!imgs.length) {
+      return '<div class="quarto-modelo-media quarto-modelo-media--vazio" aria-hidden="true"></div>';
+    }
+
+    if (imgs.length === 1) {
+      return (
+        '<div class="quarto-modelo-media">' +
+        '<img src="' +
+        esc(imgs[0]) +
+        '" alt="' +
+        esc(altBase) +
+        '" width="1280" height="720" loading="lazy" decoding="async">' +
+        '</div>'
+      );
+    }
+
+    var slides = imgs
+      .map(function (src, i) {
+        var alt = altBase + ' — foto ' + (i + 1);
+        return (
+          '<div class="swiper-slide">' +
+          '<img src="' +
+          esc(src) +
+          '" alt="' +
+          esc(alt) +
+          '" width="1280" height="720" loading="' +
+          (i === 0 ? 'eager' : 'lazy') +
+          '" decoding="async">' +
+          '</div>'
+        );
+      })
+      .join('');
+
+    return (
+      '<div class="quarto-modelo-media" data-quarto-carrossel>' +
+      '<div class="quarto-swiper swiper" aria-label="Fotos do quarto ' +
+      esc(q.titulo) +
+      '">' +
+      '<div class="swiper-wrapper">' +
+      slides +
+      '</div>' +
+      '<div class="quarto-swiper-pagination swiper-pagination" aria-label="Indicador do carrossel — ' +
+      imgs.length +
+      ' fotos"></div>' +
+      '</div></div>'
+    );
+  }
+
   global.renderQuartosPaginaCatalogo = function (mountId) {
     var el = document.getElementById(mountId || 'quartos-catalogo-mount');
     if (!el) return;
@@ -125,6 +157,7 @@
     var html = list
       .map(function (q, idx) {
         var strip = idx % 2 === 0 ? 'verde' : 'branco';
+        var invert = idx % 2 === 1 ? ' quarto-modelo-card--invert' : '';
         var lis = metaLista(q)
           .map(function (row) {
             return (
@@ -150,7 +183,10 @@
           id +
           '"><div class="container"><article id="quarto-' +
           id +
-          '" class="quarto-modelo-card">' +
+          '" class="quarto-modelo-card' +
+          invert +
+          '">' +
+          renderQuartoMedia(q) +
           '<div class="quarto-modelo-info"><h3 id="tit-' +
           id +
           '">' +
@@ -159,9 +195,7 @@
           esc(q.tipo || '') +
           '</p><p class="quarto-modelo-preco">' +
           esc(formatPrecoDiariaPorPessoa(q)) +
-          '</p>' +
-          renderQuartoDestaques(q) +
-          '<p>' +
+          '</p><p>' +
           esc(textoCorpo(q)) +
           '</p><ul class="quarto-modelo-meta">' +
           lis +
@@ -175,6 +209,10 @@
 
     if (typeof global.refreshLucideIcons === 'function') {
       global.refreshLucideIcons(el);
+    }
+
+    if (typeof global.initQuartosCardCarrosseis === 'function') {
+      global.initQuartosCardCarrosseis(el);
     }
   };
 })(window);

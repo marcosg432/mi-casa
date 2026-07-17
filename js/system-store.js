@@ -336,6 +336,12 @@
       if ((!out.destaques || !out.destaques.length) && fb.destaques && fb.destaques.length) {
         out.destaques = fb.destaques.slice();
       }
+      // Catálogo visual: sem bloco de bullets — só ícones + meta
+      out.destaques = [];
+      if (out.amenities && Array.isArray(out.amenities.destaques)) {
+        out.amenities = Object.assign({}, out.amenities);
+        delete out.amenities.destaques;
+      }
       if (fb.capacidade && (!out.capacidade || out.capacidade < fb.capacidade)) {
         out.capacidade = fb.capacidade;
       }
@@ -346,6 +352,26 @@
           camasSolteiro: fb.amenities.camasSolteiro != null ? fb.amenities.camasSolteiro : (out.amenities || {}).camasSolteiro
         });
         delete out.amenities.banheiroCompartilhado;
+        if (fb.tipo) out.tipo = fb.tipo;
+        if (fb.desc) out.desc = fb.desc;
+        if (fb.capacidade) out.capacidade = fb.capacidade;
+      } else if (fb.amenities) {
+        if (fb.amenities.camasCasal != null || fb.amenities.camasSolteiro != null) {
+          out.amenities = Object.assign({}, out.amenities || {});
+          if (fb.amenities.camasCasal != null) out.amenities.camasCasal = fb.amenities.camasCasal;
+          if (fb.amenities.camasSolteiro != null) out.amenities.camasSolteiro = fb.amenities.camasSolteiro;
+        }
+        if (fb.desc) out.desc = fb.desc;
+      }
+      /* ARARAJUBA: sempre banheiro privativo (nunca compartilhado) */
+      if (id === 'ararajuba') {
+        out.amenities = Object.assign({}, out.amenities || {}, { banheiroPrivativo: true });
+        delete out.amenities.banheiroCompartilhado;
+        out.tipo = 'Quarto Duplo com Banheiro Privativo';
+        if (fb && fb.desc) out.desc = fb.desc;
+      }
+      if (fb.ordem != null && (out.ordem == null || out.ordem === 0)) {
+        out.ordem = fb.ordem;
       }
       var lbl = String(out.precoLabel || '').trim().toLowerCase();
       if (!lbl || lbl === 'noite' || lbl === 'noite.') {
@@ -376,16 +402,31 @@
 
   async function hydrateQuartosSite() {
     var fb = (global.QUARTOS_SITE_FALLBACK || []).slice();
+    var ordemFb = {};
+    fb.forEach(function (q, i) {
+      ordemFb[String(q.id)] = q.ordem != null ? Number(q.ordem) : i;
+    });
+    function sortByCatalogo(list) {
+      return list.slice().sort(function (a, b) {
+        var oa = ordemFb[String(a.id)];
+        var ob = ordemFb[String(b.id)];
+        if (oa == null) oa = a.ordem != null ? Number(a.ordem) : 999;
+        if (ob == null) ob = b.ordem != null ? Number(b.ordem) : 999;
+        return oa - ob;
+      });
+    }
     try {
       var rows = await apiFetch(API + '/quartos');
       if (rows && rows.length) {
-        global.QUARTOS_SITE = rows.map(mapRowToQuartoSite).map(enriquecerQuartoComImagensPasta);
+        global.QUARTOS_SITE = sortByCatalogo(
+          rows.map(mapRowToQuartoSite).map(enriquecerQuartoComImagensPasta)
+        );
         return global.QUARTOS_SITE;
       }
     } catch (e) {
       console.warn('hydrateQuartosSite', e);
     }
-    global.QUARTOS_SITE = fb.length ? fb.map(enriquecerQuartoComImagensPasta) : [];
+    global.QUARTOS_SITE = fb.length ? sortByCatalogo(fb.map(enriquecerQuartoComImagensPasta)) : [];
     return global.QUARTOS_SITE;
   }
 

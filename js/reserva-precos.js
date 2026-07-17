@@ -4,7 +4,7 @@
 (function (global) {
   var CAPACIDADE = {
     'tem-tem': 4,
-    sabia: 5,
+    sabia: 4,
     soco: 4,
     ararajuba: 3
   };

@@ -2229,16 +2229,24 @@ body.lightbox-aberto .cabecalho {
 
 .quarto-modelo-card {
   display: grid;
-  grid-template-columns: 1fr;
+  grid-template-columns: minmax(300px, 1.15fr) minmax(340px, 1fr);
   align-items: stretch;
-  height: auto;
-  min-height: 0;
-  max-height: none;
+  height: 420px;
+  min-height: 420px;
+  max-height: 420px;
   background: #e8e6e3;
   border: 1px solid rgba(0, 0, 0, 0.07);
   border-radius: 18px;
   overflow: hidden;
   box-shadow: 0 12px 36px rgba(0, 0, 0, 0.08);
+}
+
+.quarto-modelo-card--invert .quarto-modelo-media {
+  order: 2;
+}
+
+.quarto-modelo-card--invert .quarto-modelo-info {
+  order: 1;
 }
 
 .quarto-modelo-media {
@@ -2334,8 +2342,8 @@ body.lightbox-aberto .cabecalho {
   flex-direction: column;
   justify-content: flex-start;
   min-height: 0;
-  height: auto;
-  overflow: visible;
+  height: 100%;
+  overflow: hidden;
   box-sizing: border-box;
 }
 
@@ -2414,6 +2422,10 @@ body.lightbox-aberto .cabecalho {
   line-height: 1.55;
   font-size: 0.95rem;
   flex-shrink: 0;
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
 }
 
 .quarto-modelo-meta {
@@ -2423,9 +2435,9 @@ body.lightbox-aberto .cabecalho {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: 0.5rem 1rem;
-  flex: 0 0 auto;
+  flex: 1 1 auto;
   min-height: 0;
-  overflow: visible;
+  overflow-y: auto;
   align-content: start;
 }
 
@@ -4631,6 +4643,9 @@ body.lightbox-aberto .cabecalho {
   height: 800px;
   padding: 0;
   overflow: hidden;
+  isolation: isolate;
+  contain: paint;
+  clip-path: inset(0);
 }
 
 .scroll-morph-container {
@@ -4641,6 +4656,8 @@ body.lightbox-aberto .cabecalho {
   display: flex;
   align-items: center;
   justify-content: center;
+  overflow: hidden;
+  clip-path: inset(0);
 }
 
 .scroll-morph-cards-wrap {
@@ -4650,6 +4667,13 @@ body.lightbox-aberto .cabecalho {
   display: flex;
   align-items: center;
   justify-content: center;
+  overflow: hidden;
+  clip-path: inset(0);
+}
+
+.scroll-morph-cards-wrap.is-offscreen {
+  visibility: hidden;
+  pointer-events: none;
 }
 
 .scroll-morph-card {
@@ -4659,6 +4683,7 @@ body.lightbox-aberto .cabecalho {
   cursor: pointer;
   z-index: 3;
   transition: opacity 0.5s ease;
+  overflow: visible;
 }
 
 .scroll-morph-card:focus {
@@ -4675,7 +4700,7 @@ body.lightbox-aberto .cabecalho {
 }
 
 .scroll-morph-card:active .scroll-morph-card-surface {
-  transform: scale(0.97);
+  filter: brightness(0.97);
 }
 
 .scroll-morph-card-motion {
@@ -4684,6 +4709,8 @@ body.lightbox-aberto .cabecalho {
   width: 100%;
   height: 100%;
   will-change: transform;
+  transform: translate3d(0, 0, 0);
+  backface-visibility: hidden;
 }
 
 .scroll-morph-card-surface {
@@ -4695,7 +4722,7 @@ body.lightbox-aberto .cabecalho {
   overflow: hidden;
   background: #e5e5e5;
   box-shadow: 0 10px 30px rgba(0, 0, 0, 0.18);
-  transition: box-shadow 0.35s ease, transform 0.2s ease;
+  transition: box-shadow 0.35s ease;
 }
 
 .scroll-morph-card-surface img {
@@ -4736,7 +4763,7 @@ body.lightbox-aberto .cabecalho {
 
 .scroll-morph-content-text {
   position: absolute;
-  top: 10%;
+  top: 6%;
   left: 50%;
   transform: translateX(-50%);
   z-index: 10;

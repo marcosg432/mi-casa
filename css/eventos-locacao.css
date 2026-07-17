@@ -359,6 +359,7 @@
   width: 2.75rem;
   height: auto;
   object-fit: contain;
+  filter: brightness(0) invert(1);
 }
 
 .eventos-banner-logo-icone svg {

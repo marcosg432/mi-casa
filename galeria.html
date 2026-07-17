@@ -14,7 +14,7 @@
   <script src="js/galeria-imagens-lista.js"></script>
   <script>
     (function preloadGaleriaArco() {
-      (window.GALERIA_IMAGENS_URLS || []).slice(0, 20).forEach(function (item) {
+      (window.GALERIA_IMAGENS_URLS || []).slice(0, 6).forEach(function (item) {
         var link = document.createElement('link');
         link.rel = 'preload';
         link.as = 'image';
@@ -295,7 +295,8 @@
       var IMAGES = IMAGENS_PASTA.slice(0, MAX_IMAGENS_ANIMACAO);
       var TOTAL_IMAGES = IMAGES.length;
       if (TOTAL_IMAGES < 1) return;
-      var MAX_SCROLL = Math.max(3000, Math.min(9000, TOTAL_IMAGES * 100));
+      var prefersReduced =
+        window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
       IMAGES.forEach(function (src) {
         var pre = new Image();
@@ -304,6 +305,10 @@
       });
 
       function lerp(s, e, t) { return s * (1 - t) + e * t; }
+      function clamp(v, a, b) { return Math.max(a, Math.min(b, v)); }
+      function easeInOutCubic(t) {
+        return t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2;
+      }
 
       var container = document.getElementById('scroll-morph-container');
       var wrap = document.getElementById('scroll-morph-cards-wrap');
@@ -313,17 +318,20 @@
       if (!container || !wrap) return;
 
       var containerSize = { width: container.offsetWidth, height: container.offsetHeight };
-      var virtualScroll = 0;
-      /* Já inicia em círculo (“bolinha”), sem fase reta/linha ao carregar */
-      var introPhase = 'circle';
-      var morphValue = 0;
-      var rotateValue = 0;
+      /* progress 0..1 contínuo: 0→0.28 morph círculo→arco, 0.28→1 rotação no arco */
+      var progress = 0;
+      var targetProgress = 0;
+      var animRaf = 0;
+      var lastTs = 0;
+      var pageLocked = false;
+      var lockedScrollY = 0;
+      var WHEEL_STEP = prefersReduced ? 0.045 : 0.028;
 
       for (var i = 0; i < TOTAL_IMAGES; i++) {
         var card = document.createElement('div');
         card.className = 'scroll-morph-card';
         card.setAttribute('data-index', i);
-        var fetchPr = i === 0 ? ' fetchpriority="high"' : '';
+        var fetchPr = i < 4 ? (i === 0 ? ' fetchpriority="high"' : '') : '';
         card.innerHTML = '<div class="scroll-morph-card-motion">' +
           '<div class="scroll-morph-card-surface">' +
             '<img src="' + IMAGES[i] + '"' +
@@ -336,6 +344,10 @@
       }
 
       var cards = wrap.querySelectorAll('.scroll-morph-card');
+      var motions = [];
+      for (var mi = 0; mi < cards.length; mi++) {
+        motions[mi] = cards[mi].querySelector('.scroll-morph-card-motion');
+      }
 
       cards.forEach(function(card) {
         var cardIndex = parseInt(card.getAttribute('data-index'), 10);
@@ -364,82 +376,206 @@
       var section = document.getElementById('scroll-morph-hero');
       if (!section) section = container.closest('section');
 
-      var rafScrollPin = null;
-      function pinSectionScroll() {
-        if (!section) return;
-        if (rafScrollPin) return;
-        rafScrollPin = requestAnimationFrame(function() {
-          window.scrollTo(0, section.offsetTop);
-          rafScrollPin = null;
-        });
+      function headerOffset() {
+        var intro = document.getElementById('intro');
+        if (!intro) return 0;
+        /* barra fixa compacta depois do scroll */
+        if (intro.classList.contains('scrolled') || !intro.classList.contains('active')) {
+          return Math.round(intro.getBoundingClientRect().height) || 72;
+        }
+        return 0;
+      }
+
+      var trapCooldownUntil = 0;
+
+      function sectionDocTop() {
+        if (!section) return 0;
+        return Math.round(
+          section.getBoundingClientRect().top + (window.pageYOffset || window.scrollY || 0)
+        );
       }
 
       function isSectionInTrapZone() {
         if (!section) return false;
+        if (performance.now() < trapCooldownUntil) return false;
         var rect = section.getBoundingClientRect();
-        var top = rect.top;
-        var bottom = rect.bottom;
-        return top <= 200 && bottom > 300;
+        var head = headerOffset();
+        return rect.top <= head + 90 && rect.bottom > head + 220;
       }
 
-      var animSpeed = 2.2;
+      function clearBodyLockStyles() {
+        document.documentElement.style.overflow = '';
+        document.body.style.overflow = '';
+        document.body.style.position = '';
+        document.body.style.top = '';
+        document.body.style.left = '';
+        document.body.style.right = '';
+        document.body.style.width = '';
+      }
 
-      var pendingMorphRaf = 0;
-      function scheduleMorphUpdate() {
-        if (pendingMorphRaf) return;
-        pendingMorphRaf = requestAnimationFrame(function () {
-          pendingMorphRaf = 0;
-          update();
-        });
+      function lockPage() {
+        if (pageLocked || window.innerWidth < 768 || !section) return;
+
+        var head = headerOffset();
+        var pinY = Math.max(0, sectionDocTop() - head);
+        window.scrollTo(0, pinY);
+
+        lockedScrollY = pinY;
+        pageLocked = true;
+        document.documentElement.style.overflow = 'hidden';
+        document.body.style.overflow = 'hidden';
+        document.body.style.position = 'fixed';
+        document.body.style.top = '-' + pinY + 'px';
+        document.body.style.left = '0';
+        document.body.style.right = '0';
+        document.body.style.width = '100%';
+      }
+
+      function unlockPage(exitMode) {
+        if (!pageLocked) return;
+        pageLocked = false;
+        clearBodyLockStyles();
+
+        var y = lockedScrollY;
+        if (exitMode === 'down' && section) {
+          y = lockedScrollY + section.offsetHeight - Math.min(80, window.innerHeight * 0.08);
+        } else if (exitMode === 'up') {
+          /* Sai da zona da animação para poder voltar ao topo */
+          y = Math.max(0, lockedScrollY - Math.round(window.innerHeight * 0.65));
+        }
+        trapCooldownUntil = performance.now() + 600;
+        window.scrollTo(0, Math.max(0, Math.round(y)));
+        syncCardsVisibility();
+      }
+
+      function ensureAnimLoop() {
+        if (animRaf) return;
+        lastTs = 0;
+        animRaf = requestAnimationFrame(tick);
+      }
+
+      function tick(ts) {
+        animRaf = 0;
+        if (!lastTs) lastTs = ts;
+        var dt = Math.min(0.05, (ts - lastTs) / 1000);
+        lastTs = ts;
+
+        /* amortecimento estável por tempo (não por frame) */
+        var follow = prefersReduced ? 1 : 1 - Math.exp(-dt * 14);
+        progress += (targetProgress - progress) * follow;
+        if (Math.abs(targetProgress - progress) < 0.0004) progress = targetProgress;
+
+        update();
+
+        if (Math.abs(targetProgress - progress) >= 0.0004) {
+          animRaf = requestAnimationFrame(tick);
+        } else {
+          lastTs = 0;
+        }
       }
 
       window.addEventListener('wheel', function(e) {
         if (!section) return;
         if (document.body.classList.contains('lightbox-aberto')) return;
         if (window.innerWidth < 768) return;
-        var inZone = isSectionInTrapZone();
-        var delta = e.deltaY;
 
+        var delta = e.deltaY;
+        if (!delta) return;
+
+        var goingDown = delta > 0;
+        var goingUp = delta < 0;
+
+        /* Em cooldown após sair, deixa o scroll da página livre */
+        if (!pageLocked && performance.now() < trapCooldownUntil) return;
+
+        var inZone = isSectionInTrapZone() || pageLocked;
         if (!inZone) return;
 
-        if (delta > 0) {
-          if (virtualScroll < MAX_SCROLL) {
-            e.preventDefault();
-            virtualScroll = Math.min(virtualScroll + delta * animSpeed, MAX_SCROLL);
-            pinSectionScroll();
-            scheduleMorphUpdate();
+        /* Animação no início (círculo) + rolar para cima = liberar e ir ao topo */
+        if (goingUp && targetProgress <= 0.02 && progress <= 0.02) {
+          e.preventDefault();
+          if (pageLocked) {
+            unlockPage('up');
+          } else {
+            trapCooldownUntil = performance.now() + 600;
           }
-        } else if (delta < 0) {
-          if (virtualScroll > 0) {
-            e.preventDefault();
-            virtualScroll = Math.max(virtualScroll + delta * animSpeed, 0);
-            pinSectionScroll();
-            scheduleMorphUpdate();
-          }
+          return;
         }
+
+        /* Depois que a animação termina para baixo, libera */
+        if (goingDown && targetProgress >= 1 && progress >= 0.995) {
+          e.preventDefault();
+          unlockPage('down');
+          return;
+        }
+
+        e.preventDefault();
+        if (!pageLocked) lockPage();
+
+        var units = Math.abs(delta);
+        /* normaliza trackpad / mouse: deltaMode 1 = linhas */
+        if (e.deltaMode === 1) units *= 16;
+        if (e.deltaMode === 2) units *= containerSize.height || 800;
+        var step = Math.min(0.08, (units / 900) * (prefersReduced ? 1.4 : 1) + WHEEL_STEP * 0.35);
+        if (goingDown) targetProgress = clamp(targetProgress + step, 0, 1);
+        else targetProgress = clamp(targetProgress - step, 0, 1);
+
+        ensureAnimLoop();
       }, { passive: false });
 
       window.addEventListener(
         'scroll',
         function () {
-          scheduleMorphUpdate();
+          if (window.innerWidth < 768) ensureAnimLoop();
         },
         { passive: true }
       );
 
-      window.addEventListener('resize', scheduleMorphUpdate, { passive: true });
+      window.addEventListener('resize', function () {
+        containerSize.width = container.offsetWidth;
+        containerSize.height = container.offsetHeight;
+        if (window.innerWidth < 768 && pageLocked) unlockPage('up');
+        ensureAnimLoop();
+      }, { passive: true });
 
       if (typeof ResizeObserver !== 'undefined') {
         new ResizeObserver(function (entries) {
           var r = entries[0].contentRect;
           containerSize.width = r.width;
           containerSize.height = r.height;
-          scheduleMorphUpdate();
+          ensureAnimLoop();
         }).observe(container);
       }
 
+      function syncCardsVisibility() {
+        if (!section || !wrap) return;
+        var rect = section.getBoundingClientRect();
+        var fullyPast =
+          rect.bottom <= headerOffset() + 8 ||
+          rect.top >= window.innerHeight - 8;
+        if (fullyPast) {
+          wrap.classList.add('is-offscreen');
+        } else {
+          wrap.classList.remove('is-offscreen');
+        }
+      }
+
+      if (typeof IntersectionObserver !== 'undefined' && section) {
+        new IntersectionObserver(
+          function () {
+            syncCardsVisibility();
+          },
+          { root: null, threshold: [0, 0.01, 0.1, 0.5, 1] }
+        ).observe(section);
+      }
+
+      window.addEventListener('scroll', syncCardsVisibility, { passive: true });
+      syncCardsVisibility();
+
       function update() {
         var isMobile = containerSize.width < 768;
+        var p = progress;
+
         if (isMobile && section) {
           var rect = section.getBoundingClientRect();
           var sectionTop = window.scrollY + rect.top;
@@ -447,73 +583,69 @@
           var endY = sectionTop + rect.height * 0.95;
           var denom = endY - startY;
           if (denom > 0) {
-            var progress = (window.scrollY - startY) / denom;
-            progress = Math.max(0, Math.min(1, progress));
-            virtualScroll = progress * MAX_SCROLL;
+            p = clamp((window.scrollY - startY) / denom, 0, 1);
+            progress = p;
+            targetProgress = p;
           }
         }
 
-        morphValue = Math.min(Math.max(virtualScroll / 600, 0), 1);
-        rotateValue = virtualScroll <= 600 ? 0 : Math.min((virtualScroll - 600) / (MAX_SCROLL - 600), 1) * 360;
+        var morphEnd = 0.28;
+        var morphValue = p <= morphEnd ? easeInOutCubic(p / morphEnd) : 1;
+        var rotateT = p <= morphEnd ? 0 : easeInOutCubic((p - morphEnd) / (1 - morphEnd));
 
-        if (morphValue > 0.8) {
+        if (morphValue > 0.82) {
           contentText.classList.add('visible');
           introText.style.opacity = '0';
         } else {
           contentText.classList.remove('visible');
-          introText.style.opacity = morphValue < 0.5 ? String(1 - morphValue * 2) : '0';
+          introText.style.opacity = morphValue < 0.55 ? String(1 - morphValue * 1.7) : '0';
         }
 
         var minDim = Math.min(containerSize.width, containerSize.height);
         var circleRadius = Math.min(minDim * 0.4, 300);
         var baseRadius = Math.min(containerSize.width, containerSize.height * 1.5);
-        var arcRadius = baseRadius * (isMobile ? 1.34 : 1.1);
-        var arcApexY = containerSize.height * (isMobile ? 0.22 : 0.25);
+        var arcRadius = baseRadius * (isMobile ? 1.18 : 0.92);
+        var arcApexY = containerSize.height * (isMobile ? 0.18 : 0.16);
         var arcCenterY = arcApexY + arcRadius;
         var spreadAngle = isMobile ? 132 : 130;
         var startAngle = -90 - spreadAngle / 2;
         var step = TOTAL_IMAGES > 1 ? spreadAngle / (TOTAL_IMAGES - 1) : spreadAngle;
         var maxRotation = spreadAngle * 0.8;
-        var boundedRotation = -(rotateValue / 360) * maxRotation;
+        var boundedRotation = -rotateT * maxRotation;
 
         for (var i = 0; i < cards.length; i++) {
           var card = cards[i];
-          var motion = card.querySelector('.scroll-morph-card-motion');
+          var motion = motions[i];
           var x = 0, y = 0, rot = 0, scale = 1;
 
-          if (introPhase === 'circle') {
-            card.style.opacity = '1';
-            var circleAngle = (i / TOTAL_IMAGES) * 360;
-            var circleRad = circleAngle * Math.PI / 180;
-            var circleX = Math.cos(circleRad) * circleRadius;
-            var circleY = Math.sin(circleRad) * circleRadius;
-            var circleRot = circleAngle + 90;
+          card.style.opacity = '1';
+          var circleAngle = (i / TOTAL_IMAGES) * 360;
+          var circleRad = circleAngle * Math.PI / 180;
+          var circleX = Math.cos(circleRad) * circleRadius;
+          var circleY = Math.sin(circleRad) * circleRadius;
+          var circleRot = circleAngle + 90;
 
-            var currentArcAngle = startAngle + (i * step) + boundedRotation;
-            var arcRad = currentArcAngle * Math.PI / 180;
-            var arcX = Math.cos(arcRad) * arcRadius;
-            var arcY = Math.sin(arcRad) * arcRadius + arcCenterY;
-            var arcRot = currentArcAngle + 90;
-            /* Cartões maiores no CSS + escala menor = mesma área visual, foto menos borrada */
-            var arcScale = isMobile ? 1.12 : 1.62;
+          var currentArcAngle = startAngle + (i * step) + boundedRotation;
+          var arcRad = currentArcAngle * Math.PI / 180;
+          var arcX = Math.cos(arcRad) * arcRadius;
+          var arcY = Math.sin(arcRad) * arcRadius + arcCenterY;
+          var arcRot = currentArcAngle + 90;
+          var arcScale = isMobile ? 1.12 : 1.62;
 
-            x = lerp(circleX, arcX, morphValue);
-            y = lerp(circleY, arcY, morphValue);
-            rot = lerp(circleRot, arcRot, morphValue);
-            scale = lerp(1, arcScale, morphValue);
-          }
+          x = lerp(circleX, arcX, morphValue);
+          y = lerp(circleY, arcY, morphValue);
+          rot = lerp(circleRot, arcRot, morphValue);
+          scale = lerp(1, arcScale, morphValue);
 
           if (motion) {
-            motion.style.transform = 'translate(' + x + 'px, ' + y + 'px) rotate(' + rot + 'deg) scale(' + scale + ')';
+            motion.style.transform =
+              'translate3d(' + x.toFixed(2) + 'px, ' + y.toFixed(2) + 'px, 0) rotate(' +
+              rot.toFixed(2) + 'deg) scale(' + scale.toFixed(3) + ')';
           }
-        }
-
-        if (!isMobile && section && virtualScroll > 0 && virtualScroll < MAX_SCROLL && isSectionInTrapZone()) {
-          window.scrollTo(0, section.offsetTop);
         }
       }
 
-      scheduleMorphUpdate();
+      ensureAnimLoop();
     })();
 
   </script>
