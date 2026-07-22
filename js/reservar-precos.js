@@ -1,11 +1,11 @@
-﻿/**
+/**
  * Regras de preço e mensagem WhatsApp — reservas Mi Casa, Su Casa.
  * Cobrança por pessoa; o quarto inteiro fica indisponível no período.
  */
 (function (global) {
   var CAPACIDADES = {
-    'tem-tem': 4,
-    sabia: 4,
+    'tem-tem': 3,
+    sabia: 3,
     soco: 4,
     ararajuba: 3
   };

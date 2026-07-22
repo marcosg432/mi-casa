@@ -8,11 +8,11 @@
   var FALLBACK = [
     {
       id: 'sabia',
-      capacidade: 4,
+      capacidade: 3,
       titulo: 'SABIÁ',
       tipo: 'Quarto Família com Suíte Privativa',
       desc:
-        'Quarto família com suíte privativa exclusiva para os hóspedes deste quarto. Ambiente amplo, ar-condicionado, ventilador, cozinha compacta privativa e vista para o jardim. Até 4 pessoas · 40 m².',
+        'Quarto família com suíte privativa exclusiva para os hóspedes deste quarto. Ambiente amplo, ar-condicionado, ventilador, cozinha compacta privativa e vista para o jardim. Até 3 pessoas · 40 m².',
       preco: 'R$ 150',
       precoLabel: 'diária por pessoa',
       img: 'imagem/imagem quartos/sabia/quarto2_convertido.webp',
@@ -26,7 +26,7 @@
         maquinaLavar: true,
         ventilador: true,
         banheiroPrivativo: true,
-        camasCasal: 0,
+        camasCasal: 1,
         camasSolteiro: 2,
         metros2: 40
       }
@@ -40,7 +40,7 @@
         'Quarto Duplo com Banheiro Privativo. Confortável para casais ou viajantes: cama de casal, uma cama de solteiro, ar-condicionado, ventilador, vista para o jardim e banheiro privativo com chuveiro. Até 3 pessoas · 20 m².',
       preco: 'R$ 150',
       precoLabel: 'diária por pessoa',
-      img: 'imagem/imagem quartos/ararajuba/6949931c-86c1-4f37-8df9-b26a34f19aa5.webp',
+      img: 'imagem/imagem quartos/ararajuba/quarto_01_web.webp',
       alt: 'Quarto ARARAJUBA — Mi Casa, Su Casa',
       verQuartoHref: 'quartos.html#quarto-ararajuba',
       ordem: 1,
@@ -58,14 +58,14 @@
     },
     {
       id: 'tem-tem',
-      capacidade: 4,
+      capacidade: 3,
       titulo: 'TEM-TEM',
       tipo: 'Quarto Duplo com Banheiro Compartilhado',
       desc:
         'Quarto Duplo com Banheiro Compartilhado. Quarto duplo aconchegante, ideal para casais: cama de casal, uma cama de solteiro, ar-condicionado, ventilador, vista para o jardim e banheiro compartilhado. Até 3 pessoas · 20 m².',
       preco: 'R$ 150',
       precoLabel: 'diária por pessoa',
-      img: 'imagem/imagem quartos/tem-tem/quarto_01_web.webp',
+      img: 'imagem/imagem quartos/tem-tem/quarto_detalhe_web.webp',
       alt: 'Quarto TEM-TEM — Mi Casa, Su Casa',
       verQuartoHref: 'quartos.html#quarto-tem-tem',
       ordem: 2,

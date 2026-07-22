@@ -25,6 +25,10 @@
       'Ventilador': 'fan',
       'Guarda-roupa': 'shirt',
       'Camas': 'bed',
+      'cama de solteiro': 'bed',
+      'camas de solteiro': 'bed',
+      'cama de casal': 'bed',
+      'camas de casal': 'bed',
       'Capacidade': 'users',
       'Tamanho': 'ruler',
       'Diária': 'banknote'
@@ -54,11 +58,17 @@
     if (a.guardaRoupa) lines.push({ k: 'Guarda-roupa', v: 'sim' });
     var cc = Number(a.camasCasal) || 0;
     var cs = Number(a.camasSolteiro) || 0;
-    if (cc > 0 || cs > 0) {
-      var partes = [];
-      if (cc > 0) partes.push(cc + (cc === 1 ? ' cama de casal' : ' camas de casal'));
-      if (cs > 0) partes.push(cs + (cs === 1 ? ' cama de solteiro' : ' camas de solteiro'));
-      lines.push({ k: 'Camas', v: partes.join(' · ') });
+    if (cs > 0) {
+      lines.push({
+        k: cs === 1 ? 'cama de solteiro' : 'camas de solteiro',
+        v: String(cs)
+      });
+    }
+    if (cc > 0) {
+      lines.push({
+        k: cc === 1 ? 'cama de casal' : 'camas de casal',
+        v: String(cc)
+      });
     }
     if (q.capacidade) lines.push({ k: 'Capacidade', v: 'até ' + q.capacidade + ' pessoas' });
     if (a.metros2) lines.push({ k: 'Tamanho', v: String(a.metros2) + ' m²' });

@@ -26,10 +26,24 @@ function optional(name, fallback) {
 var DEFAULT_ADMIN_HASH =
   '$2a$12$/eOzygNedzIWJkFiAWfyT.M4Mwi.SjlV7RIb5oTngMEl962VZNV1q';
 
+/**
+ * Aceita a Project URL da API (https://xxxx.supabase.co).
+ * Se o utilizador colar o link do dashboard, extrai o project ref.
+ */
+function normalizeSupabaseUrl(raw) {
+  var url = String(raw || '').trim().replace(/\/+$/, '');
+  if (!url) return '';
+  var dash = url.match(/supabase\.com\/dashboard\/project\/([a-z0-9]+)/i);
+  if (dash) return 'https://' + dash[1] + '.supabase.co';
+  var api = url.match(/^(https?:\/\/[a-z0-9-]+\.supabase\.co)/i);
+  if (api) return api[1];
+  return url;
+}
+
 var config = {
   port: Number(process.env.PORT) || 3014,
   nodeEnv: process.env.NODE_ENV || 'development',
-  supabaseUrl: optional('SUPABASE_URL', ''),
+  supabaseUrl: normalizeSupabaseUrl(optional('SUPABASE_URL', '')),
   supabaseServiceRoleKey: optional('SUPABASE_SERVICE_ROLE_KEY', ''),
   jwtSecret: optional('JWT_SECRET', 'dev-local-mi-casa-jwt-secret-2026-min32'),
   adminUsername: optional('ADMIN_USERNAME', 'micasasucasaben@gmail.com'),
@@ -47,7 +61,16 @@ function assertProductionConfig() {
   if (config.disablePanelAuth) return;
   var warnings = [];
   if (!config.supabaseUrl) warnings.push('SUPABASE_URL ausente — reservas podem usar armazenamento local.');
+  else if (!/^https:\/\/[a-z0-9-]+\.supabase\.co$/i.test(config.supabaseUrl)) {
+    warnings.push('SUPABASE_URL inválida — use a Project URL (https://SEU_REF.supabase.co), não o link do dashboard.');
+  }
   if (!config.supabaseServiceRoleKey) warnings.push('SUPABASE_SERVICE_ROLE_KEY ausente.');
+  else if (
+    !config.supabaseServiceRoleKey.startsWith('eyJ') &&
+    !config.supabaseServiceRoleKey.startsWith('sb_secret_')
+  ) {
+    warnings.push('SUPABASE_SERVICE_ROLE_KEY com formato inesperado — use a service_role / secret key.');
+  }
   if (!config.adminPasswordHash) warnings.push('ADMIN_PASSWORD_HASH ausente.');
   if (config.jwtSecret.length < 32) warnings.push('JWT_SECRET deve ter pelo menos 32 caracteres.');
   if (config.isProduction && !config.turnstileSecretKey) {
@@ -58,4 +81,10 @@ function assertProductionConfig() {
   });
 }
 
-module.exports = { config: config, required: required, optional: optional, assertProductionConfig: assertProductionConfig };
+module.exports = {
+  config: config,
+  required: required,
+  optional: optional,
+  assertProductionConfig: assertProductionConfig,
+  normalizeSupabaseUrl: normalizeSupabaseUrl
+};

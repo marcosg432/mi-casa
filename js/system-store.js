@@ -370,6 +370,11 @@
         out.tipo = 'Quarto Duplo com Banheiro Privativo';
         if (fb && fb.desc) out.desc = fb.desc;
       }
+      /* SABIÁ e TEM-TEM: capacidade máxima 3 (adultos + crianças) */
+      if (id === 'sabia' || id === 'tem-tem') {
+        out.capacidade = 3;
+        if (fb && fb.desc) out.desc = fb.desc;
+      }
       if (fb.ordem != null && (out.ordem == null || out.ordem === 0)) {
         out.ordem = fb.ordem;
       }

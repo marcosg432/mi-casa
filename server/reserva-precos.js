@@ -1,8 +1,8 @@
 'use strict';
 
 var CAPACIDADE = {
-  'tem-tem': 4,
-  sabia: 4,
+  'tem-tem': 3,
+  sabia: 3,
   soco: 4,
   ararajuba: 3
 };

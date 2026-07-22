@@ -14,13 +14,46 @@ var {
 async function expirarReservasPendentes() {
   var sb = getSupabaseAdmin();
   var res = await sb.rpc('expirar_reservas_pendentes');
-  if (res.error) {
-    if (String(res.error.message || '').indexOf('expirar_reservas_pendentes') !== -1) {
+  if (!res.error) return Number(res.data) || 0;
+
+  var msg = String(res.error.message || '');
+  var missingRpc =
+    msg.indexOf('expirar_reservas_pendentes') !== -1 ||
+    String(res.error.code || '') === 'PGRST202';
+
+  if (!missingRpc) throw res.error;
+
+  /* Fallback JS quando a migration 013 ainda não foi aplicada no projeto. */
+  var pending = await sb
+    .from('reservas')
+    .select('id, hold_expires_at, created_at, status')
+    .eq('status', 'pendente');
+  if (pending.error) {
+    if (String(pending.error.message || '').indexOf('hold_expires_at') !== -1) {
       return 0;
     }
-    throw res.error;
+    throw pending.error;
   }
-  return Number(res.data) || 0;
+
+  var now = Date.now();
+  var ids = (pending.data || [])
+    .filter(function (row) {
+      var hold = row.hold_expires_at
+        ? new Date(row.hold_expires_at).getTime()
+        : row.created_at
+          ? new Date(row.created_at).getTime() + 30 * 60 * 60 * 1000
+          : 0;
+      return hold > 0 && hold < now;
+    })
+    .map(function (row) {
+      return row.id;
+    });
+
+  if (!ids.length) return 0;
+
+  var upd = await sb.from('reservas').update({ status: 'cancelada' }).in('id', ids);
+  if (upd.error) throw upd.error;
+  return ids.length;
 }
 
 async function listarReservas() {

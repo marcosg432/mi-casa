@@ -8,11 +8,11 @@
   /** Fallback estático — usado se a API não estiver disponível. */
   global.QUARTOS_IMAGENS_PASTAS = {
     'tem-tem': [
-      BASE + '/tem-tem/quarto_01_web.webp',
       BASE + '/tem-tem/quarto_detalhe_web.webp',
       BASE + '/tem-tem/quarto_suite_web.webp',
       BASE + '/tem-tem/quarto_cortina_web.webp',
-      BASE + '/tem-tem/imagem_convertida.webp'
+      BASE + '/tem-tem/imagem_convertida.webp',
+      BASE + '/tem-tem/e7bf59b2-06d8-4b13-bb99-54a9d09426d7.webp'
     ],
     soco: [
       BASE + '/soco/10933a8a-60dd-4808-b943-0b3ab0c21c42.webp',
@@ -26,10 +26,10 @@
       BASE + '/sabia/imagem_convertida_2.webp'
     ],
     ararajuba: [
+      BASE + '/ararajuba/quarto_01_web.webp',
       BASE + '/ararajuba/6949931c-86c1-4f37-8df9-b26a34f19aa5.webp',
       BASE + '/ararajuba/98cad899-a9b2-4611-be21-c3c56fef6c2c.webp',
-      BASE + '/ararajuba/cacd8ad0-6493-4b26-95b8-1a8eebd1f796.webp',
-      BASE + '/ararajuba/e7bf59b2-06d8-4b13-bb99-54a9d09426d7.webp'
+      BASE + '/ararajuba/cacd8ad0-6493-4b26-95b8-1a8eebd1f796.webp'
     ]
   };
 
