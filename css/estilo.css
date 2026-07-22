@@ -5313,7 +5313,7 @@ body.lightbox-aberto .cabecalho {
   transition: transform 0.15s ease, box-shadow 0.15s ease;
 }
 
-.reservar-cal-day:hover:not(.reservar-cal-past):not(:disabled) {
+.reservar-cal-day:hover:not(.reservar-cal-past):not(.reservar-cal-ocupado):not(:disabled) {
   transform: scale(1.06);
   box-shadow: 0 4px 14px rgba(0, 0, 0, 0.25);
   background: rgba(255, 255, 255, 0.28);
@@ -5326,10 +5326,33 @@ body.lightbox-aberto .cabecalho {
 }
 
 .reservar-cal-ocupado {
-  opacity: 0.5;
+  opacity: 0.55;
   cursor: not-allowed;
-  color: rgba(255, 255, 255, 0.55) !important;
-  background: rgba(92, 36, 36, 0.55);
+  color: rgba(255, 255, 255, 0.5) !important;
+  -webkit-text-fill-color: rgba(255, 255, 255, 0.5) !important;
+  background:
+    repeating-linear-gradient(
+      -45deg,
+      rgba(0, 0, 0, 0.28),
+      rgba(0, 0, 0, 0.28) 2px,
+      rgba(70, 20, 20, 0.55) 2px,
+      rgba(70, 20, 20, 0.55) 6px
+    ) !important;
+  box-shadow: none !important;
+  transform: none !important;
+}
+
+.reservar-cal-day.reservar-cal-ocupado:hover {
+  transform: none;
+  box-shadow: none;
+  background:
+    repeating-linear-gradient(
+      -45deg,
+      rgba(0, 0, 0, 0.28),
+      rgba(0, 0, 0, 0.28) 2px,
+      rgba(70, 20, 20, 0.55) 2px,
+      rgba(70, 20, 20, 0.55) 6px
+    ) !important;
 }
 
 .reservar-cal-pick-in {

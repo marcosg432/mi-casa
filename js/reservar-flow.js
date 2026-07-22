@@ -691,10 +691,38 @@
       if (isOccupied) classes += ' reservar-cal-ocupado';
       if (isIn) classes += ' reservar-cal-pick-in';
       if (isOut) classes += ' reservar-cal-pick-out';
-      if (!isPast && !isOccupied) {
-        html += '<button type="button" class="' + classes + '" data-cal="' + field + '" data-y="' + y + '" data-m="' + m + '" data-d="' + day + '">' + day + '</button>';
-      } else {
+      if (isPast) {
         html += '<span class="' + classes + '" aria-disabled="true">' + day + '</span>';
+      } else if (isOccupied) {
+        html +=
+          '<button type="button" class="' +
+          classes +
+          '" data-cal="' +
+          field +
+          '" data-y="' +
+          y +
+          '" data-m="' +
+          m +
+          '" data-d="' +
+          day +
+          '" data-ocupado="1" aria-label="Data já reservada">' +
+          day +
+          '</button>';
+      } else {
+        html +=
+          '<button type="button" class="' +
+          classes +
+          '" data-cal="' +
+          field +
+          '" data-y="' +
+          y +
+          '" data-m="' +
+          m +
+          '" data-d="' +
+          day +
+          '">' +
+          day +
+          '</button>';
       }
     }
     html += '</div>';

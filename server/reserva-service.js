@@ -29,10 +29,15 @@ async function expirarReservasPendentes() {
     .select('id, hold_expires_at, created_at, status')
     .eq('status', 'pendente');
   if (pending.error) {
-    if (String(pending.error.message || '').indexOf('hold_expires_at') !== -1) {
-      return 0;
-    }
-    throw pending.error;
+    var missHoldCol =
+      String(pending.error.message || '').indexOf('hold_expires_at') !== -1 ||
+      String(pending.error.code || '') === '42703';
+    if (!missHoldCol) throw pending.error;
+    pending = await sb
+      .from('reservas')
+      .select('id, created_at, status')
+      .eq('status', 'pendente');
+    if (pending.error) throw pending.error;
   }
 
   var now = Date.now();
@@ -158,7 +163,15 @@ async function atualizarStatusReserva(id, status) {
   if (next === 'confirmada') patch.hold_expires_at = null;
   var sb = getSupabaseAdmin();
   var res = await sb.from('reservas').update(patch).eq('id', id).select('*').single();
-  if (res.error) throw res.error;
+  if (res.error) {
+    var missHold =
+      String(res.error.message || '').indexOf('hold_expires_at') !== -1 ||
+      String(res.error.code || '') === '42703';
+    if (missHold && next === 'confirmada') {
+      res = await sb.from('reservas').update({ status: next }).eq('id', id).select('*').single();
+    }
+    if (res.error) throw res.error;
+  }
   return normalizeReservaRow(res.data);
 }
 
@@ -178,11 +191,22 @@ async function getOccupiedDateMapForQuarto(quartoId) {
   var map = {};
   var targetQuarto = normalizeQuartoId(quartoId);
 
+  /* hold_expires_at pode não existir se a migration 013 ainda não foi aplicada. */
   var reservas = await sb
     .from('reservas')
-    .select('data_entrada, data_saida, status, quarto_id, hold_expires_at, created_at')
+    .select('data_entrada, data_saida, status, quarto_id, created_at, hold_expires_at')
     .neq('status', 'cancelada');
-  if (reservas.error) throw reservas.error;
+  if (reservas.error) {
+    var missHold =
+      String(reservas.error.message || '').indexOf('hold_expires_at') !== -1 ||
+      String(reservas.error.code || '') === '42703';
+    if (!missHold) throw reservas.error;
+    reservas = await sb
+      .from('reservas')
+      .select('data_entrada, data_saida, status, quarto_id, created_at')
+      .neq('status', 'cancelada');
+    if (reservas.error) throw reservas.error;
+  }
 
   (reservas.data || []).forEach(function (r) {
     if (!reservaBloqueiaDatas(r)) return;
