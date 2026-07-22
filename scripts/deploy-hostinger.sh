@@ -16,10 +16,11 @@ if [ -z "$APP_DIR" ] || [ ! -f "$APP_DIR/package.json" ]; then
   echo ""
   echo "Não encontrei a pasta do projeto automaticamente."
   echo "Tente manualmente (ajuste o caminho):"
+  echo "  cd /var/www/mi-casa-su-casa"
   echo "  cd /var/www/mi-casa"
-  echo "  cd /root/mi-casa"
+  echo "  cd /root/mi-casa-su-casa"
   echo ""
-  for TRY in /var/www/mi-casa /root/mi-casa /home/*/mi-casa; do
+  for TRY in /var/www/mi-casa-su-casa /var/www/mi-casa /root/mi-casa-su-casa /root/mi-casa /home/*/mi-casa-su-casa /home/*/mi-casa; do
     if [ -f "$TRY/package.json" ] && [ -f "$TRY/server.js" ]; then
       APP_DIR="$TRY"
       break
@@ -28,7 +29,7 @@ if [ -z "$APP_DIR" ] || [ ! -f "$APP_DIR/package.json" ]; then
 fi
 
 if [ -z "$APP_DIR" ] || [ ! -f "$APP_DIR/package.json" ]; then
-  echo "ERRO: pasta do projeto não encontrada. Rode: find / -name server.js -path '*/mi-casa/*' 2>/dev/null"
+  echo "ERRO: pasta do projeto não encontrada. Rode: find / -name server.js \\( -path '*/mi-casa-su-casa/*' -o -path '*/mi-casa/*' \\) 2>/dev/null"
   exit 1
 fi
 

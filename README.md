@@ -20,4 +20,4 @@ npm run pm2:start
 
 Ver [DEPLOY-HOSTINGER.md](./DEPLOY-HOSTINGER.md) para nginx, `git pull` e detalhes na Hostinger.
 
-Repositório: [github.com/marcosg432/mi-casa](https://github.com/marcosg432/mi-casa)
+Repositório: [github.com/noryxteam/mi-casa-su-casa](https://github.com/noryxteam/mi-casa-su-casa)

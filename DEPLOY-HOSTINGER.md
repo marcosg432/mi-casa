@@ -10,8 +10,8 @@ Se já existir outro processo na **3014** (`pm2 list` / `sudo ss -tlnp | grep 30
 
 ```bash
 cd /var/www   # ou a pasta que preferires
-git clone https://github.com/marcosg432/mi-casa.git
-cd mi-casa
+git clone https://github.com/noryxteam/mi-casa-su-casa.git
+cd mi-casa-su-casa
 npm ci --omit=dev
 pm2 start ecosystem.config.cjs
 pm2 save
@@ -21,7 +21,7 @@ pm2 startup   # segue as instruções que o comando imprimir (systemd)
 Atualizar código depois de um `git pull`:
 
 ```bash
-cd /caminho/para/mi-casa
+cd /caminho/para/mi-casa-su-casa
 git pull origin main
 npm ci --omit=dev
 pm2 reload mi-casa
