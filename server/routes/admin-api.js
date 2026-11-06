@@ -6,11 +6,15 @@ var { requireAuth } = require('../middleware/require-auth');
 var {
   listarReservas,
   atualizarStatusReserva,
+  trocarQuartoReserva,
   listarBloqueios,
   addBloqueio,
   removeBloqueio
 } = require('../reserva-service');
 var { getSupabaseAdmin } = require('../supabase-admin');
+var { publicMailSettings, saveMailSettings } = require('../mail-settings');
+var { enviarEmailTeste } = require('../reserva-email');
+var { startGoogleConnect, handleGoogleCallback } = require('../google-mail');
 var { validarPayloadReserva, normalizeReservaRow } = require('../reserva-validator');
 var {
   getDashboardMesas,
@@ -24,8 +28,19 @@ var {
 
 var router = express.Router();
 if (!config.disablePanelAuth) {
-  router.use(requireAuth);
+  router.use(function (req, res, next) {
+    if (req.path === '/email/google/callback') return next();
+    return requireAuth(req, res, next);
+  });
 }
+
+router.get('/email/google/start', function (req, res) {
+  startGoogleConnect(req, res);
+});
+
+router.get('/email/google/callback', function (req, res) {
+  handleGoogleCallback(req, res);
+});
 
 router.get('/reservas', async function (req, res) {
   try {
@@ -34,6 +49,16 @@ router.get('/reservas', async function (req, res) {
   } catch (e) {
     console.error('[admin/reservas GET]', e);
     res.status(500).json({ error: 'Erro ao listar reservas.' });
+  }
+});
+
+router.patch('/reservas/:id/quarto', express.json(), async function (req, res) {
+  try {
+    var updated = await trocarQuartoReserva(req.params.id, req.body && req.body.quartoId);
+    res.json(updated);
+  } catch (e) {
+    console.error('[admin/reservas quarto]', e);
+    res.status(e.status || 500).json({ error: e.message || 'Erro ao trocar o quarto.' });
   }
 });
 
@@ -186,6 +211,30 @@ router.patch('/mesas/:id/status', express.json(), async function (req, res) {
   } catch (e) {
     console.error('[admin/mesas/status PATCH]', e);
     res.status(e.status || 500).json({ error: e.message || 'Erro ao atualizar mesa.' });
+  }
+});
+
+router.get('/email', function (req, res) {
+  res.json(publicMailSettings());
+});
+
+router.put('/email', express.json(), function (req, res) {
+  try {
+    res.json(saveMailSettings(req.body || {}));
+  } catch (e) {
+    res.status(e.status || 500).json({ error: e.message || 'Não foi possível salvar o e-mail.' });
+  }
+});
+
+router.post('/email/teste', express.json(), async function (req, res) {
+  try {
+    await enviarEmailTeste();
+    res.json({ ok: true });
+  } catch (e) {
+    console.error('[admin/email/teste]', e.message || e);
+    res.status(e.status || 500).json({
+      error: e.message || 'Não foi possível enviar o e-mail de teste.'
+    });
   }
 });
 

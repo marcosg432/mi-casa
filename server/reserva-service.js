@@ -2,7 +2,8 @@
 
 var { getSupabaseAdmin } = require('./supabase-admin');
 var { normalizeQuartoId, mesmoQuarto } = require('./quarto-ids');
-var { reservaBloqueiaDatas } = require('./reserva-hold');
+var { reservaBloqueiaDatas, HOLD_MS } = require('./reserva-hold');
+var { enviarEmailNovaReserva } = require('./reserva-email');
 var {
   validarPayloadReserva,
   normalizeReservaRow,
@@ -13,17 +14,6 @@ var {
 
 async function expirarReservasPendentes() {
   var sb = getSupabaseAdmin();
-  var res = await sb.rpc('expirar_reservas_pendentes');
-  if (!res.error) return Number(res.data) || 0;
-
-  var msg = String(res.error.message || '');
-  var missingRpc =
-    msg.indexOf('expirar_reservas_pendentes') !== -1 ||
-    String(res.error.code || '') === 'PGRST202';
-
-  if (!missingRpc) throw res.error;
-
-  /* Fallback JS quando a migration 013 ainda não foi aplicada no projeto. */
   var pending = await sb
     .from('reservas')
     .select('id, hold_expires_at, created_at, status')
@@ -46,7 +36,7 @@ async function expirarReservasPendentes() {
       var hold = row.hold_expires_at
         ? new Date(row.hold_expires_at).getTime()
         : row.created_at
-          ? new Date(row.created_at).getTime() + 30 * 60 * 60 * 1000
+          ? new Date(row.created_at).getTime() + HOLD_MS
           : 0;
       return hold > 0 && hold < now;
     })
@@ -86,12 +76,13 @@ async function buscarReservaDuplicada(data) {
     var row = res.data[i];
     if (!mesmoQuarto(normalizeQuartoId(row.quarto_id), quarto)) continue;
     var normalized = normalizeReservaRow(row);
-    if (reservaBloqueiaDatas(normalized)) return normalized;
+    var st = String(normalized.status || '').toLowerCase();
+    if (st === 'pendente' || reservaBloqueiaDatas(normalized)) return normalized;
   }
   return null;
 }
 
-async function criarReservaValidada(payload) {
+async function criarReservaValidada(payload, opts) {
   await expirarReservasPendentes();
   var valid = validarPayloadReserva(payload);
   if (!valid.ok) {
@@ -111,44 +102,56 @@ async function criarReservaValidada(payload) {
   if (existing.error) throw existing.error;
   var codigo = nextCodigo(existing.data || []);
 
-  var rpc = await sb.rpc('criar_reserva_segura', {
-    p_codigo: codigo,
-    p_nome: data.nome,
-    p_email: data.email,
-    p_telefone: data.telefone,
-    p_pessoas: data.pessoas,
-    p_adultos: data.adultos,
-    p_criancas: data.criancas,
-    p_data_entrada: data.dataEntrada,
-    p_data_saida: data.dataSaida,
-    p_noites: data.noites,
-    p_valor_total: data.valorTotal,
-    p_valor_diaria: data.valorDiaria,
-    p_valor_adicional: data.valorAdicional,
-    p_quarto_id: data.quartoId,
-    p_plataforma: data.plataforma,
-    p_status: data.status,
-    p_requer_orcamento: data.requerOrcamento,
-    p_metodo_pagamento: data.metodoPagamento
-  });
-
-  if (rpc.error) {
-    var errMsg = String(rpc.error.message || '');
-    var errCode = String(rpc.error.code || '');
-    if (
-      errMsg.indexOf('CONFLITO_DATAS') !== -1 ||
-      errMsg.indexOf('QUARTO_OBRIGATORIO') !== -1 ||
-      errCode === '23P01' ||
-      errCode === 'P0001'
-    ) {
-      var conflict = new Error('Esse período já está reservado ou bloqueado para este quarto.');
+  var quartoId = normalizeQuartoId(data.quartoId);
+  var holdExpires = new Date(Date.now() + HOLD_MS).toISOString();
+  var insertRow = {
+    codigo: codigo,
+    nome: data.nome,
+    email: data.email,
+    telefone: data.telefone,
+    pessoas: data.pessoas,
+    adultos: data.adultos,
+    criancas: data.criancas,
+    data_entrada: data.dataEntrada,
+    data_saida: data.dataSaida,
+    noites: data.noites,
+    valor_total: data.valorTotal,
+    valor_diaria: data.valorDiaria,
+    valor_adicional: data.valorAdicional,
+    quarto_id: quartoId,
+    plataforma: data.plataforma || 'site',
+    status: data.status || 'pendente',
+    requer_orcamento: !!data.requerOrcamento,
+    metodo_pagamento: data.metodoPagamento || 'whatsapp',
+    hold_expires_at: holdExpires
+  };
+  var inserted = await sb.from('reservas').insert(insertRow).select('*').single();
+  if (inserted.error) {
+    var missHold =
+      String(inserted.error.message || '').indexOf('hold_expires_at') !== -1 ||
+      String(inserted.error.code || '') === '42703';
+    if (missHold) {
+      delete insertRow.hold_expires_at;
+      inserted = await sb.from('reservas').insert(insertRow).select('*').single();
+    }
+  }
+  if (inserted.error) {
+    var errMsg = String(inserted.error.message || '');
+    var errCode = String(inserted.error.code || '');
+    if (errCode === '23P01' || errMsg.indexOf('sobreposicao') !== -1 || errMsg.indexOf('CONFLITO') !== -1) {
+      var conflict = new Error('Esse período já está confirmado ou bloqueado para este quarto.');
       conflict.status = 409;
       throw conflict;
     }
-    throw rpc.error;
+    throw inserted.error;
   }
 
-  return normalizeReservaRow(rpc.data);
+  var criada = normalizeReservaRow(inserted.data);
+  var siteBase = opts && opts.siteBase;
+  enviarEmailNovaReserva(criada, siteBase).catch(function (e) {
+    console.warn('[email] falha ao avisar reserva:', e.message || e);
+  });
+  return criada;
 }
 
 async function atualizarStatusReserva(id, status) {
@@ -170,7 +173,16 @@ async function atualizarStatusReserva(id, status) {
     if (missHold && next === 'confirmada') {
       res = await sb.from('reservas').update({ status: next }).eq('id', id).select('*').single();
     }
-    if (res.error) throw res.error;
+    if (res.error) {
+      var upMsg = String(res.error.message || '');
+      var upCode = String(res.error.code || '');
+      if (upCode === '23P01' || upMsg.indexOf('sobreposicao') !== -1) {
+        var taken = new Error('Esse quarto já está confirmado nessas datas.');
+        taken.status = 409;
+        throw taken;
+      }
+      throw res.error;
+    }
   }
   return normalizeReservaRow(res.data);
 }
@@ -232,15 +244,44 @@ async function getOccupiedDateMapForQuarto(quartoId) {
 }
 
 async function verificarConflito(quartoId, dataEntrada, dataSaida) {
-  await expirarReservasPendentes();
-  var sb = getSupabaseAdmin();
-  var res = await sb.rpc('datas_tem_conflito', {
-    p_quarto_id: normalizeQuartoId(quartoId),
-    p_data_entrada: dataEntrada,
-    p_data_saida: dataSaida
+  var map = await getOccupiedDateMapForQuarto(quartoId);
+  var hit = false;
+  eachNight(dataEntrada, dataSaida, function (d) {
+    if (map[d]) hit = true;
   });
+  return hit;
+}
+
+async function trocarQuartoReserva(id, quartoId) {
+  await expirarReservasPendentes();
+  var nextQuarto = normalizeQuartoId(quartoId);
+  if (!nextQuarto) {
+    var bad = new Error('Escolha um quarto.');
+    bad.status = 400;
+    throw bad;
+  }
+  var sb = getSupabaseAdmin();
+  var atual = await sb.from('reservas').select('*').eq('id', id).single();
+  if (atual.error || !atual.data) {
+    var missing = new Error('Reserva não encontrada.');
+    missing.status = 404;
+    throw missing;
+  }
+  var status = String(atual.data.status || '').toLowerCase();
+  if (status !== 'pendente') {
+    var locked = new Error('Só dá para trocar o quarto enquanto a reserva está pendente.');
+    locked.status = 400;
+    throw locked;
+  }
+  var conflito = await verificarConflito(nextQuarto, atual.data.data_entrada, atual.data.data_saida);
+  if (conflito) {
+    var conflict = new Error('Esse quarto já está confirmado nessas datas.');
+    conflict.status = 409;
+    throw conflict;
+  }
+  var res = await sb.from('reservas').update({ quarto_id: nextQuarto }).eq('id', id).select('*').single();
   if (res.error) throw res.error;
-  return !!res.data;
+  return normalizeReservaRow(res.data);
 }
 
 async function listarBloqueios() {
@@ -306,6 +347,7 @@ module.exports = {
   listarReservas: listarReservas,
   criarReservaValidada: criarReservaValidada,
   atualizarStatusReserva: atualizarStatusReserva,
+  trocarQuartoReserva: trocarQuartoReserva,
   getOccupiedDateMapForQuarto: getOccupiedDateMapForQuarto,
   verificarConflito: verificarConflito,
   listarBloqueios: listarBloqueios,

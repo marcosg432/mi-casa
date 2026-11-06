@@ -561,194 +561,6 @@ body.painel {
   filter: brightness(1.06);
 }
 
-.sys-payment-card::before {
-  display: none;
-}
-
-.sys-payment-card {
-  padding: 0;
-  border-radius: 14px;
-  overflow: hidden;
-}
-
-.sys-pay-head,
-.sys-pay-row {
-  display: grid;
-  grid-template-columns: 1.8fr 1fr 1fr;
-  align-items: center;
-}
-
-.sys-pay-head {
-  min-height: 62px;
-  padding: 0 1.2rem;
-  background: var(--surface-2);
-  color: var(--muted);
-  font-size: 0.92rem;
-  font-weight: 600;
-  border-bottom: 1px solid var(--border);
-}
-
-.sys-pay-body {
-  background: #ffffff;
-}
-
-.sys-pay-body .sys-pay-row:first-child {
-  border-top: none;
-}
-
-.sys-pay-row {
-  min-height: 58px;
-  padding: 0 1.2rem;
-  color: var(--text);
-  font-size: 0.94rem;
-  font-weight: 600;
-  border-top: 1px solid var(--border);
-}
-
-.sys-pay-cell {
-  display: flex;
-  align-items: center;
-  gap: 0.8rem;
-}
-
-.sys-pay-method {
-  font-size: 0.96rem;
-}
-
-.sys-pay-icon {
-  width: 1.35rem;
-  display: inline-flex;
-  justify-content: center;
-  font-size: 0.95rem;
-  opacity: 0.86;
-}
-
-/* Gráfico reservas/dia: apenas no dashboard em ecrã largo (sem variante mobile) */
-.sys-reservas-chart-desktop-only {
-  display: block;
-}
-
-.sys-reservas-chart-card::before {
-  display: none;
-}
-
-.sys-reservas-chart-card {
-  border-radius: 14px;
-  padding: 0.85rem 0.95rem 0.95rem;
-}
-
-.sys-chart-head {
-  font-size: 0.95rem;
-  color: var(--text);
-  font-weight: 700;
-  margin-bottom: 0.5rem;
-}
-
-.sys-chart-wrap {
-  position: relative;
-  border-radius: 12px;
-  overflow: hidden;
-  background: #f8faf9;
-  border: 1px solid var(--border);
-}
-
-.sys-chart-svg {
-  width: 100%;
-  height: 288px;
-  display: block;
-}
-
-.sys-chart-axis-line {
-  stroke: rgba(148, 163, 184, 0.55);
-  stroke-width: 1;
-}
-
-.sys-chart-grid-line {
-  stroke: rgba(148, 163, 184, 0.28);
-  stroke-width: 1;
-  stroke-dasharray: 4 6;
-}
-
-.sys-chart-y-tick {
-  fill: var(--muted);
-  font-size: 11px;
-  font-weight: 600;
-  font-family: 'Plus Jakarta Sans', system-ui, sans-serif;
-}
-
-.sys-chart-x-tick {
-  fill: var(--muted);
-  font-size: 10px;
-  font-weight: 600;
-  font-family: 'Plus Jakarta Sans', system-ui, sans-serif;
-}
-
-.sys-chart-line {
-  fill: none;
-  stroke: var(--primary);
-  stroke-width: 2.75;
-  stroke-linecap: round;
-  stroke-linejoin: round;
-}
-
-.sys-chart-area {
-  stroke: none;
-  pointer-events: none;
-}
-
-.sys-chart-x {
-  margin-top: 0.45rem;
-  display: grid;
-  grid-template-columns: repeat(var(--chart-days), 26px);
-  justify-content: start;
-  gap: 0;
-  width: 100%;
-  overflow-x: auto;
-  overscroll-behavior: contain;
-  scrollbar-width: thin;
-}
-
-.sys-chart-x-item {
-  font-size: 0.7rem;
-  color: var(--muted);
-  text-align: center;
-  white-space: nowrap;
-  display: block;
-  padding: 0.1rem 0;
-}
-
-.sys-chart-hit {
-  fill: transparent;
-  cursor: pointer;
-}
-
-.sys-chart-crosshair {
-  stroke: rgba(45, 106, 74, 0.55);
-  stroke-width: 1.2;
-  stroke-dasharray: 3 5;
-}
-
-.sys-chart-dot {
-  fill: var(--primary-strong);
-  stroke: rgba(45, 106, 74, 0.25);
-  stroke-width: 6;
-}
-
-.sys-chart-tooltip {
-  position: absolute;
-  z-index: 3;
-  background: var(--surface);
-  border: 1px solid var(--border);
-  color: var(--text);
-  border-radius: 10px;
-  padding: 0.32rem 0.58rem;
-  font-size: 0.78rem;
-  font-weight: 700;
-  pointer-events: none;
-  white-space: nowrap;
-  box-shadow: var(--shadow-md);
-}
-
 .sys-header-card {
   position: relative;
   overflow: hidden;
@@ -786,14 +598,6 @@ body.painel {
   justify-self: center;
 }
 
-.sys-grid-4 {
-  display: grid;
-  grid-template-columns: repeat(4, minmax(0, 1fr));
-  gap: 0.8rem;
-}
-
-.sys-grid-4.sys-grid-3 { grid-template-columns: repeat(3, minmax(0, 1fr)); }
-
 .sys-card {
   position: relative;
   overflow: hidden;
@@ -815,16 +619,6 @@ body.painel {
   background: linear-gradient(180deg, #dfe6e3 0%, rgba(45, 106, 74, 0.25) 100%);
   opacity: 0.9;
   pointer-events: none;
-}
-
-.sys-grid-4.sys-grid-3 > .sys-card:first-child {
-  background: #ffffff;
-  border-color: rgba(45, 106, 74, 0.22);
-}
-
-.sys-grid-4.sys-grid-3 > .sys-card:first-child::before {
-  background: linear-gradient(180deg, var(--primary) 0%, var(--primary-mid) 100%);
-  opacity: 1;
 }
 
 #tab-calendario .sys-config-bloqueios {
@@ -865,15 +659,6 @@ body.painel {
 
 .sys-header-card .sys-metric-sub {
   color: #3d5a48;
-}
-
-.sys-platform.small {
-  margin-top: 0.4rem;
-  font-size: 0.72rem;
-  line-height: 1.1;
-  font-weight: 600;
-  color: var(--muted);
-  letter-spacing: 0.01em;
 }
 
 .sys-search {
@@ -2180,8 +1965,6 @@ a.sys-btn--ghost:hover {
   .sys-app-search-submit {
     padding-inline: 0.7rem;
   }
-  .sys-grid-4 { grid-template-columns: 1fr 1fr; }
-  .sys-grid-4.sys-grid-3 { grid-template-columns: 1fr; }
   .sys-header-split { grid-template-columns: 1fr; gap: 0.4rem; }
   .sys-header-divider { display: none; }
   .sys-topbar {
@@ -2193,22 +1976,6 @@ a.sys-btn--ghost:hover {
   }
   .sys-topbar-title {
     font-size: 1.55rem;
-  }
-  .sys-pay-head,
-  .sys-pay-row {
-    grid-template-columns: 1.5fr 0.8fr 0.9fr;
-    font-size: 0.88rem;
-    min-height: 52px;
-  }
-  .sys-pay-method {
-    font-size: 0.89rem;
-  }
-  .sys-pay-icon {
-    font-size: 0.82rem;
-    width: 1.05rem;
-  }
-  .sys-reservas-chart-desktop-only {
-    display: none !important;
   }
   .sys-row,
   .sys-history-cards,
@@ -2310,25 +2077,6 @@ a.sys-btn--ghost:hover {
 
   .sys-card::before {
     display: none;
-  }
-
-  .sys-grid-4.sys-grid-3 > .sys-card:first-child {
-    background: #fff;
-    border-color: var(--border);
-  }
-
-  .sys-grid-4.sys-grid-3 > .sys-card:first-child::before {
-    display: none;
-  }
-
-  .sys-pay-head {
-    background: linear-gradient(180deg, #4a6f5a 0%, #3d5e4a 55%, #365648 100%);
-    color: rgba(248, 252, 250, 0.95);
-    border-bottom: 1px solid rgba(255, 255, 255, 0.18);
-  }
-
-  .sys-pay-body {
-    background: #fff;
   }
 
   /* Barra “Dashboard” + filtros: verde suave (menos forte que #1a432e) */

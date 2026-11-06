@@ -3,19 +3,10 @@
   var reservasCache = [];
   var bloqueiosCache = [];
   var API = '/api';
-  var HOLD_MS = 30 * 60 * 60 * 1000;
-
   function reservaBloqueiaDatas(r) {
     if (!r) return false;
     var status = String(r.status || '').toLowerCase();
-    if (status === 'cancelada') return false;
-    if (status === 'confirmada' || status === 'ativa') return true;
-    if (status === 'pendente') {
-      if (r.holdExpiresAt) return new Date(r.holdExpiresAt).getTime() > Date.now();
-      if (r.criadoEm) return new Date(r.criadoEm).getTime() + HOLD_MS > Date.now();
-      return true;
-    }
-    return false;
+    return status === 'confirmada' || status === 'ativa';
   }
 
   function apiFetch(url, opts) {
@@ -207,6 +198,17 @@
 
   async function cancelarReserva(id) {
     return atualizarStatusReserva(id, 'cancelada');
+  }
+
+  async function trocarQuartoReserva(id, quartoId) {
+    var updated = await apiFetchAdmin(API + '/admin/reservas/' + encodeURIComponent(String(id)) + '/quarto', {
+      method: 'PATCH',
+      body: { quartoId: quartoId }
+    });
+    reservasCache = reservasCache.map(function (r) {
+      return r.id === id ? updated : r;
+    });
+    return updated;
   }
 
   async function atualizarStatusReserva(id, status) {
@@ -485,6 +487,7 @@
     hasRangeConflictForQuarto: hasRangeConflictForQuarto,
     cancelarReserva: cancelarReserva,
     atualizarStatusReserva: atualizarStatusReserva,
+    trocarQuartoReserva: trocarQuartoReserva,
     searchReservas: searchReservas,
     faturamentoPorPlataforma: faturamentoPorPlataforma,
     getOccupiedDateMap: getOccupiedDateMap,

@@ -192,7 +192,7 @@
 
           <section id="painel-etapa-confirmacao" class="reservar-etapa" hidden aria-labelledby="titulo-etapa-confirmacao">
             <h2 id="titulo-etapa-confirmacao">Confirmar reserva</h2>
-            <p class="reservar-etapa-desc">Revise os dados. Ao clicar em <strong>Finalizar no WhatsApp</strong>, sua solicitação será registrada, as datas ficarão <strong>travadas por 30 horas</strong> e você será direcionado ao WhatsApp com a mensagem pronta. O proprietário deve confirmar no painel nesse prazo; sem confirmação, as datas são reabertas automaticamente.</p>
+            <p class="reservar-etapa-desc">Revise os dados. Ao clicar em <strong>Finalizar no WhatsApp</strong>, o pedido fica <strong>pendente</strong> no painel, você recebe o card e é direcionado ao WhatsApp. As datas só fecham quando a pousada confirmar. Sem resposta em 3 dias, o pedido é recusado.</p>
             <div class="reservar-confirmacao-resumo" id="reservar-confirmacao-resumo" aria-live="polite"></div>
             <div id="reservar-turnstile-wrap" class="reservar-turnstile-wrap"></div>
             <div class="reservar-acoes-etapa">
@@ -303,8 +303,10 @@
 
   <div id="reservar-sucesso" class="reservar-overlay" hidden aria-live="assertive" role="dialog" aria-modal="true" aria-labelledby="reservar-sucesso-titulo">
     <div class="reservar-sucesso-card">
-      <p id="reservar-sucesso-titulo" class="reservar-sucesso-msg">Sua reserva foi concluída!</p>
-      <p class="reservar-sucesso-sub">Redirecionando para o WhatsApp…</p>
+      <p id="reservar-sucesso-titulo" class="reservar-sucesso-msg">Pedido pendente</p>
+      <p id="reservar-sucesso-nome" class="reservar-sucesso-msg"></p>
+      <p id="reservar-sucesso-detalhe" class="reservar-sucesso-sub"></p>
+      <p class="reservar-sucesso-sub">Abrindo o WhatsApp…</p>
       <a href="index.html" id="reservar-sucesso-inicio" class="btn-reservar-primario reservar-sucesso-inicio">Ir para o início</a>
     </div>
   </div>

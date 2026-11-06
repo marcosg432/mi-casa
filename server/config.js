@@ -54,7 +54,16 @@ var config = {
   turnstileSecretKey: optional('TURNSTILE_SECRET_KEY', ''),
   isProduction: process.env.NODE_ENV === 'production',
   disablePanelAuth:
-    process.env.DISABLE_PANEL_AUTH === '1' || process.env.DISABLE_PANEL_AUTH === 'true'
+    process.env.DISABLE_PANEL_AUTH === '1' || process.env.DISABLE_PANEL_AUTH === 'true',
+  notifyEmail: optional('NOTIFY_EMAIL', 'micasasucasaben@gmail.com'),
+  publicSiteUrl: optional('PUBLIC_SITE_URL', ''),
+  smtpHost: optional('SMTP_HOST', 'smtp.gmail.com'),
+  smtpPort: Number(process.env.SMTP_PORT) || 587,
+  smtpUser: optional('SMTP_USER', ''),
+  smtpPass: optional('SMTP_PASS', ''),
+  smtpFrom: optional('SMTP_FROM', ''),
+  googleClientId: optional('GOOGLE_CLIENT_ID', ''),
+  googleClientSecret: optional('GOOGLE_CLIENT_SECRET', '')
 };
 
 function assertProductionConfig() {

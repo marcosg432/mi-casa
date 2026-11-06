@@ -420,9 +420,15 @@
       ov.hidden = false;
       document.body.style.overflow = 'hidden';
       var titulo = document.getElementById('reservar-sucesso-titulo');
-      if (titulo) {
-        titulo.textContent =
-          'Reserva #' + (reservaObj.codigo || '—') + ' — abrindo WhatsApp…';
+      var nomeEl = document.getElementById('reservar-sucesso-nome');
+      var detalheEl = document.getElementById('reservar-sucesso-detalhe');
+      if (titulo) titulo.textContent = 'Pedido pendente';
+      if (nomeEl) nomeEl.textContent = 'Cliente ' + (state.nome || reservaObj.nome || '');
+      if (detalheEl) {
+        detalheEl.textContent =
+          quartoTituloPorId(state.quartoId) +
+          ' · ' +
+          (reservaObj.codigo ? '#' + reservaObj.codigo : 'aguardando confirmação');
       }
     }
     window.setTimeout(function () {

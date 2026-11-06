@@ -102,7 +102,10 @@ router.post('/reservas', reservaLimiter, express.json({ limit: '32kb' }), async 
       });
     }
 
-    var created = await criarReservaValidada(req.body || {});
+    var proto = req.get('x-forwarded-proto') || req.protocol || 'http';
+    var host = req.get('x-forwarded-host') || req.get('host') || '';
+    var siteBase = proto + '://' + host;
+    var created = await criarReservaValidada(req.body || {}, { siteBase: siteBase });
     res.status(201).json(created);
   } catch (e) {
     console.error('[api/reservas POST]', e);

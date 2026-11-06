@@ -106,6 +106,9 @@ if (config.disablePanelAuth) {
   app.get('/painel-mesas.html', requireAuthPage, function (req, res) {
     res.sendFile(path.join(root, 'painel-mesas.html'));
   });
+  app.get('/confirmar-reserva.html', requireAuthPage, function (req, res) {
+    res.sendFile(path.join(root, 'confirmar-reserva.html'));
+  });
 }
 
 function sendNoCacheFile(relativePath) {

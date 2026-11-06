@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Confirmar reserva — Mi Casa, Su Casa</title>
+  <link rel="stylesheet" href="css/estilo.css">
+  <style>
+    body { background: #f4f2ed; }
+    .confirmar-wrap {
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 6.5rem 1rem 2rem;
+    }
+    .confirmar-card {
+      width: min(520px, 100%);
+      background: #fff;
+      border-radius: 18px;
+      padding: 1.6rem 1.4rem 1.4rem;
+      box-shadow: 0 18px 40px rgba(20, 40, 30, 0.08);
+    }
+    .confirmar-kicker {
+      margin: 0;
+      font-size: 0.72rem;
+      letter-spacing: 0.16em;
+      text-transform: uppercase;
+      color: #3d6b4f;
+      font-weight: 700;
+    }
+    .confirmar-nome {
+      margin: 0.35rem 0 0.4rem;
+      font-family: 'Cormorant Garamond', Georgia, serif;
+      font-size: clamp(2rem, 6vw, 2.8rem);
+      line-height: 1.05;
+    }
+    .confirmar-meta { margin: 0 0 1.1rem; color: #333; }
+    .confirmar-acoes { display: flex; flex-direction: column; gap: 0.65rem; }
+    .confirmar-btn {
+      border: 0;
+      border-radius: 999px;
+      padding: 0.9rem 1rem;
+      font-weight: 700;
+      cursor: pointer;
+      font-size: 1rem;
+    }
+    .confirmar-btn--ok { background: #2d5a3d; color: #fff; }
+    .confirmar-btn--no { background: #fff; color: #8a2b2b; border: 1px solid #e4c8c8; }
+    .confirmar-btn--alt { background: #f4f2ed; color: #1a1a1a; }
+    .confirmar-troca { display: flex; gap: 0.5rem; align-items: center; }
+    .confirmar-troca select { flex: 1; padding: 0.75rem; border-radius: 12px; border: 1px solid #ddd; }
+    .confirmar-msg { margin-top: 0.8rem; font-weight: 650; }
+    .confirmar-editar { display: inline-block; margin-top: 0.2rem; color: #2d5a3d; font-weight: 700; }
+  </style>
+</head>
+<body>
+  <div class="confirmar-wrap">
+    <article class="confirmar-card" id="confirmar-card">
+      <p>Carregando pedido…</p>
+    </article>
+  </div>
+  <script>
+    (function () {
+      var params = new URLSearchParams(window.location.search);
+      var id = params.get('id') || '';
+      var card = document.getElementById('confirmar-card');
+
+      function esc(s) {
+        return String(s == null ? '' : s)
+          .replace(/&/g, '&amp;')
+          .replace(/</g, '&lt;')
+          .replace(/>/g, '&gt;')
+          .replace(/"/g, '&quot;');
+      }
+      function primeiroNome(nome) {
+        var parte = String(nome || '').trim().split(/\s+/)[0] || 'cliente';
+        return parte.charAt(0).toUpperCase() + parte.slice(1);
+      }
+      function fmt(iso) {
+        var m = String(iso || '').match(/^(\d{4})-(\d{2})-(\d{2})/);
+        return m ? m[3] + '/' + m[2] + '/' + m[1] : '—';
+      }
+      function tituloQuarto(quartoId, lista) {
+        var idq = String(quartoId || '');
+        for (var i = 0; i < lista.length; i++) {
+          if (String(lista[i].id) === idq) return lista[i].titulo || lista[i].nome || idq;
+        }
+        return idq || 'Quarto';
+      }
+
+      function irLogin() {
+        var next = window.location.pathname + window.location.search;
+        window.location.href = '/login.html?next=' + encodeURIComponent(next);
+      }
+
+      async function api(url, opts) {
+        opts = opts || {};
+        opts.credentials = 'include';
+        if (opts.body) {
+          opts.headers = { 'Content-Type': 'application/json' };
+          opts.body = JSON.stringify(opts.body);
+        }
+        var res = await fetch(url, opts);
+        if (res.status === 401) {
+          irLogin();
+          throw new Error('auth');
+        }
+        var data = await res.json().catch(function () { return {}; });
+        if (!res.ok) throw new Error(data.error || 'Erro');
+        return data;
+      }
+
+      function render(reserva, quartos, aviso) {
+        var st = String(reserva.status || '').toLowerCase();
+        var nome = primeiroNome(reserva.nome);
+        var quarto = tituloQuarto(reserva.quartoId, quartos);
+        var meta = quarto + ' · ' + fmt(reserva.dataEntrada) + ' a ' + fmt(reserva.dataSaida);
+        var html =
+          '<p class="confirmar-kicker">Pedido</p>' +
+          '<h1 class="confirmar-nome">Cliente ' + esc(nome) + '</h1>' +
+          '<p class="confirmar-meta">' + esc(meta) + '</p>';
+        if (st === 'confirmada' || st === 'ativa') {
+          html += '<p class="confirmar-msg">Reserva confirmada. Essas datas estão fechadas neste quarto.</p>';
+        } else if (st === 'cancelada') {
+          html += '<p class="confirmar-msg">Compra não foi confirmada.</p>';
+        } else {
+          var opts = quartos.map(function (q) {
+            var qid = q.id;
+            var sel = String(qid) === String(reserva.quartoId) ? ' selected' : '';
+            return '<option value="' + esc(qid) + '"' + sel + '>' + esc(q.titulo || q.nome || qid) + '</option>';
+          }).join('');
+          html +=
+            '<div class="confirmar-acoes">' +
+            '<button type="button" class="confirmar-btn confirmar-btn--ok" id="btn-confirmar">Confirmar reserva de ' +
+            esc(nome) +
+            '?</button>' +
+            '<button type="button" class="confirmar-btn confirmar-btn--no" id="btn-recusar">Compra não foi confirmada</button>' +
+            '<div class="confirmar-troca"><select id="sel-quarto">' +
+            opts +
+            '</select><button type="button" class="confirmar-btn confirmar-btn--alt" id="btn-trocar">Trocar quarto</button></div>' +
+            '<a class="confirmar-editar" href="/painel.html?reserva=' +
+            encodeURIComponent(reserva.id) +
+            '">Editar</a>' +
+            '</div>';
+        }
+        if (aviso) html += '<p class="confirmar-msg">' + esc(aviso) + '</p>';
+        card.innerHTML = html;
+        var ok = document.getElementById('btn-confirmar');
+        var no = document.getElementById('btn-recusar');
+        var trocar = document.getElementById('btn-trocar');
+        if (ok) ok.addEventListener('click', function () { agir('confirmada'); });
+        if (no) no.addEventListener('click', function () { agir('cancelada'); });
+        if (trocar) trocar.addEventListener('click', trocarQuarto);
+      }
+
+      var reservaAtual = null;
+      var quartosAtuais = [];
+
+      async function agir(status) {
+        var updated = await api('/api/admin/reservas/' + encodeURIComponent(id) + '/status', {
+          method: 'PATCH',
+          body: { status: status }
+        });
+        reservaAtual = updated;
+        render(updated, quartosAtuais, status === 'cancelada' ? 'Compra não foi confirmada.' : '');
+      }
+
+      async function trocarQuarto() {
+        var sel = document.getElementById('sel-quarto');
+        var quartoId = sel ? sel.value : '';
+        if (!quartoId || quartoId === String(reservaAtual.quartoId)) return;
+        var updated = await api('/api/admin/reservas/' + encodeURIComponent(id) + '/quarto', {
+          method: 'PATCH',
+          body: { quartoId: quartoId }
+        });
+        reservaAtual = updated;
+        render(updated, quartosAtuais, 'Quarto trocado. As datas só fecham quando você confirmar.');
+      }
+
+      async function boot() {
+        if (!id) {
+          card.innerHTML = '<p>Pedido não encontrado.</p>';
+          return;
+        }
+        try {
+          var publicCfg = await fetch('/api/config/public').then(function (r) { return r.json(); }).catch(function () { return {}; });
+          if (!publicCfg.disablePanelAuth) {
+            var me = await fetch('/api/auth/me', { credentials: 'include' });
+            if (!me.ok) return irLogin();
+          }
+          var reservas = await api('/api/admin/reservas');
+          var quartos = await api('/api/admin/quartos');
+          quartosAtuais = Array.isArray(quartos) ? quartos : [];
+          reservaAtual = (reservas || []).find(function (r) { return String(r.id) === id; });
+          if (!reservaAtual) {
+            card.innerHTML = '<p>Pedido não encontrado.</p>';
+            return;
+          }
+          render(reservaAtual, quartosAtuais);
+        } catch (e) {
+          if (e && e.message === 'auth') return;
+          card.innerHTML = '<p>' + esc(e.message || 'Não foi possível abrir o pedido.') + '</p>';
+        }
+      }
+      boot();
+    })();
+  </script>
+</body>
+</html>

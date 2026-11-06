@@ -11,4 +11,5 @@ npm-debug.log*
 Thumbs.db
 *.local
 data/mesas-local.json
+data/mail-settings.json
 imagem/_heavy_bak/

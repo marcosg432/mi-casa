@@ -34,14 +34,13 @@
     if (!r || String(r.status || '').toLowerCase() !== 'pendente') return '';
     var expires = r.holdExpiresAt ? new Date(r.holdExpiresAt) : null;
     if (!expires && r.criadoEm) {
-      expires = new Date(new Date(r.criadoEm).getTime() + 30 * 60 * 60 * 1000);
+      expires = new Date(new Date(r.criadoEm).getTime() + 3 * 24 * 60 * 60 * 1000);
     }
-    if (!expires || isNaN(expires.getTime())) return 'Prazo: 30 horas após o pedido';
+    if (!expires || isNaN(expires.getTime())) return 'Pendente: as datas continuam livres por 3 dias';
     var diff = expires.getTime() - Date.now();
-    if (diff <= 0) return 'Prazo expirado — datas serão reabertas';
-    var h = Math.floor(diff / 3600000);
-    var m = Math.floor((diff % 3600000) / 60000);
-    return 'Confirme em até ' + h + 'h ' + m + 'min (senão as datas reabrem)';
+    if (diff <= 0) return 'Prazo de 3 dias acabou — o pedido será recusado';
+    var dias = Math.ceil(diff / (24 * 60 * 60 * 1000));
+    return 'Pendente. Datas livres. Sem resposta em ' + dias + ' dia' + (dias === 1 ? '' : 's') + ', o pedido é recusado';
   }
 
   function valorReservaTexto(r) {
@@ -261,7 +260,8 @@
         faturamento: 'Faturamento',
         ficha: 'Ficha de reserva',
         quartos: 'Quartos',
-        calendario: 'Configuração'
+        calendario: 'Configuração',
+        email: 'E-mail'
       };
       crumb.textContent = labels[tab] || tab;
     }
@@ -280,8 +280,6 @@
     var reservas = filterReservasByPeriodo(reservasBase, state.periodo);
     var f = SystemStore.faturamentoPorPlataforma(reservas);
     var qtdReservas = reservas.length;
-    var meiosPagamento = renderMeiosPagamento(reservas);
-    var graficoReservas = renderGraficoReservasDia(reservas);
     var periodoLabelMap = {
       hoje: 'Hoje',
       mes_passado: 'Mês passado',
@@ -334,412 +332,7 @@
       '<div class="sys-header-col"><div class="sys-metric-main">' +
       esc(money(f.total)) +
       '</div><div class="sys-metric-sub">Total geral</div></div>' +
-      '</div>' +
-      '<div class="sys-grid-4 sys-grid-3">' +
-      cardPlataforma('Booking', f.booking) +
-      cardPlataforma('Airbnb', f.airbnb) +
-      cardPlataforma('VRBO', f.vrbo) +
-      '</div>' +
-      '<div style="margin-top:3.6rem">' +
-      meiosPagamento +
-      '</div>' +
-      '<div class="sys-reservas-chart-desktop-only" style="margin-top:1.2rem">' +
-      graficoReservas +
       '</div>';
-    bindReservasChartTooltip();
-  }
-
-  function cardPlataforma(label, value) {
-    return (
-      '<article class="sys-card"><div class="sys-metric-main">' +
-      esc(money(value)) +
-      '</div><div class="sys-platform small">' +
-      esc(label) +
-      '</div></article>'
-    );
-  }
-
-  function renderMeiosPagamento(reservas) {
-    var methods = [
-      { key: 'pix', icon: '◈', label: 'Pix', value: 0 },
-      { key: 'cartao_credito', icon: '▭', label: 'Cartão de crédito', value: 0 },
-      { key: 'cartao_debito', icon: '▭', label: 'Cartão de débito', value: 0 }
-    ];
-    var byKey = {};
-    methods.forEach(function (m) {
-      byKey[m.key] = m;
-    });
-    (reservas || []).forEach(function (r) {
-      var key = String((r && r.metodoPagamento) || 'pix').toLowerCase();
-      var method = byKey[key] || byKey.pix;
-      method.value += Number((r && r.valorTotal) || 0);
-    });
-    var totalGeral = methods.reduce(function (acc, item) {
-      return acc + (Number(item.value) || 0);
-    }, 0);
-    var lines = methods
-      .map(function (item) {
-        var conv = totalGeral > 0 ? ((item.value / totalGeral) * 100).toFixed(0) : '0';
-        return (
-          '<div class="sys-pay-row">' +
-          '<div class="sys-pay-cell sys-pay-method"><span class="sys-pay-icon">' +
-          esc(item.icon) +
-          '</span><span>' +
-          esc(item.label) +
-          '</span></div>' +
-          '<div class="sys-pay-cell">' +
-          esc(conv) +
-          '%</div>' +
-          '<div class="sys-pay-cell">' +
-          esc(money(item.value)) +
-          '</div>' +
-          '</div>'
-        );
-      })
-      .join('');
-    return (
-      '<article class="sys-card sys-payment-card">' +
-      '<div class="sys-pay-head">' +
-      '<div>Meios de Pagamento</div>' +
-      '<div>Conversão</div>' +
-      '<div>Valor</div>' +
-      '</div>' +
-      '<div class="sys-pay-body">' +
-      lines +
-      '</div>' +
-      '</article>'
-    );
-  }
-
-  function reservasCountsPorDiaNoMesAtual(reservas) {
-    var now = new Date();
-    var year = now.getFullYear();
-    var month = now.getMonth();
-    var daysInMonth = new Date(year, month + 1, 0).getDate();
-    var counts = new Array(daysInMonth).fill(0);
-    (reservas || []).forEach(function (r) {
-      var criado = r && r.criadoEm ? new Date(r.criadoEm) : null;
-      if (!criado || isNaN(criado.getTime())) return;
-      if (criado.getFullYear() !== year || criado.getMonth() !== month) return;
-      counts[criado.getDate() - 1] += 1;
-    });
-    var maxCount = counts.reduce(function (acc, n) {
-      return n > acc ? n : acc;
-    }, 0);
-    return {
-      year: year,
-      month: month,
-      daysInMonth: daysInMonth,
-      counts: counts,
-      maxCount: maxCount,
-      axisMax: chartAxisMaxFromCounts(maxCount)
-    };
-  }
-
-  function chartAxisMaxFromCounts(maxCount) {
-    var n = Math.max(0, Math.floor(Number(maxCount) || 0));
-    if (n === 0) return 1;
-    if (n <= 5) return n;
-    if (n <= 10) return 10;
-    var step = Math.ceil(n / 4);
-    return step * 4;
-  }
-
-  function chartYTicks(axisMax) {
-    axisMax = Math.max(1, Math.floor(Number(axisMax) || 1));
-    if (axisMax <= 6) {
-      var small = [];
-      for (var i = 0; i <= axisMax; i++) small.push(i);
-      return small;
-    }
-    var ticks = [0];
-    var step = Math.max(1, Math.ceil(axisMax / 4));
-    for (var v = step; v < axisMax; v += step) ticks.push(v);
-    if (ticks[ticks.length - 1] !== axisMax) ticks.push(axisMax);
-    return ticks;
-  }
-
-  function chartShowDayLabel(day, total) {
-    if (total <= 14) return true;
-    if (day === 1 || day === total) return true;
-    if (total <= 21) return day % 2 === 0;
-    return day % 5 === 0;
-  }
-
-  function renderGraficoReservasDia(reservas) {
-    var agg = reservasCountsPorDiaNoMesAtual(reservas);
-    var daysInMonth = agg.daysInMonth;
-    var counts = agg.counts;
-    var axisMax = agg.axisMax;
-
-    var width = 1080;
-    var height = 288;
-    var left = 46;
-    var right = 16;
-    var top = 14;
-    var bottom = 34;
-    var plotW = width - left - right;
-    var plotH = height - top - bottom;
-    var yTicks = chartYTicks(axisMax);
-
-    var gridLines = '';
-    var yAxisTicks = '';
-    yTicks.forEach(function (tickVal) {
-      var gy = top + plotH - (tickVal / axisMax) * plotH;
-      gridLines +=
-        '<line x1="' +
-        left +
-        '" y1="' +
-        gy.toFixed(2) +
-        '" x2="' +
-        (left + plotW) +
-        '" y2="' +
-        gy.toFixed(2) +
-        '" class="sys-chart-grid-line" />';
-      yAxisTicks +=
-        '<text class="sys-chart-y-tick" x="' +
-        (left - 10).toFixed(2) +
-        '" y="' +
-        (gy + 4).toFixed(2) +
-        '" text-anchor="end">' +
-        tickVal +
-        '</text>';
-    });
-
-    var baselineY = top + plotH;
-    var axisBaseline =
-      '<line x1="' +
-      left +
-      '" y1="' +
-      baselineY.toFixed(2) +
-      '" x2="' +
-      (left + plotW) +
-      '" y2="' +
-      baselineY.toFixed(2) +
-      '" class="sys-chart-axis-line" />';
-
-    var pointsArr = counts.map(function (value, idx) {
-      var x = left + (idx * plotW) / Math.max(1, counts.length - 1);
-      var y = top + plotH - (value / axisMax) * plotH;
-      return { x: x, y: y, day: idx + 1, count: value };
-    });
-
-    function smoothLinePathCatmull(points) {
-      if (!points.length) return '';
-      function fx(n) {
-        return Number(n).toFixed(2);
-      }
-      if (points.length === 1) {
-        return 'M ' + fx(points[0].x) + ' ' + fx(points[0].y);
-      }
-      if (points.length === 2) {
-        return (
-          'M ' +
-          fx(points[0].x) +
-          ' ' +
-          fx(points[0].y) +
-          ' L ' +
-          fx(points[1].x) +
-          ' ' +
-          fx(points[1].y)
-        );
-      }
-      var d = 'M ' + fx(points[0].x) + ' ' + fx(points[0].y);
-      for (var i = 0; i < points.length - 1; i++) {
-        var p0 =
-          i > 0
-            ? points[i - 1]
-            : { x: 2 * points[i].x - points[i + 1].x, y: 2 * points[i].y - points[i + 1].y };
-        var p1 = points[i];
-        var p2 = points[i + 1];
-        var p3 =
-          i + 2 < points.length
-            ? points[i + 2]
-            : { x: 2 * points[i + 1].x - points[i].x, y: 2 * points[i + 1].y - points[i].y };
-        var c1x = p1.x + (p2.x - p0.x) / 6;
-        var c1y = p1.y + (p2.y - p0.y) / 6;
-        var c2x = p2.x - (p3.x - p1.x) / 6;
-        var c2y = p2.y - (p3.y - p1.y) / 6;
-        d += ' C ' + fx(c1x) + ' ' + fx(c1y) + ', ' + fx(c2x) + ' ' + fx(c2y) + ', ' + fx(p2.x) + ' ' + fx(p2.y);
-      }
-      return d;
-    }
-
-    var smoothPath = smoothLinePathCatmull(pointsArr);
-    var areaPath = '';
-    if (smoothPath && pointsArr.length >= 2) {
-      var lastPt = pointsArr[pointsArr.length - 1];
-      var firstPt = pointsArr[0];
-      areaPath =
-        smoothPath +
-        ' L ' +
-        lastPt.x.toFixed(2) +
-        ' ' +
-        baselineY.toFixed(2) +
-        ' L ' +
-        firstPt.x.toFixed(2) +
-        ' ' +
-        baselineY.toFixed(2) +
-        ' Z';
-    }
-
-    var xAxisLabels = pointsArr
-      .filter(function (p) {
-        return chartShowDayLabel(p.day, daysInMonth);
-      })
-      .map(function (p) {
-        return (
-          '<text class="sys-chart-x-tick" x="' +
-          p.x.toFixed(2) +
-          '" y="' +
-          (baselineY + 22).toFixed(2) +
-          '" text-anchor="middle">' +
-          String(p.day).padStart(2, '0') +
-          '</text>'
-        );
-      })
-      .join('');
-
-    var hitAreas = pointsArr
-      .map(function (p) {
-        return (
-          '<rect class="sys-chart-hit" x="' +
-          (p.x - 9).toFixed(2) +
-          '" y="' +
-          top.toFixed(2) +
-          '" width="18" height="' +
-          plotH.toFixed(2) +
-          '" data-day="' +
-          p.day +
-          '" data-count="' +
-          p.count +
-          '" data-x="' +
-          p.x.toFixed(2) +
-          '" data-y="' +
-          p.y.toFixed(2) +
-          '" />'
-        );
-      })
-      .join('');
-
-    return (
-      '<article class="sys-card sys-reservas-chart-card sys-reservas-chart-card--desktop">' +
-      '<div class="sys-chart-head">Reservas feitas por dia</div>' +
-      '<div class="sys-chart-wrap">' +
-      '<svg viewBox="0 0 ' +
-      width +
-      ' ' +
-      height +
-      '" class="sys-chart-svg" role="img" aria-label="Gráfico de reservas por dia">' +
-      '<defs>' +
-      '<linearGradient id="reservas-chart-area-grad" x1="0" y1="0" x2="0" y2="1">' +
-      '<stop offset="0%" stop-color="#2d6a4a" stop-opacity="0.28"/>' +
-      '<stop offset="100%" stop-color="#2d6a4a" stop-opacity="0"/>' +
-      '</linearGradient></defs>' +
-      '<g>' +
-      axisBaseline +
-      gridLines +
-      yAxisTicks +
-      xAxisLabels +
-      (areaPath
-        ? '<path d="' + areaPath + '" class="sys-chart-area" fill="url(#reservas-chart-area-grad)" />'
-        : '') +
-      (smoothPath
-        ? '<path d="' + smoothPath + '" class="sys-chart-line" fill="none" />'
-        : '') +
-      '<line class="sys-chart-crosshair" x1="' +
-      left +
-      '" y1="' +
-      top +
-      '" x2="' +
-      left +
-      '" y2="' +
-      baselineY.toFixed(2) +
-      '" hidden />' +
-      '<circle class="sys-chart-dot" cx="' +
-      left +
-      '" cy="' +
-      baselineY.toFixed(2) +
-      '" r="4.5" hidden />' +
-      hitAreas +
-      '</g></svg>' +
-      '<div class="sys-chart-tooltip" hidden></div>' +
-      '</div>' +
-      '</article>'
-    );
-  }
-
-  function bindReservasChartTooltip() {
-    document.querySelectorAll('.sys-reservas-chart-card').forEach(function (card) {
-      var tooltip = card.querySelector('.sys-chart-tooltip');
-      var wrap = card.querySelector('.sys-chart-wrap');
-      var crosshair = card.querySelector('.sys-chart-crosshair');
-      var dot = card.querySelector('.sys-chart-dot');
-      if (!tooltip || !wrap) return;
-      var hits = card.querySelectorAll('.sys-chart-hit');
-      function hideAll() {
-        tooltip.hidden = true;
-        if (crosshair) crosshair.setAttribute('hidden', 'hidden');
-        if (dot) dot.setAttribute('hidden', 'hidden');
-      }
-      var scroller = wrap.closest('.sys-reservas-mobile-scroll');
-      if (scroller) {
-        scroller.addEventListener('scroll', hideAll, { passive: true });
-      }
-      hits.forEach(function (hit) {
-        function show() {
-          var day = hit.getAttribute('data-day');
-          var count = hit.getAttribute('data-count');
-          var useBbox = hit.getAttribute('data-use-bbox') === '1';
-          var dateLab = hit.getAttribute('data-date-label');
-          tooltip.textContent =
-            (dateLab || String(day).padStart(2, '0')) + ' - ' + count + ' reserva' + (count === '1' ? '' : 's');
-          tooltip.hidden = false;
-          var wr = wrap.getBoundingClientRect();
-          var tipW = 140;
-          if (useBbox) {
-            var cr = card.getBoundingClientRect();
-            var hr = hit.getBoundingClientRect();
-            var tipX = Math.max(8, Math.min(cr.width - tipW - 8, hr.left + hr.width / 2 - cr.left - tipW / 2));
-            var tipY = Math.max(8, hr.top - cr.top - 36);
-            tooltip.style.left = tipX + 'px';
-            tooltip.style.top = tipY + 'px';
-            if (crosshair) crosshair.setAttribute('hidden', 'hidden');
-            if (dot) dot.setAttribute('hidden', 'hidden');
-          } else {
-            var x = Number(hit.getAttribute('data-x') || 0);
-            var y = Number(hit.getAttribute('data-y') || 0);
-            var cr = card.getBoundingClientRect();
-            var svgEl = wrap.querySelector('svg');
-            var vb =
-              svgEl && svgEl.viewBox && svgEl.viewBox.baseVal ? svgEl.viewBox.baseVal : { width: 1080, height: 288 };
-            var vbW = vb.width || 1080;
-            var vbH = vb.height || 288;
-            var scaleX = wr.width / vbW;
-            var scaleY = wr.height / vbH;
-            var tipX2 = Math.max(8, Math.min(cr.width - tipW - 8, wr.left - cr.left + x * scaleX - tipW / 2));
-            var tipY2 = Math.max(8, wr.top - cr.top + y * scaleY - 48);
-            tooltip.style.left = tipX2 + 'px';
-            tooltip.style.top = tipY2 + 'px';
-            if (crosshair) {
-              crosshair.setAttribute('x1', String(x));
-              crosshair.setAttribute('x2', String(x));
-              crosshair.removeAttribute('hidden');
-            }
-            if (dot) {
-              dot.setAttribute('cx', String(x));
-              dot.setAttribute('cy', String(y));
-              dot.removeAttribute('hidden');
-            }
-          }
-        }
-        hit.addEventListener('mouseenter', show);
-        hit.addEventListener('mousemove', show);
-        hit.addEventListener('mouseleave', hideAll);
-        hit.addEventListener('touchstart', show, { passive: true });
-      });
-      wrap.addEventListener('mouseleave', hideAll);
-    });
   }
 
   function renderRows(list, withOpen) {
@@ -1008,6 +601,96 @@
       '" />' +
       historicoRows +
       '';
+  }
+
+  function renderEmail() {
+    var el = document.getElementById('tab-email');
+    if (!el) return;
+    el.innerHTML =
+      '<h2 class="sys-section-title">E-mail das reservas</h2>' +
+      '<p class="sys-metric-sub" style="margin-bottom:1rem">Conecte o Gmail do bot. O Google pede a sua confirmação. Depois de aceitar, essa conta envia os avisos.</p>' +
+      '<form id="form-email-avisos" class="sys-card" style="max-width:520px;display:grid;gap:0.85rem">' +
+      '<p class="sys-metric-sub" id="mail-google-status">Ainda sem Gmail conectado.</p>' +
+      '<a class="sys-btn" id="mail-google" href="/api/admin/email/google/start" style="display:inline-flex;align-items:center;text-decoration:none;width:fit-content">Conectar Gmail do bot</a>' +
+      '<label class="sys-label">E-mail que recebe<input class="sys-input" id="mail-to" type="email" autocomplete="email" required /></label>' +
+      '<div style="display:flex;gap:0.6rem;flex-wrap:wrap">' +
+      '<button type="submit" class="sys-btn">Salvar</button>' +
+      '<button type="button" class="sys-btn sys-btn--ghost" id="mail-test">Enviar teste</button>' +
+      '</div>' +
+      '<p class="sys-metric-sub" id="mail-status" role="status"></p>' +
+      '</form>';
+    fetch('/api/admin/email', { credentials: 'include' })
+      .then(function (res) {
+        return res.json();
+      })
+      .then(function (data) {
+        var to = document.getElementById('mail-to');
+        var googleStatus = document.getElementById('mail-google-status');
+        var googleBtn = document.getElementById('mail-google');
+        var status = document.getElementById('mail-status');
+        if (!to) return;
+        to.value = data.notifyEmail || '';
+        if (googleStatus) {
+          googleStatus.textContent = data.googleConnected
+            ? 'Enviando por ' + data.googleEmail
+            : 'Ainda sem Gmail conectado.';
+        }
+        if (googleBtn && data.googleConnected) googleBtn.textContent = 'Trocar conta do Gmail';
+        var flag = '';
+        try {
+          flag = new URLSearchParams(window.location.search).get('google') || '';
+        } catch (eFlag) {}
+        if (status && flag === 'ok') status.textContent = 'Gmail conectado. Salve o e-mail que recebe e envie um teste.';
+        if (status && flag === 'negado') status.textContent = 'Confirmação cancelada. Conecte de novo e aceite.';
+        if (status && flag === 'falha') status.textContent = 'Não foi possível conectar. Confira o endereço de retorno no Google Cloud e tente de novo.';
+        if (flag && window.history.replaceState) window.history.replaceState({}, '', '/painel.html');
+      })
+      .catch(function () {});
+  }
+
+  function salvarEmailAvisos(ev) {
+    ev.preventDefault();
+    var status = document.getElementById('mail-status');
+    var body = {
+      notifyEmail: document.getElementById('mail-to').value
+    };
+    if (status) status.textContent = 'Salvando…';
+    fetch('/api/admin/email', {
+      method: 'PUT',
+      credentials: 'include',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(body)
+    })
+      .then(function (res) {
+        return res.json().then(function (data) {
+          if (!res.ok) throw new Error(data.error || 'Não foi possível salvar.');
+          return data;
+        });
+      })
+      .then(function () {
+        if (status) status.textContent = 'Salvo. Os avisos vão para esse e-mail.';
+      })
+      .catch(function (err) {
+        if (status) status.textContent = err.message || 'Não foi possível salvar.';
+      });
+  }
+
+  function enviarTesteEmail() {
+    var status = document.getElementById('mail-status');
+    if (status) status.textContent = 'Enviando teste…';
+    fetch('/api/admin/email/teste', { method: 'POST', credentials: 'include' })
+      .then(function (res) {
+        return res.json().then(function (data) {
+          if (!res.ok) throw new Error(data.error || 'Não foi possível enviar.');
+          return data;
+        });
+      })
+      .then(function () {
+        if (status) status.textContent = 'Teste enviado para o e-mail que recebe.';
+      })
+      .catch(function (err) {
+        if (status) status.textContent = err.message || 'Não foi possível enviar o teste.';
+      });
   }
 
   function renderCalendario() {
@@ -1744,6 +1427,21 @@
         tryDeleteQuarto(elDelQuarto.getAttribute('data-quarto-delete'));
         return;
       }
+      var trocarId = ev.target.getAttribute('data-trocar-quarto');
+      if (trocarId) {
+        var selQuarto = document.getElementById('modal-trocar-quarto');
+        var novoQuarto = selQuarto ? selQuarto.value : '';
+        if (!novoQuarto || !SystemStore.trocarQuartoReserva) return;
+        SystemStore.trocarQuartoReserva(trocarId, novoQuarto)
+          .then(function () {
+            renderAll();
+            openModal(trocarId);
+          })
+          .catch(function (err) {
+            alert((err && err.message) || 'Não foi possível trocar o quarto.');
+          });
+        return;
+      }
       var confirmId = ev.target.getAttribute('data-confirm-reserva');
       if (confirmId) {
         if (!SystemStore.atualizarStatusReserva) return;
@@ -1759,7 +1457,8 @@
       }
       var cancelId = ev.target.getAttribute('data-cancel-reserva');
       if (cancelId) {
-        var ok = window.confirm('Deseja realmente cancelar esta reserva?');
+        var recusa = ev.target.getAttribute('data-recusa') === '1';
+        var ok = window.confirm(recusa ? 'Marcar como compra não confirmada?' : 'Deseja realmente cancelar esta reserva?');
         if (!ok) return;
         SystemStore.cancelarReserva(cancelId)
           .then(function () {
@@ -1825,7 +1524,19 @@
       }
     });
 
+    document.body.addEventListener('click', function (ev) {
+      if (ev.target && ev.target.id === 'mail-google') {
+        window.location.href = '/api/admin/email/google/start';
+        return;
+      }
+      if (ev.target && ev.target.id === 'mail-test') enviarTesteEmail();
+    });
+
     document.body.addEventListener('submit', function (ev) {
+      if (ev.target.id === 'form-email-avisos') {
+        salvarEmailAvisos(ev);
+        return;
+      }
       if (ev.target.id === 'form-bloqueio') {
         ev.preventDefault();
         var ini = document.getElementById('bloqueio-inicio').value;
@@ -1845,6 +1556,31 @@
         handleQuartoEditorSubmit();
       }
     });
+  }
+
+  function primeiroNomePainel(nome) {
+    var parte = String(nome || '').trim().split(/\s+/)[0] || 'cliente';
+    return parte.charAt(0).toUpperCase() + parte.slice(1);
+  }
+
+  function quartoTrocaHtml(reserva) {
+    var list = window.QUARTOS_SITE || [];
+    var opts = list
+      .map(function (q) {
+        var sel = String(q.id) === String(reserva.quartoId) ? ' selected' : '';
+        return '<option value="' + esc(q.id) + '"' + sel + '>' + esc(q.titulo || q.id) + '</option>';
+      })
+      .join('');
+    if (!opts) return '';
+    return (
+      '<label class="sys-ficha-status-wrap sys-ficha-detalhe__status-edit"><span>Trocar quarto</span>' +
+      '<select id="modal-trocar-quarto" class="sys-ficha-status-select">' +
+      opts +
+      '</select></label>' +
+      '<button type="button" class="sys-ficha-detalhe__btn" data-trocar-quarto="' +
+      esc(reserva.id) +
+      '">Trocar quarto</button>'
+    );
   }
 
   function openModal(id) {
@@ -1896,9 +1632,14 @@
       (st === 'pendente'
         ? '<button type="button" class="sys-ficha-detalhe__btn sys-ficha-detalhe__btn--confirm" data-confirm-reserva="' +
           esc(reserva.id) +
-          '">Confirmar reserva</button>'
-        : '') +
-      (reserva.status === 'cancelada'
+          '">Confirmar reserva de ' +
+          esc(primeiroNomePainel(reserva.nome)) +
+          '?</button>' +
+          quartoTrocaHtml(reserva) +
+          '<button type="button" class="sys-ficha-detalhe__btn sys-ficha-detalhe__btn--danger" data-cancel-reserva="' +
+          esc(reserva.id) +
+          '" data-recusa="1">Compra não foi confirmada</button>'
+        : reserva.status === 'cancelada'
         ? '<button type="button" class="sys-ficha-detalhe__btn sys-ficha-detalhe__btn--muted" disabled>reserva cancelada</button>'
         : '<button type="button" class="sys-ficha-detalhe__btn sys-ficha-detalhe__btn--danger" data-cancel-reserva="' +
           esc(reserva.id) +
@@ -1964,6 +1705,11 @@
       console.error('renderQuartos', e);
     }
     try {
+      renderEmail();
+    } catch (e) {
+      console.error('renderEmail', e);
+    }
+    try {
       setActiveTab(state.tab);
     } catch (e) {
       console.error('setActiveTab', e);
@@ -2001,7 +1747,7 @@
         var me = await fetch('/api/auth/me', { credentials: 'include' });
         if (!me.ok) {
           window.location.href =
-            '/login.html?next=' + encodeURIComponent(window.location.pathname || '/painel.html');
+            '/login.html?next=' + encodeURIComponent((window.location.pathname || '/painel.html') + window.location.search);
           return;
         }
       }
@@ -2012,6 +1758,18 @@
       console.error('Falha ao carregar painel:', errBoot);
       alert('Não foi possível carregar dados do servidor.');
     }
+    try {
+      if (new URLSearchParams(window.location.search).get('tab') === 'email') state.tab = 'email';
+    } catch (eTab) {}
     renderAll();
+    var pedidoId = '';
+    try {
+      pedidoId = new URLSearchParams(window.location.search).get('reserva') || '';
+    } catch (e) {}
+    if (pedidoId) {
+      state.tab = 'ficha';
+      setActiveTab('ficha');
+      openModal(pedidoId);
+    }
   })();
 })();
