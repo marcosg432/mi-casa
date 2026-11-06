@@ -10,8 +10,8 @@ Se já existir outro processo na **3014** (`pm2 list` / `sudo ss -tlnp | grep 30
 
 ```bash
 cd /var/www   # ou a pasta que preferires
-git clone https://github.com/worldakyra-collab/micasaeu.git
-cd mi-casa-su-casa
+git clone https://github.com/marcosg432/mi-casa.git
+cd mi-casa
 npm ci --omit=dev
 pm2 start ecosystem.config.cjs
 pm2 save

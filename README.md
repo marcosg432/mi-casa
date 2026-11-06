@@ -20,4 +20,4 @@ npm run pm2:start
 
 Ver [DEPLOY-HOSTINGER.md](./DEPLOY-HOSTINGER.md) para nginx, `git pull` e detalhes na Hostinger.
 
-Repositório: [github.com/worldakyra-collab/micasaeu](https://github.com/worldakyra-collab/micasaeu)
+Repositório: [github.com/marcosg432/mi-casa](https://github.com/marcosg432/mi-casa)
